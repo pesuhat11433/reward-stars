@@ -573,35 +573,67 @@
   }
 
   /* Sticker picker */
-  .sticker-grid {
-    display: grid;
-    grid-template-columns: repeat(8, 1fr);
-    gap: 6px;
-    max-height: 160px;
-    overflow-y: auto;
-    padding: 4px;
+  .sticker-picker-wrap {
     background: var(--surface-2);
     border-radius: var(--r);
+    overflow: hidden;
+  }
+  .sticker-tabs {
+    display: flex;
+    gap: 4px;
+    padding: 8px 8px 0;
+    background: var(--surface-2);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .sticker-tabs::-webkit-scrollbar { display: none; }
+  .sticker-tab-btn {
+    border: none;
+    background: transparent;
+    padding: 6px 10px;
+    border-radius: 8px 8px 0 0;
+    font-size: 18px;
+    cursor: pointer;
+    flex-shrink: 0;
+    opacity: 0.5;
+    transition: opacity 0.15s, background 0.15s;
+    font-family: inherit;
+  }
+  .sticker-tab-btn.active {
+    background: white;
+    opacity: 1;
+    box-shadow: 0 -1px 4px rgba(0,0,0,0.06);
+  }
+  .sticker-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+    max-height: 260px;
+    overflow-y: auto;
+    padding: 10px;
+    background: white;
+    border-radius: 0 0 var(--r) var(--r);
   }
   .sticker-opt {
     aspect-ratio: 1;
-    border-radius: 10px;
+    border-radius: 12px;
     border: 2px solid transparent;
-    background: white;
+    background: var(--surface-2);
     cursor: pointer;
-    font-size: 22px;
+    font-size: 28px;
     display: grid;
     place-items: center;
-    transition: transform 0.15s;
+    transition: transform 0.15s, border-color 0.15s, background 0.15s;
     font-family: inherit;
   }
-  .sticker-opt:hover { transform: scale(1.1); }
+  .sticker-opt:hover { transform: scale(1.15); background: white; }
   .sticker-opt.active {
     border-color: var(--ink);
     background: var(--sun-soft);
+    transform: scale(1.05);
   }
   @media (max-width: 480px) {
-    .sticker-grid { grid-template-columns: repeat(6, 1fr); }
+    .sticker-grid { grid-template-columns: repeat(5, 1fr); max-height: 220px; }
   }
 
   /* Color picker */
@@ -1039,6 +1071,132 @@
     white-space: nowrap;
   }
 
+  /* === Polaroid history cards === */
+  .polaroid-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    padding: 4px 2px 8px;
+  }
+  @media (min-width: 520px) {
+    .polaroid-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  .history-polaroid {
+    background: #fff;
+    border-radius: 3px;
+    padding: 8px 8px 34px;
+    box-shadow: 0 3px 14px rgba(0,0,0,0.18), 0 1px 3px rgba(0,0,0,0.1);
+    transform: rotate(var(--tilt, 0deg));
+    position: relative;
+    transition: transform 0.25s cubic-bezier(.34,1.56,.64,1), box-shadow 0.2s;
+    cursor: pointer;
+  }
+  .history-polaroid:hover {
+    transform: rotate(0deg) scale(1.04) translateY(-4px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.22);
+    z-index: 5;
+  }
+
+  .polaroid-photo-area {
+    width: 100%;
+    aspect-ratio: 1;
+    background: #f0f0f0;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin-bottom: 2px;
+  }
+  .polaroid-photo-area img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .polaroid-sticker-bg {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 52px;
+    background: linear-gradient(135deg, #FFF8F0, #FFF1CC);
+  }
+  .polaroid-icon-badge {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    background: white;
+    border-radius: 50%;
+    width: 26px;
+    height: 26px;
+    display: grid;
+    place-items: center;
+    font-size: 14px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  }
+
+  .polaroid-caption {
+    text-align: center;
+    padding: 4px 2px 0;
+  }
+  .polaroid-msg {
+    font-size: 11px;
+    font-weight: 700;
+    color: #2B2A33;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-bottom: 1px;
+    font-family: -apple-system, 'PingFang TC', sans-serif;
+  }
+  .polaroid-time {
+    font-size: 10px;
+    color: #aaa;
+    font-family: monospace;
+  }
+
+  .polaroid-save-btn {
+    position: absolute;
+    bottom: 5px;
+    right: 7px;
+    background: none;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    opacity: 0.35;
+    padding: 2px;
+    transition: opacity 0.18s, transform 0.15s;
+    font-family: inherit;
+    line-height: 1;
+  }
+  .polaroid-save-btn:hover { opacity: 1; transform: scale(1.2); }
+
+  /* Export all button row */
+  .polaroid-export-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 8px;
+  }
+  .polaroid-export-all-btn {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.25);
+    color: rgba(255,255,255,0.85);
+    border-radius: 100px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.18s;
+  }
+  .polaroid-export-all-btn:hover {
+    background: rgba(255,255,255,0.25);
+    color: #fff;
+  }
+
   /* Lightbox */
   .lightbox {
     position: fixed;
@@ -1293,7 +1451,7 @@
   }
 
   /* History inside cosmos */
-  .cosmos .history-day { margin-bottom: 14px; }
+  .cosmos .history-day { margin-bottom: 18px; }
   .cosmos .history-date {
     color: rgba(255,255,255,0.6);
     font-weight: 700;
@@ -1328,8 +1486,19 @@
     z-index: 250;
     overflow: hidden;
     display: none;
+    background: transparent;
   }
-  .stamp-anim.show { display: block; }
+  .stamp-anim.show {
+    display: block;
+    pointer-events: all;
+    cursor: pointer;
+    background: rgba(0, 0, 0, 0.72);
+    animation: anim-bg-in 0.35s ease forwards;
+  }
+  @keyframes anim-bg-in {
+    from { background: rgba(0,0,0,0); }
+    to   { background: rgba(0,0,0,0.72); }
+  }
   .stamp-anim-center {
     position: absolute;
     top: 50%;
@@ -1337,9 +1506,9 @@
     transform: translate(-50%, -50%);
   }
   .stamp-anim-sticker {
-    font-size: 96px;
+    font-size: 120px;
     animation: stamp-pop 1.4s cubic-bezier(.34, 1.56, .64, 1);
-    text-shadow: 0 0 32px rgba(255,255,255,0.6);
+    text-shadow: 0 0 48px rgba(255,255,255,0.9), 0 0 80px rgba(255,255,255,0.5);
   }
   @keyframes stamp-pop {
     0% { transform: scale(0) rotate(-20deg); opacity: 0; }
@@ -1761,6 +1930,7 @@
     </div>
     <div style="display:flex; align-items:center; gap:8px;">
       <button class="lib-button" id="libBtn" title="我的圖庫">🖼️</button>
+      <button class="lib-button" id="backupBtn" title="備份 / 還原資料">💾</button>
       <div class="tabs" role="tablist">
         <button class="tab-btn active" data-tab="cards">獎勵卡</button>
         <button class="tab-btn" data-tab="history">小寶盒</button>
@@ -1824,6 +1994,66 @@ const STICKERS = [
   '🎁','🍩','🍭','🧁','🍪','🌻','🌺','🍀',
   '⚽','🏀','🚗','✈️','🚀','🎵','🎨','📚'
 ];
+
+// Sticker category maps for the picker tabs
+const STICKER_CATS_MAP = {
+  star:   new Set(['⭐','❤️','🌟','✨','🌈','🎀','🌸','🍀','🌺','🌻','💫','💕','💖','🎊','🎉','🎈']),
+  animal: new Set(['🦋','🐱','🐶','🐰','🦄','🐻','🐼','🐨','🦊','🐯','🐮','🐷','🐸','🐧','🐤','🦁','🐵']),
+  food:   new Set(['🍓','🍩','🍭','🧁','🍪','🍰','🍦','🎂','🍎','🍊','🍇','🍉']),
+  sport:  new Set(['⚽','🏀','🚗','✈️','🚀','🎵','🎨','📚','🎮','🛼','🏆','🎪','🎠']),
+  party:  new Set(['🎈','🎁','🎊','🎉','🎆','🎇','🧨','🪄','🎀','🎂']),
+};
+
+// Upgrade a plain .sticker-grid into a tabbed picker
+function upgradeStickerGrid(gridId) {
+  const grid = document.getElementById(gridId);
+  if (!grid || grid.parentNode.classList.contains('sticker-picker-wrap')) return;
+
+  const items = grid.querySelectorAll('.sticker-opt');
+  const hasImages = [...items].some(it => it.querySelector('img'));
+
+  const catDefs = [
+    { id: 'all',    icon: '🌟', label: '全部',  keys: null },
+    { id: 'star',   icon: '⭐', label: '閃亮',  keys: STICKER_CATS_MAP.star },
+    { id: 'animal', icon: '🐱', label: '動物',  keys: STICKER_CATS_MAP.animal },
+    { id: 'food',   icon: '🍩', label: '美食',  keys: STICKER_CATS_MAP.food },
+    { id: 'sport',  icon: '⚽', label: '活動',  keys: STICKER_CATS_MAP.sport },
+    { id: 'party',  icon: '🎉', label: '節慶',  keys: STICKER_CATS_MAP.party },
+  ];
+  if (hasImages) catDefs.push({ id: 'image', icon: '🖼️', label: '圖庫', keys: 'image' });
+
+  const wrap = document.createElement('div');
+  wrap.className = 'sticker-picker-wrap';
+
+  const tabs = document.createElement('div');
+  tabs.className = 'sticker-tabs';
+
+  catDefs.forEach((cat, i) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'sticker-tab-btn' + (i === 0 ? ' active' : '');
+    btn.textContent = cat.icon;
+    btn.title = cat.label;
+    btn.onclick = () => {
+      tabs.querySelectorAll('.sticker-tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      items.forEach(item => {
+        if (cat.keys === null) {
+          item.style.display = '';
+        } else if (cat.keys === 'image') {
+          item.style.display = item.querySelector('img') ? '' : 'none';
+        } else {
+          item.style.display = cat.keys.has(item.dataset.v) ? '' : 'none';
+        }
+      });
+    };
+    tabs.appendChild(btn);
+  });
+
+  grid.parentNode.insertBefore(wrap, grid);
+  wrap.appendChild(tabs);
+  wrap.appendChild(grid);
+}
 
 const AVATARS = [
   '🐻','🐱','🐶','🐰','🦊','🐼','🐨','🦁',
@@ -2080,10 +2310,19 @@ function playStampAnimation(sticker, theme) {
     animFireworks(overlay, sticker);
   }
 
-  setTimeout(() => {
+  // Click anywhere to dismiss early
+  overlay.onclick = () => {
     overlay.classList.remove('show');
     overlay.innerHTML = '';
-  }, 1800);
+  };
+
+  const timer = setTimeout(() => {
+    overlay.classList.remove('show');
+    overlay.innerHTML = '';
+  }, 2400);
+
+  // Cancel auto-dismiss if user clicked
+  overlay.addEventListener('click', () => clearTimeout(timer), { once: true });
 }
 
 function makeCenterSticker(sticker) {
@@ -2671,22 +2910,27 @@ function renderHistory() {
 
         <div class="vault-section-title">活動歷程</div>
 
-        <div class="history-filters">
-          <button class="filter-chip ${historyFilter==='all'?'active':''}" data-f="all">全部</button>
-          <button class="filter-chip ${historyFilter==='stamp'?'active':''}" data-f="stamp">集點</button>
-          <button class="filter-chip ${historyFilter==='redeem'?'active':''}" data-f="redeem">兌換</button>
-          <button class="filter-chip ${historyFilter==='theme'?'active':''}" data-f="theme">主題變更</button>
+        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+          <div class="history-filters" style="margin-bottom:0;">
+            <button class="filter-chip ${historyFilter==='all'?'active':''}" data-f="all">全部</button>
+            <button class="filter-chip ${historyFilter==='stamp'?'active':''}" data-f="stamp">集點</button>
+            <button class="filter-chip ${historyFilter==='redeem'?'active':''}" data-f="redeem">兌換</button>
+            <button class="filter-chip ${historyFilter==='theme'?'active':''}" data-f="theme">主題變更</button>
+          </div>
+          <button class="polaroid-export-all-btn" onclick="exportAllPolaroids()">📥 全部匯出</button>
         </div>
 
         ${days.length === 0 ? `
           <div class="vault-empty" style="padding:18px 12px;">
-            <div style="font-size:34px; margin-bottom:6px;">📖</div>
-            <div class="vault-empty-text">這個時段還沒有紀錄</div>
+            <div style="font-size:34px; margin-bottom:6px;">📸</div>
+            <div class="vault-empty-text">還沒有拍立得記錄</div>
           </div>
         ` : days.map(day => `
           <div class="history-day">
             <div class="history-date">${formatDayHeader(day)}</div>
-            ${groups[day].map(renderHistoryItem).join('')}
+            <div class="polaroid-grid">
+              ${groups[day].map(renderHistoryItem).join('')}
+            </div>
           </div>
         `).join('')}
       </div>
@@ -2817,6 +3061,7 @@ function openEditTrophy(tid) {
     fileInput.value = '';
   };
 
+  upgradeStickerGrid('editEmojiGrid');
   document.querySelectorAll('#editEmojiGrid .sticker-opt').forEach(b => {
     b.onclick = () => {
       document.querySelectorAll('#editEmojiGrid .sticker-opt').forEach(x => x.classList.remove('active'));
@@ -2852,66 +3097,192 @@ function renderHistoryItem(h) {
   const t = state.themes.find(tt => tt.id === h.themeId);
   const kid = state.kids.find(k => k.id === (h.kidId || (t && t.kidId)));
   const kidName = kid ? kid.name : '';
-  let icon = '🔹', iconClass = 'create', msg = '', extra = '', thumb = '';
+  let icon = '🔹', msg = '', caption = '', photo = '';
+
   switch (h.type) {
     case 'stamp':
-      icon = h.sticker || (t && t.sticker) || '⭐'; iconClass = 'stamp';
-      msg = `${kidName} 完成「${h.themeTitle || (t && t.title) || '主題'}」（第 ${h.pointAt} 點）`;
-      if (h.reason) extra = h.reason;
-      if (h.photo) thumb = `<img class="history-thumb" src="${h.photo}" alt="紀念照">`;
+      icon = h.sticker || (t && t.sticker) || '⭐';
+      msg = h.reason || `${kidName}集點 · 第${h.pointAt}點`;
+      caption = h.reason ? `${kidName} 第${h.pointAt}點` : '';
+      if (h.photo) photo = h.photo;
       break;
     case 'unstamp':
-      icon = '↩️'; iconClass = 'unstamp';
-      msg = `撤銷 ${kidName} 的「${h.themeTitle || (t && t.title) || '主題'}」一個章`;
+      icon = '↩️';
+      msg = `撤銷章 · ${kidName}`;
       break;
     case 'redeem':
-      icon = h.trophyEmoji || '🎁'; iconClass = 'redeem';
-      msg = `${kidName} 集滿「${h.themeTitle || (t && t.title) || '主題'}」入手寶物：${h.reward || '獎勵'}`;
-      if (h.trophyPhoto) thumb = `<img class="history-thumb" src="${h.trophyPhoto}" alt="寶物">`;
+      icon = h.trophyEmoji || '🎁';
+      msg = `${kidName} 兌換了「${h.reward || '寶物'}」🎉`;
+      if (h.trophyPhoto) photo = h.trophyPhoto;
       break;
     case 'create_theme':
-      icon = '✨'; iconClass = 'create';
-      msg = `新增主題：${h.themeTitle}（目標 ${h.goal} 點）`;
+      icon = '✨';
+      msg = `新主題：${h.themeTitle}`;
       break;
     case 'delete_theme':
-      icon = '🗑️'; iconClass = 'delete';
+      icon = '🗑️';
       msg = `刪除主題：${h.themeTitle}`;
       break;
     case 'reset_theme':
-      icon = '🔄'; iconClass = 'unstamp';
-      msg = `重設主題：${h.themeTitle}`;
+      icon = '🔄';
+      msg = `重設：${h.themeTitle}`;
       break;
     case 'edit_theme':
-      icon = '✏️'; iconClass = 'create';
-      msg = `更新主題：${h.themeTitle}`;
+      icon = '✏️';
+      msg = `更新：${h.themeTitle}`;
       break;
     case 'create_kid':
-      icon = (kid && kid.avatar) || '👶'; iconClass = 'kid';
-      msg = `新增小朋友：${h.kidName}`;
+      icon = (kid && kid.avatar) || '👶';
+      msg = `新增 ${h.kidName}`;
       break;
     case 'delete_kid':
-      icon = '👋'; iconClass = 'delete';
-      msg = `移除小朋友：${h.kidName}`;
+      icon = '👋';
+      msg = `移除 ${h.kidName}`;
       break;
     case 'edit_kid':
-      icon = (kid && kid.avatar) || '✏️'; iconClass = 'kid';
-      msg = `編輯小朋友：${h.kidName}`;
+      icon = (kid && kid.avatar) || '✏️';
+      msg = `編輯 ${h.kidName}`;
       break;
   }
+
   const d = new Date(h.timestamp);
   const hh = String(d.getHours()).padStart(2, '0');
   const mm = String(d.getMinutes()).padStart(2, '0');
+  // Gentle tilt: deterministic from timestamp
+  const tilt = ((h.timestamp % 9) - 4) * 0.55;
+
+  const photoArea = photo
+    ? `<img src="${escapeAttr(photo)}" alt="">
+       <div class="polaroid-icon-badge">${renderStickerHTML(icon, {size:14})}</div>`
+    : `<div class="polaroid-sticker-bg">${renderStickerHTML(icon, {size:'56px'})}</div>`;
+
+  const displayMsg = msg;
+  const subMsg = caption;
+
   return `
-    <div class="history-item">
-      <div class="history-icon ${iconClass}">${renderStickerHTML(icon, {size:'80%'})}</div>
-      <div class="history-text">
-        <div class="history-msg">${escapeHtml(msg)}</div>
-        ${extra ? `<div class="history-reason">💭 ${escapeHtml(extra)}</div>` : ''}
-        <div class="history-time">${hh}:${mm}</div>
+    <div class="history-polaroid" style="--tilt:${tilt}deg"
+         data-sticker="${escapeAttr(icon)}"
+         data-photo="${escapeAttr(photo)}"
+         data-msg="${escapeAttr(displayMsg)}"
+         data-sub="${escapeAttr(subMsg)}"
+         data-time="${escapeAttr(hh+':'+mm)}">
+      <div class="polaroid-photo-area">
+        ${photoArea}
       </div>
-      ${thumb}
+      <div class="polaroid-caption">
+        <div class="polaroid-msg">${escapeHtml(displayMsg)}</div>
+        ${subMsg ? `<div class="polaroid-time">${escapeHtml(subMsg)} · ${hh}:${mm}</div>` : `<div class="polaroid-time">${hh}:${mm}</div>`}
+      </div>
+      <button class="polaroid-save-btn" title="儲存為拍立得圖片" onclick="event.stopPropagation(); exportPolaroid(this)">💾</button>
     </div>
   `;
+}
+
+// ---- Polaroid export functions ----
+function exportPolaroid(btn) {
+  const card = btn.closest('.history-polaroid');
+  const photo = card.dataset.photo;
+  const msg   = card.dataset.msg;
+  const time  = card.dataset.time;
+  const sticker = card.dataset.sticker;
+
+  const PAD = 22, SIZE = 380, CAPTION_H = 84;
+  const W = SIZE + PAD * 2, H = SIZE + CAPTION_H + PAD * 2;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  const render = (photoImg) => {
+    // White background
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, W, H);
+
+    // Photo area fill
+    ctx.fillStyle = '#f0ece6';
+    ctx.fillRect(PAD, PAD, SIZE, SIZE);
+
+    if (photoImg) {
+      const s = Math.min(photoImg.width, photoImg.height);
+      const sx = (photoImg.width - s) / 2, sy = (photoImg.height - s) / 2;
+      ctx.drawImage(photoImg, sx, sy, s, s, PAD, PAD, SIZE, SIZE);
+    } else {
+      // Gradient background + sticker
+      const grad = ctx.createLinearGradient(PAD, PAD, PAD + SIZE, PAD + SIZE);
+      grad.addColorStop(0, '#FFF8F0');
+      grad.addColorStop(1, '#FEF0CC');
+      ctx.fillStyle = grad;
+      ctx.fillRect(PAD, PAD, SIZE, SIZE);
+      ctx.font = `${Math.round(SIZE * 0.36)}px serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(sticker, W / 2, PAD + SIZE / 2);
+    }
+
+    // Caption region
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, PAD + SIZE, W, CAPTION_H + PAD);
+
+    // Subtle divider
+    ctx.strokeStyle = '#e8e4de';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(PAD, PAD + SIZE + 14);
+    ctx.lineTo(W - PAD, PAD + SIZE + 14);
+    ctx.stroke();
+
+    // Message
+    ctx.fillStyle = '#2B2A33';
+    ctx.font = `bold 17px -apple-system, "PingFang TC", sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'alphabetic';
+    let msgText = msg;
+    const maxTW = SIZE - 8;
+    while (ctx.measureText(msgText + '…').width > maxTW && msgText.length > 1) {
+      msgText = msgText.slice(0, -1);
+    }
+    if (msgText !== msg) msgText += '…';
+    ctx.fillText(msgText, W / 2, PAD + SIZE + 42);
+
+    // Time
+    ctx.fillStyle = '#bbb';
+    ctx.font = `13px monospace`;
+    ctx.fillText(time, W / 2, PAD + SIZE + 64);
+
+    // Branding watermark
+    ctx.fillStyle = '#d8d4ce';
+    ctx.font = `11px -apple-system, "PingFang TC", sans-serif`;
+    ctx.fillText('集點寶貝 ✦ Reward Stars', W / 2, H - 9);
+
+    const link = document.createElement('a');
+    link.download = `集點寶貝-${Date.now()}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  };
+
+  if (photo) {
+    const img = new Image();
+    img.onload = () => render(img);
+    img.onerror = () => render(null);
+    img.src = photo;
+  } else {
+    render(null);
+  }
+}
+
+function exportAllPolaroids() {
+  const cards = [...document.querySelectorAll('.history-polaroid')];
+  if (!cards.length) { toast('沒有紀錄可以匯出'); return; }
+  toast(`開始匯出 ${cards.length} 張拍立得…`);
+  let i = 0;
+  const next = () => {
+    if (i >= cards.length) return;
+    const btn = cards[i].querySelector('.polaroid-save-btn');
+    if (btn) exportPolaroid(btn);
+    i++;
+    setTimeout(next, 350);
+  };
+  next();
 }
 
 // ---- Actions ----
@@ -3059,6 +3430,9 @@ function openStampDialog(tid) {
   `);
 
   const titleEl = document.querySelector('.modal-title');
+
+  // Upgrade sticker grid with category tabs
+  upgradeStickerGrid('stampStickerGrid');
 
   // Sticker picker
   function setSticker(s) {
@@ -3468,6 +3842,7 @@ function openRedeemDialog(tid) {
   };
 
   // Emoji picker
+  upgradeStickerGrid('rewardEmojiGrid');
   document.querySelectorAll('#rewardEmojiGrid .sticker-opt').forEach(b => {
     b.onclick = () => {
       document.querySelectorAll('#rewardEmojiGrid .sticker-opt').forEach(x => x.classList.remove('active'));
@@ -3732,6 +4107,7 @@ function openThemeEditor(tid) {
   });
 
   // Sticker handlers
+  upgradeStickerGrid('stickerGrid');
   document.querySelectorAll('#stickerGrid .sticker-opt').forEach(b => {
     b.onclick = () => {
       document.querySelectorAll('#stickerGrid .sticker-opt').forEach(x => x.classList.remove('active'));
@@ -3785,6 +4161,7 @@ function openThemeEditor(tid) {
         sticker: draft.sticker || '⭐',
         color: draft.color,
         startDate, endDate,
+        stamps: [],
         points: 0,
         redeemedAt: null,
         createdAt: Date.now(),
@@ -3868,6 +4245,141 @@ document.getElementById('fab').onclick = () => {
 
 // ---- Library button ----
 document.getElementById('libBtn').onclick = openLibrary;
+
+// ---- Backup / Restore ----
+function openBackupModal() {
+  const kids = state.kids.length;
+  const themes = state.themes.length;
+  const stamps = state.themes.reduce((s, t) => s + (t.stamps ? t.stamps.length : 0), 0);
+  const bytes = JSON.stringify(state).length;
+  const kb = (bytes / 1024).toFixed(1);
+  const d = new Date();
+  const dateStr = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+
+  openModal(`
+    <div class="modal-handle"></div>
+    <div class="modal-title">💾 備份 & 還原</div>
+    <div class="modal-sub">資料存在這台裝置的瀏覽器裡，換瀏覽器或清除快取就需要重新匯入</div>
+
+    <div style="background:var(--surface-2); border-radius:var(--r); padding:14px 16px; margin-bottom:18px;">
+      <div style="font-size:13px; color:var(--ink-soft); margin-bottom:8px; font-weight:700;">目前的資料</div>
+      <div style="display:flex; gap:16px; flex-wrap:wrap;">
+        <span style="font-size:13px;">👶 ${kids} 位小朋友</span>
+        <span style="font-size:13px;">📋 ${themes} 個主題</span>
+        <span style="font-size:13px;">⭐ ${stamps} 個集點</span>
+        <span style="font-size:13px; color:var(--ink-faint);">${kb} KB</span>
+      </div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:18px;">
+      <button class="btn btn-primary" id="doExport" style="justify-content:center; display:flex; align-items:center; gap:8px;">
+        📤 匯出備份檔（.json）
+      </button>
+      <label class="btn" style="background:var(--mint-soft); color:#2C8262; justify-content:center; display:flex; align-items:center; gap:8px; cursor:pointer;">
+        📥 匯入備份檔
+        <input type="file" id="importFile" accept=".json" style="display:none">
+      </label>
+    </div>
+
+    <div style="background:#FFF8F0; border-radius:var(--r); padding:12px 14px; font-size:12px; color:var(--ink-soft); line-height:1.6;">
+      💡 <strong>小提示：</strong>建議定期匯出備份，或換裝置/瀏覽器前先匯出，再在新瀏覽器裡匯入。照片和自訂圖庫也會一起備份。
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-cancel" id="backupClose">關閉</button>
+    </div>
+  `);
+
+  document.getElementById('backupClose').onclick = closeModal;
+
+  document.getElementById('doExport').onclick = async () => {
+    try {
+      const backup = {
+        _app: '集點寶貝 Reward Stars',
+        _version: 2,
+        _exportedAt: new Date().toISOString(),
+        state,
+        customLib,
+      };
+      const json = JSON.stringify(backup, null, 2);
+      const fileName = `集點寶貝備份-${dateStr}.json`;
+
+      // iOS Safari: use Web Share API with file if available
+      if (navigator.canShare) {
+        const file = new File([json], fileName, { type: 'application/json' });
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file], title: '集點寶貝備份' });
+          return;
+        }
+      }
+
+      // Standard download (desktop / Android)
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      toast('備份已下載！');
+    } catch(e) {
+      if (e.name !== 'AbortError') toast('匯出失敗：' + (e.message || e));
+    }
+  };
+
+  document.getElementById('importFile').onchange = async (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const backup = JSON.parse(text);
+      // Basic validation
+      if (!backup.state || !backup.state.kids || !backup.state.themes) {
+        toast('檔案格式不對，請選擇集點寶貝備份檔');
+        return;
+      }
+      // Run migration on imported state
+      (backup.state.themes || []).forEach(t => {
+        if (!Array.isArray(t.stamps)) {
+          t.stamps = Array.from({ length: Math.max(0, t.points || 0) }, (_, i) => ({
+            id: uid('s'), at: (t.createdAt || Date.now()) + i * 60000,
+            sticker: t.sticker || '⭐',
+          }));
+        }
+        t.points = t.stamps.length;
+      });
+      // Confirm before overwriting
+      closeModal();
+      setTimeout(() => {
+        openConfirm({
+          icon: '📥',
+          title: '確定要匯入備份？',
+          text: `將會覆蓋現有的 ${kids} 位小朋友、${themes} 個主題的資料`,
+          confirmLabel: '確定匯入',
+          danger: true,
+          onConfirm: () => {
+            state = backup.state;
+            if (backup.customLib) {
+              customLib = backup.customLib;
+              localStorage.setItem(LIBRARY_KEY, JSON.stringify(customLib));
+            }
+            saveState();
+            closeModal();
+            render();
+            toast('✅ 匯入成功！');
+          }
+        });
+      }, 150);
+    } catch(e) {
+      toast('讀取失敗：' + (e.message || '格式錯誤'));
+    }
+    e.target.value = '';
+  };
+}
+
+document.getElementById('backupBtn').onclick = openBackupModal;
 
 // ---- Initial library + render ----
 loadCustomLib();
