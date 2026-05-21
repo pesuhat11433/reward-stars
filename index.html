@@ -2272,32 +2272,55 @@ function saveCustomLib() {
 
 // Load bundled manifest — first try inline data, then fetch assets/manifest.json
 async function loadManifest() {
-  const norm = (arr) => Array.isArray(arr)
+  // Compute base path for the manifest (everything before /manifest.json)
+  // e.g. 'assets/manifest.json' → 'assets/'
+  const manifestBase = MANIFEST_URL.replace(/manifest\.json.*$/, '');
+
+  // Resolve a path inside the manifest: prepend manifestBase unless it's already absolute
+  function resolvePath(p, base) {
+    if (!p || typeof p !== 'string') return p;
+    if (p.startsWith('data:') || p.startsWith('http://') || p.startsWith('https://') || p.startsWith('/')) return p;
+    if (p.startsWith(base)) return p; // already prefixed
+    return base + p;
+  }
+
+  const norm = (arr, base) => Array.isArray(arr)
     ? arr.map((item, i) => {
-        if (typeof item === 'string') return { id: 'b_' + i + '_' + item.replace(/[^a-z0-9]/gi,''), src: item, source: 'bundled' };
-        return { id: 'b_' + (item.id || i), src: item.src, label: item.label, source: 'bundled' };
+        if (typeof item === 'string') return { id: 'b_' + i + '_' + item.replace(/[^a-z0-9]/gi,''), src: resolvePath(item, base), source: 'bundled' };
+        return { id: 'b_' + (item.id || i), src: resolvePath(item.src, base), label: item.label, source: 'bundled' };
       }).filter(x => x.src)
     : [];
 
+  function normIllustrations(illust, base) {
+    const out = {};
+    if (illust && typeof illust === 'object') {
+      for (const [k, v] of Object.entries(illust)) {
+        out[k] = resolvePath(v, base);
+      }
+    }
+    return out;
+  }
+
   // Inline data (when images are embedded in the HTML itself)
+  // Inline images already have absolute data: URLs, so base is empty.
   if (window.__BUNDLED_MANIFEST__) {
     const data = window.__BUNDLED_MANIFEST__;
-    bundledLib.stickers = norm(data.stickers);
-    bundledLib.avatars = norm(data.avatars);
-    bundledLib.trophies = norm(data.trophies);
-    bundledLib.illustrations = (data.illustrations && typeof data.illustrations === 'object') ? data.illustrations : {};
+    bundledLib.stickers = norm(data.stickers, '');
+    bundledLib.avatars = norm(data.avatars, '');
+    bundledLib.trophies = norm(data.trophies, '');
+    bundledLib.illustrations = normIllustrations(data.illustrations, '');
     return true;
   }
 
-  // Otherwise fetch from assets/manifest.json
+  // Otherwise fetch from assets/manifest.json — prefix paths with assets/
   try {
     const res = await fetch(MANIFEST_URL, { cache: 'no-store' });
     if (!res.ok) return false;
     const data = await res.json();
-    bundledLib.stickers = norm(data.stickers);
-    bundledLib.avatars = norm(data.avatars);
-    bundledLib.trophies = norm(data.trophies);
-    bundledLib.illustrations = (data.illustrations && typeof data.illustrations === 'object') ? data.illustrations : {};
+    bundledLib.stickers = norm(data.stickers, manifestBase);
+    bundledLib.avatars = norm(data.avatars, manifestBase);
+    bundledLib.trophies = norm(data.trophies, manifestBase);
+    bundledLib.illustrations = normIllustrations(data.illustrations, manifestBase);
     return true;
   } catch(e) {
     console.info('No bundled manifest found (this is OK):', e.message);
