@@ -5,33 +5,40 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>集點寶貝 · 小朋友獎勵卡</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #FBF7F2;
+    --bg: #F4EEE0;
     --surface: #FFFFFF;
-    --surface-2: #FFF8F0;
-    --ink: #2B2A33;
-    --ink-soft: #6B6975;
-    --ink-faint: #A8A5B0;
-    --line: #EFEAE2;
-    --line-soft: #F5F1EA;
-    --primary: #FF8FA3;
-    --primary-soft: #FFE4E9;
-    --mint: #8DD9C0;
-    --mint-soft: #DCF3EB;
-    --sun: #FFD66B;
-    --sun-soft: #FFF1CC;
-    --sky: #9BC9F2;
-    --sky-soft: #E2EFFB;
-    --lilac: #C7B0E6;
-    --lilac-soft: #EEE5FA;
-    --danger: #FF6B6B;
-    --shadow: 0 2px 8px rgba(43, 42, 51, 0.04), 0 8px 24px rgba(43, 42, 51, 0.06);
-    --shadow-lg: 0 4px 16px rgba(43, 42, 51, 0.06), 0 20px 40px rgba(43, 42, 51, 0.1);
-    --r-sm: 10px;
-    --r: 16px;
-    --r-lg: 22px;
-    --r-xl: 28px;
+    --surface-2: #FCF7EA;
+    --ink: #221F2E;
+    --ink-soft: #6F6A78;
+    --ink-faint: #A9A398;
+    --line: #EAE0C8;
+    --line-soft: #F2EBD9;
+    --primary: #FF6A39;
+    --primary-soft: #FFE0D0;
+    --mint: #B7D42A;
+    --mint-soft: #EDF4C6;
+    --sun: #FFB23F;
+    --sun-soft: #FFEACB;
+    --sky: #A9C6F5;
+    --sky-soft: #E8F0FD;
+    --lilac: #B49BE8;
+    --lilac-soft: #EDE4FB;
+    --pink: #FF4FA0;
+    --pink-soft: #FFE0EF;
+    --danger: #FF5A5A;
+    --shadow: 0 2px 8px rgba(34, 31, 46, 0.05), 0 8px 24px rgba(34, 31, 46, 0.07);
+    --shadow-lg: 0 4px 16px rgba(34, 31, 46, 0.07), 0 20px 40px rgba(34, 31, 46, 0.12);
+    --r-sm: 12px;
+    --r: 18px;
+    --r-lg: 24px;
+    --r-xl: 30px;
+    --font-display: 'Fredoka', -apple-system, "PingFang TC", "Microsoft JhengHei", sans-serif;
+    --font-body: 'Nunito', -apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", "Segoe UI", system-ui, sans-serif;
   }
 
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -41,20 +48,19 @@
     padding: 0;
     background: var(--bg);
     color: var(--ink);
-    font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", "Segoe UI", system-ui, sans-serif;
+    font-family: var(--font-body);
     font-size: 16px;
     line-height: 1.5;
+    font-weight: 600;
     -webkit-font-smoothing: antialiased;
     overscroll-behavior-y: contain;
   }
 
   body {
     min-height: 100vh;
-    background:
-      radial-gradient(ellipse at top left, #FFEEF1 0%, transparent 45%),
-      radial-gradient(ellipse at bottom right, #E2EFFB 0%, transparent 45%),
-      var(--bg);
+    background: var(--bg);
     background-attachment: fixed;
+    position: relative;
   }
 
   .app {
@@ -63,6 +69,7 @@
     min-height: 100vh;
     padding: 20px 18px 120px;
     position: relative;
+    z-index: 1;
   }
 
   /* === Header === */
@@ -78,24 +85,28 @@
     gap: 10px;
   }
   .brand-icon {
-    width: 38px;
-    height: 38px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #FFB5BA, #FFD66B);
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), var(--sun));
     display: grid;
     place-items: center;
-    box-shadow: 0 4px 12px rgba(255, 143, 163, 0.35);
+    box-shadow: 0 4px 14px rgba(255, 106, 57, 0.4);
+    border: 3px solid var(--surface);
   }
   .brand-title {
-    font-size: 20px;
-    font-weight: 800;
-    letter-spacing: -0.5px;
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+    color: var(--ink);
   }
   .brand-sub {
     font-size: 11px;
     color: var(--ink-faint);
     letter-spacing: 1.5px;
     margin-top: -2px;
+    font-weight: 800;
   }
 
   /* === Tab Bar === */
@@ -106,22 +117,24 @@
     padding: 4px;
     box-shadow: var(--shadow);
     gap: 2px;
+    border: 2px solid var(--line);
   }
   .tab-btn {
     border: none;
     background: transparent;
     padding: 8px 16px;
     font-size: 14px;
-    font-weight: 700;
+    font-weight: 800;
     color: var(--ink-soft);
     border-radius: 100px;
     cursor: pointer;
     transition: all 0.2s;
-    font-family: inherit;
+    font-family: var(--font-display);
   }
   .tab-btn.active {
-    background: var(--ink);
+    background: var(--primary);
     color: #fff;
+    box-shadow: 0 3px 10px rgba(255, 106, 57, 0.35);
   }
 
   /* === Kid Selector === */
@@ -146,10 +159,11 @@
     cursor: pointer;
     flex-shrink: 0;
     transition: all 0.2s;
-    border: 2px solid transparent;
+    border: 2px solid var(--line);
   }
   .kid-chip.active {
-    border-color: var(--ink);
+    border-color: var(--primary);
+    background: var(--primary-soft);
     transform: translateY(-2px);
   }
   .kid-avatar {
@@ -159,31 +173,34 @@
     display: grid;
     place-items: center;
     font-size: 20px;
-    background: var(--primary-soft);
+    background: var(--sun-soft);
+    border: 2px solid var(--surface);
     flex-shrink: 0;
   }
   .kid-name {
-    font-weight: 700;
+    font-weight: 800;
     font-size: 14px;
     white-space: nowrap;
+    font-family: var(--font-display);
   }
   .kid-chip.add {
     padding: 8px 14px;
     color: var(--ink-soft);
-    border: 2px dashed var(--line);
+    border: 2px dashed var(--ink-faint);
     background: transparent;
     box-shadow: none;
   }
-  .kid-chip.add:hover { color: var(--ink); border-color: var(--ink-soft); }
+  .kid-chip.add:hover { color: var(--primary); border-color: var(--primary); }
 
   /* === Welcome / Empty State === */
   .empty-state {
     text-align: center;
     padding: 50px 24px;
     background: var(--surface);
-    border-radius: var(--r-lg);
+    border-radius: var(--r-xl);
     box-shadow: var(--shadow);
     margin-top: 16px;
+    border: 2px dashed var(--line);
   }
   .empty-illust {
     width: 140px;
@@ -191,14 +208,16 @@
     margin: 0 auto 16px;
   }
   .empty-title {
-    font-size: 18px;
-    font-weight: 800;
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 600;
     margin-bottom: 6px;
   }
   .empty-text {
     color: var(--ink-soft);
     font-size: 14px;
     margin-bottom: 20px;
+    font-weight: 700;
   }
 
   /* === Theme Cards === */
@@ -210,18 +229,19 @@
   }
   .theme-card {
     background: var(--surface);
-    border-radius: var(--r-lg);
+    border-radius: var(--r-xl);
     padding: 18px;
     box-shadow: var(--shadow);
     position: relative;
     overflow: hidden;
     transition: transform 0.2s;
+    border: 2px solid var(--line);
   }
   .theme-card::before {
     content: '';
     position: absolute;
     top: 0; left: 0; right: 0;
-    height: 4px;
+    height: 6px;
     background: var(--theme-color, var(--primary));
   }
   .theme-card.completed {
@@ -246,18 +266,21 @@
     min-width: 0;
   }
   .theme-sticker-big {
-    width: 48px;
-    height: 48px;
-    border-radius: 14px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
     background: var(--theme-color-soft, var(--primary-soft));
     display: grid;
     place-items: center;
     font-size: 26px;
     flex-shrink: 0;
+    border: 2px solid var(--surface);
+    box-shadow: var(--shadow);
   }
   .theme-title {
-    font-size: 17px;
-    font-weight: 800;
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 600;
     margin-bottom: 2px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -294,9 +317,9 @@
   .stamp-grid.size-20 { grid-template-columns: repeat(5, 1fr); }
   .stamp-cell {
     aspect-ratio: 1;
-    border-radius: 12px;
+    border-radius: 50%;
     background: var(--line-soft);
-    border: 2px dashed var(--line);
+    border: 2px dashed var(--ink-faint);
     display: grid;
     place-items: center;
     font-size: 20px;
@@ -307,7 +330,7 @@
   }
   .stamp-cell.filled {
     background: var(--theme-color-soft, var(--primary-soft));
-    border: 2px solid var(--theme-color, var(--primary));
+    border: 3px solid var(--theme-color, var(--primary));
     animation: pop 0.4s cubic-bezier(.34, 1.56, .64, 1);
   }
   .stamp-cell.has-photo {
@@ -364,26 +387,28 @@
   }
   .progress-text {
     font-size: 13px;
-    font-weight: 700;
+    font-weight: 800;
     color: var(--ink-soft);
   }
   .progress-text strong {
+    font-family: var(--font-display);
     color: var(--theme-color, var(--primary));
-    font-size: 16px;
+    font-size: 17px;
   }
   .date-pill {
     font-size: 11px;
+    font-weight: 800;
     color: var(--ink-faint);
     background: var(--line-soft);
-    padding: 4px 8px;
+    padding: 4px 10px;
     border-radius: 100px;
   }
   .date-pill.expiring {
-    background: #FFF1CC;
+    background: var(--sun-soft);
     color: #B57F00;
   }
   .date-pill.expired {
-    background: #FFE0E0;
+    background: var(--pink-soft);
     color: var(--danger);
   }
 
@@ -396,16 +421,17 @@
     border: none;
     padding: 10px 16px;
     border-radius: 100px;
-    font-weight: 700;
+    font-weight: 800;
     cursor: pointer;
     font-size: 14px;
     transition: all 0.2s;
-    font-family: inherit;
+    font-family: var(--font-display);
   }
   .btn-primary {
-    background: var(--ink);
+    background: var(--primary);
     color: white;
     flex: 1;
+    box-shadow: 0 4px 12px rgba(255, 106, 57, 0.35);
   }
   .btn-primary:hover { transform: translateY(-1px); }
   .btn-soft {
@@ -414,10 +440,10 @@
     flex: 1;
   }
   .btn-success {
-    background: linear-gradient(135deg, #8DD9C0, #6BC9A8);
+    background: linear-gradient(135deg, var(--mint), #8FBE1E);
     color: white;
     flex: 1;
-    box-shadow: 0 4px 12px rgba(141, 217, 192, 0.4);
+    box-shadow: 0 4px 12px rgba(183, 212, 42, 0.4);
   }
   .btn-success:hover { transform: translateY(-1px); }
   .btn-ghost {
@@ -431,7 +457,7 @@
     justify-content: center;
     gap: 8px;
     padding: 12px;
-    background: linear-gradient(135deg, #DCF3EB, #FFF1CC);
+    background: linear-gradient(135deg, #EDF4C6, #FFEACB);
     border-radius: 14px;
     margin-top: 12px;
     font-weight: 700;
@@ -444,20 +470,20 @@
     bottom: 24px;
     left: 50%;
     transform: translateX(-50%);
-    background: var(--ink);
+    background: var(--primary);
     color: white;
-    border: none;
-    padding: 14px 24px;
+    border: 3px solid var(--surface);
+    padding: 14px 26px;
     border-radius: 100px;
     font-size: 15px;
     font-weight: 700;
     cursor: pointer;
-    box-shadow: 0 6px 20px rgba(43, 42, 51, 0.25);
+    box-shadow: 0 8px 24px rgba(255, 106, 57, 0.4);
     display: flex;
     align-items: center;
     gap: 8px;
     z-index: 50;
-    font-family: inherit;
+    font-family: var(--font-display);
     transition: all 0.2s;
   }
   .fab:hover { transform: translate(-50%, -2px); }
@@ -467,7 +493,7 @@
   .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(43, 42, 51, 0.45);
+    background: rgba(34, 31, 46, 0.45);
     backdrop-filter: blur(8px);
     z-index: 100;
     display: none;
@@ -502,14 +528,16 @@
     margin: 0 auto 16px;
   }
   .modal-title {
-    font-size: 20px;
-    font-weight: 800;
+    font-family: var(--font-display);
+    font-size: 21px;
+    font-weight: 600;
     margin-bottom: 4px;
   }
   .modal-sub {
     color: var(--ink-soft);
     font-size: 13px;
     margin-bottom: 22px;
+    font-weight: 700;
   }
 
   .field {
@@ -532,12 +560,13 @@
     padding: 12px 14px;
     font-size: 15px;
     font-family: inherit;
+    font-weight: 700;
     color: var(--ink);
     transition: border-color 0.2s;
   }
   .input:focus, .textarea:focus {
     outline: none;
-    border-color: var(--ink);
+    border-color: var(--primary);
     background: white;
   }
   .textarea { resize: vertical; min-height: 60px; }
@@ -561,15 +590,15 @@
     border-radius: 100px;
     cursor: pointer;
     font-size: 14px;
-    font-weight: 700;
+    font-weight: 800;
     color: var(--ink-soft);
     transition: all 0.15s;
-    font-family: inherit;
+    font-family: var(--font-display);
   }
   .chip.active {
-    background: var(--ink);
+    background: var(--primary);
     color: white;
-    border-color: var(--ink);
+    border-color: var(--primary);
   }
 
   /* === Sticker trigger button (in stamp dialog) === */
@@ -800,6 +829,7 @@
   .color-opt:hover { transform: scale(1.1); }
   .color-opt.active {
     border-color: var(--ink);
+    box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--ink);
   }
 
   /* Avatar grid for kid */
@@ -822,7 +852,7 @@
   }
   .avatar-opt:hover { transform: scale(1.1); }
   .avatar-opt.active {
-    border-color: var(--ink);
+    border-color: var(--primary);
     background: var(--sun-soft);
   }
 
@@ -861,18 +891,20 @@
     padding: 14px;
     box-shadow: var(--shadow);
     text-align: center;
+    border: 2px solid var(--line);
   }
   .stat-value {
-    font-size: 22px;
-    font-weight: 800;
-    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--primary);
     line-height: 1;
   }
   .stat-label {
     font-size: 11px;
     color: var(--ink-soft);
     margin-top: 4px;
-    font-weight: 600;
+    font-weight: 800;
   }
 
   .history-filters {
@@ -885,12 +917,12 @@
   }
   .history-filters::-webkit-scrollbar { display: none; }
   .filter-chip {
-    border: none;
+    border: 2px solid var(--line);
     background: var(--surface);
     padding: 6px 12px;
     border-radius: 100px;
     font-size: 12px;
-    font-weight: 700;
+    font-weight: 800;
     color: var(--ink-soft);
     cursor: pointer;
     box-shadow: var(--shadow);
@@ -1043,8 +1075,9 @@
     font-size: 28px;
   }
   .confirm-title {
-    font-size: 17px;
-    font-weight: 800;
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 600;
     margin-bottom: 4px;
   }
   .confirm-text {
@@ -1270,7 +1303,7 @@
     align-items: center;
     justify-content: center;
     font-size: 52px;
-    background: linear-gradient(135deg, #FFF8F0, #FFF1CC);
+    background: linear-gradient(135deg, #FCF7EA, #FFEACB);
   }
   .polaroid-icon-badge {
     position: absolute;
@@ -1293,7 +1326,7 @@
   .polaroid-msg {
     font-size: 11px;
     font-weight: 700;
-    color: #2B2A33;
+    color: #221F2E;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -1370,7 +1403,7 @@
     background:
       radial-gradient(ellipse at 20% 10%, rgba(199, 176, 230, 0.4) 0%, transparent 50%),
       radial-gradient(ellipse at 80% 20%, rgba(155, 201, 242, 0.35) 0%, transparent 50%),
-      radial-gradient(ellipse at 50% 90%, rgba(255, 143, 163, 0.3) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 90%, rgba(255, 79, 160, 0.3) 0%, transparent 50%),
       linear-gradient(180deg, #1A1B3A 0%, #2D1F4F 50%, #3D2A5F 100%);
     border-radius: var(--r-xl);
     padding: 22px 18px 26px;
@@ -1405,9 +1438,9 @@
     background-image:
       radial-gradient(1px 1px at 30% 25%, rgba(255,255,255,0.6), transparent),
       radial-gradient(1px 1px at 60% 75%, rgba(255,255,255,0.6), transparent),
-      radial-gradient(2px 2px at 80% 40%, rgba(255,214,107,0.8), transparent),
+      radial-gradient(2px 2px at 80% 40%, rgba(255,178,63,0.8), transparent),
       radial-gradient(1.5px 1.5px at 20% 80%, rgba(199,176,230,0.8), transparent),
-      radial-gradient(1px 1px at 70% 10%, rgba(255,143,163,0.7), transparent);
+      radial-gradient(1px 1px at 70% 10%, rgba(255,79,160,0.7), transparent);
     background-size: 100% 100%;
     opacity: 0.9;
     animation: twinkle 5s ease-in-out 1s infinite reverse;
@@ -1421,12 +1454,13 @@
   .cosmos-content { position: relative; z-index: 2; }
 
   .vault-title {
-    font-size: 22px;
-    font-weight: 900;
+    font-family: var(--font-display);
+    font-size: 24px;
+    font-weight: 600;
     text-align: center;
     margin-bottom: 4px;
     letter-spacing: -0.5px;
-    background: linear-gradient(135deg, #FFD66B, #FFB5BA, #C7B0E6);
+    background: linear-gradient(135deg, #FFB23F, #FFAFD1, #B49BE8);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -1457,8 +1491,8 @@
     font-size: 22px;
     font-weight: 800;
     line-height: 1;
-    color: #FFD66B;
-    text-shadow: 0 0 12px rgba(255,214,107,0.5);
+    color: #FFB23F;
+    text-shadow: 0 0 12px rgba(255,178,63,0.5);
   }
   .vault-stat-label {
     font-size: 10px;
@@ -1498,19 +1532,19 @@
     width: 100%;
     height: 100%;
     border-radius: 16px;
-    background: linear-gradient(135deg, rgba(255,214,107,0.95), rgba(255,143,163,0.9));
+    background: linear-gradient(135deg, rgba(255,178,63,0.95), rgba(255,79,160,0.9));
     padding: 3px;
     position: relative;
     box-shadow:
       0 0 0 1px rgba(255,255,255,0.3),
-      0 4px 16px rgba(255,214,107,0.4),
-      0 0 40px rgba(255,214,107,0.25);
+      0 4px 16px rgba(255,178,63,0.4),
+      0 0 40px rgba(255,178,63,0.25);
     overflow: hidden;
     animation: glow-pulse 3s ease-in-out infinite;
   }
   @keyframes glow-pulse {
-    0%, 100% { box-shadow: 0 0 0 1px rgba(255,255,255,0.3), 0 4px 16px rgba(255,214,107,0.4), 0 0 40px rgba(255,214,107,0.25); }
-    50% { box-shadow: 0 0 0 1px rgba(255,255,255,0.6), 0 4px 20px rgba(255,214,107,0.7), 0 0 56px rgba(255,214,107,0.5); }
+    0%, 100% { box-shadow: 0 0 0 1px rgba(255,255,255,0.3), 0 4px 16px rgba(255,178,63,0.4), 0 0 40px rgba(255,178,63,0.25); }
+    50% { box-shadow: 0 0 0 1px rgba(255,255,255,0.6), 0 4px 20px rgba(255,178,63,0.7), 0 0 56px rgba(255,178,63,0.5); }
   }
   .trophy-inner {
     width: 100%;
@@ -1781,7 +1815,7 @@
     text-align: center;
     cursor: pointer;
     transition: all 0.2s;
-    background: linear-gradient(135deg, #FFF8F0, #FFF1CC);
+    background: linear-gradient(135deg, #FCF7EA, #FFEACB);
     font-family: inherit;
     width: 100%;
   }
@@ -1805,7 +1839,7 @@
     position: absolute;
     top: 12px;
     left: 12px;
-    background: linear-gradient(135deg, #FFD66B, #FFB5BA);
+    background: linear-gradient(135deg, #FFB23F, #FFAFD1);
     color: white;
     padding: 4px 12px;
     border-radius: 100px;
@@ -1823,12 +1857,12 @@
     height: 180px;
     margin: 0 auto 16px;
     border-radius: 28px;
-    background: linear-gradient(135deg, #FFD66B, #FFB5BA);
+    background: linear-gradient(135deg, #FFB23F, #FFAFD1);
     padding: 4px;
     box-shadow:
       0 0 0 1px rgba(255,255,255,0.4),
-      0 12px 32px rgba(255,214,107,0.4),
-      0 0 64px rgba(255,214,107,0.4);
+      0 12px 32px rgba(255,178,63,0.4),
+      0 0 64px rgba(255,178,63,0.4);
     animation: glow-pulse 3s ease-in-out infinite;
   }
   .trophy-detail-inner {
@@ -1880,8 +1914,8 @@
   /* === Library (圖庫) === */
   .lib-button {
     background: var(--surface);
-    border: none;
-    border-radius: 12px;
+    border: 2px solid var(--line);
+    border-radius: 50%;
     width: 38px;
     height: 38px;
     cursor: pointer;
@@ -1893,7 +1927,7 @@
     font-family: inherit;
     transition: all 0.2s;
   }
-  .lib-button:hover { color: var(--ink); transform: translateY(-1px); }
+  .lib-button:hover { color: var(--primary); border-color: var(--primary); transform: translateY(-1px); }
 
   .lib-tabs {
     display: flex;
@@ -2208,12 +2242,12 @@ const AVATARS = [
 ];
 
 const COLORS = [
-  { name:'pink', main:'#FF8FA3', soft:'#FFE4E9' },
-  { name:'mint', main:'#5DBFA3', soft:'#DCF3EB' },
-  { name:'sun', main:'#F5B748', soft:'#FFF1CC' },
-  { name:'sky', main:'#6FA8DC', soft:'#E2EFFB' },
-  { name:'lilac', main:'#A88BD9', soft:'#EEE5FA' },
-  { name:'coral', main:'#FF7F66', soft:'#FFE2D9' },
+  { name:'pink', main:'#FF4FA0', soft:'#FFE0EF' },
+  { name:'mint', main:'#8FBE1E', soft:'#EDF4C6' },
+  { name:'sun', main:'#FFB23F', soft:'#FFEACB' },
+  { name:'sky', main:'#5B8FE0', soft:'#E8F0FD' },
+  { name:'lilac', main:'#9670D9', soft:'#EDE4FB' },
+  { name:'coral', main:'#FF6A39', soft:'#FFE0D0' },
 ];
 
 // ---- State ----
@@ -2450,7 +2484,7 @@ function burstConfetti() {
   const c = document.getElementById('confetti');
   c.style.display = 'block';
   c.innerHTML = '';
-  const palette = ['#FF8FA3','#FFD66B','#8DD9C0','#9BC9F2','#C7B0E6','#FF7F66'];
+  const palette = ['#FF4FA0','#FFB23F','#B7D42A','#A9C6F5','#B49BE8','#FF6A39'];
   for (let i = 0; i < 80; i++) {
     const piece = document.createElement('div');
     piece.className = 'confetti-piece';
@@ -2546,7 +2580,7 @@ function animSparkles(overlay, sticker) {
     const dist = 100 + Math.random() * 200;
     s.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
     s.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
-    s.style.color = ['#FFD66B','#FF8FA3','#8DD9C0','#9BC9F2','#C7B0E6'][i % 5];
+    s.style.color = ['#FFB23F','#FF4FA0','#B7D42A','#A9C6F5','#B49BE8'][i % 5];
     s.style.animationDelay = (Math.random() * 0.2) + 's';
     overlay.appendChild(s);
   }
@@ -2559,12 +2593,12 @@ function animRainbow(overlay, sticker) {
     <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <linearGradient id="rb1" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stop-color="#FF6B6B"/>
-          <stop offset="20%" stop-color="#FFD66B"/>
-          <stop offset="40%" stop-color="#8DD9C0"/>
-          <stop offset="60%" stop-color="#9BC9F2"/>
-          <stop offset="80%" stop-color="#C7B0E6"/>
-          <stop offset="100%" stop-color="#FF8FA3"/>
+          <stop offset="0%" stop-color="#FF5A5A"/>
+          <stop offset="20%" stop-color="#FFB23F"/>
+          <stop offset="40%" stop-color="#B7D42A"/>
+          <stop offset="60%" stop-color="#A9C6F5"/>
+          <stop offset="80%" stop-color="#B49BE8"/>
+          <stop offset="100%" stop-color="#FF4FA0"/>
         </linearGradient>
       </defs>
       <path d="M 30 150 A 70 70 0 0 1 170 150" fill="none" stroke="url(#rb1)" stroke-width="22" stroke-linecap="round"/>
@@ -2580,7 +2614,7 @@ function animRainbow(overlay, sticker) {
     s.textContent = '✨';
     s.style.setProperty('--dx', (Math.random() * 400 - 200) + 'px');
     s.style.setProperty('--dy', (Math.random() * 200 + 100) + 'px');
-    s.style.color = '#FFD66B';
+    s.style.color = '#FFB23F';
     s.style.animationDelay = (0.3 + Math.random() * 0.4) + 's';
     overlay.appendChild(s);
   }
@@ -2588,7 +2622,7 @@ function animRainbow(overlay, sticker) {
 
 function animFireworks(overlay, sticker) {
   overlay.appendChild(makeCenterSticker(sticker));
-  const colors = ['#FF8FA3','#FFD66B','#8DD9C0','#9BC9F2','#C7B0E6','#FF6B6B'];
+  const colors = ['#FF4FA0','#FFB23F','#B7D42A','#A9C6F5','#B49BE8','#FF5A5A'];
   // Two firework bursts at offset positions
   for (let burst = 0; burst < 3; burst++) {
     const cx = (burst === 0 ? -180 : burst === 1 ? 180 : 0);
@@ -2647,20 +2681,20 @@ function animCharacter(overlay, sticker) {
         <path d="M32 70 Q24 100 32 120 L40 118 Q36 95 40 75 Z" fill="#3D2A5F"/>
         <path d="M108 70 Q116 100 108 120 L100 118 Q104 95 100 75 Z" fill="#3D2A5F"/>
         <!-- Cheeks -->
-        <ellipse cx="50" cy="85" rx="6" ry="4" fill="#FFB5BA" opacity="0.8"/>
-        <ellipse cx="90" cy="85" rx="6" ry="4" fill="#FFB5BA" opacity="0.8"/>
+        <ellipse cx="50" cy="85" rx="6" ry="4" fill="#FFAFD1" opacity="0.8"/>
+        <ellipse cx="90" cy="85" rx="6" ry="4" fill="#FFAFD1" opacity="0.8"/>
         <!-- Eyes (smiling) -->
-        <path d="M52 75 Q56 70 60 75" stroke="#2B2A33" stroke-width="3" fill="none" stroke-linecap="round"/>
-        <path d="M80 75 Q84 70 88 75" stroke="#2B2A33" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M52 75 Q56 70 60 75" stroke="#221F2E" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M80 75 Q84 70 88 75" stroke="#221F2E" stroke-width="3" fill="none" stroke-linecap="round"/>
         <!-- Sparkle in eyes -->
-        <circle cx="58" cy="73" r="1.5" fill="#FFD66B"/>
-        <circle cx="86" cy="73" r="1.5" fill="#FFD66B"/>
+        <circle cx="58" cy="73" r="1.5" fill="#FFB23F"/>
+        <circle cx="86" cy="73" r="1.5" fill="#FFB23F"/>
         <!-- Mouth -->
-        <path d="M64 92 Q70 98 76 92" stroke="#2B2A33" stroke-width="2.5" fill="#FF8FA3" stroke-linecap="round"/>
+        <path d="M64 92 Q70 98 76 92" stroke="#221F2E" stroke-width="2.5" fill="#FF4FA0" stroke-linecap="round"/>
         <!-- Body / collar -->
-        <path d="M40 116 Q70 110 100 116 L100 140 L40 140 Z" fill="#FF8FA3"/>
+        <path d="M40 116 Q70 110 100 116 L100 140 L40 140 Z" fill="#FF4FA0"/>
         <!-- Star on chest -->
-        <path d="M70 125 L72 130 L77 130 L73 133 L75 138 L70 135 L65 138 L67 133 L63 130 L68 130 Z" fill="#FFD66B"/>
+        <path d="M70 125 L72 130 L77 130 L73 133 L75 138 L70 135 L65 138 L67 133 L63 130 L68 130 Z" fill="#FFB23F"/>
         <!-- Waving hand -->
         <g class="cute-char-wave">
           <ellipse cx="115" cy="80" rx="10" ry="13" fill="#FFE0CF"/>
@@ -2806,13 +2840,14 @@ function renderWelcome() {
   const illust = custom
     ? `<img class="empty-illust" src="${escapeAttr(custom)}" alt="">`
     : `<svg class="empty-illust" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="100" cy="100" r="80" fill="#FFE4E9"/>
-        <circle cx="75" cy="90" r="8" fill="#2B2A33"/>
-        <circle cx="125" cy="90" r="8" fill="#2B2A33"/>
-        <path d="M75 120 Q100 140 125 120" stroke="#2B2A33" stroke-width="4" fill="none" stroke-linecap="round"/>
-        <circle cx="55" cy="115" r="8" fill="#FFB5BA"/>
-        <circle cx="145" cy="115" r="8" fill="#FFB5BA"/>
-        <path d="M100 30 L106 50 L126 50 L110 62 L116 82 L100 70 L84 82 L90 62 L74 50 L94 50 Z" fill="#FFD66B"/>
+        <circle cx="100" cy="100" r="72" fill="#EDF4C6" stroke="#B7D42A" stroke-width="4"/>
+        <path d="M70 95 Q75 82 82 95" stroke="#221F2E" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <path d="M118 95 Q123 82 130 95" stroke="#221F2E" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <path d="M68 122 Q100 152 132 122" stroke="#221F2E" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <circle cx="34" cy="46" r="9" fill="none" stroke="#FF4FA0" stroke-width="4"/>
+        <circle cx="168" cy="56" r="7" fill="none" stroke="#A9C6F5" stroke-width="4"/>
+        <circle cx="166" cy="150" r="8" fill="none" stroke="#FF6A39" stroke-width="4"/>
+        <circle cx="28" cy="150" r="6" fill="none" stroke="#B49BE8" stroke-width="4"/>
       </svg>`;
   return `
     <div class="empty-state">
@@ -2830,14 +2865,14 @@ function renderEmptyThemes(kid) {
   const illust = custom
     ? `<img class="empty-illust" src="${escapeAttr(custom)}" alt="">`
     : `<svg class="empty-illust" viewBox="0 0 200 200">
-        <rect x="40" y="50" width="120" height="100" rx="14" fill="${color.soft}" stroke="${color.main}" stroke-width="3" stroke-dasharray="6 4"/>
-        <circle cx="70" cy="80" r="8" fill="${color.main}" opacity="0.4"/>
-        <circle cx="100" cy="80" r="8" fill="${color.main}" opacity="0.4"/>
-        <circle cx="130" cy="80" r="8" fill="${color.main}" opacity="0.4"/>
-        <circle cx="70" cy="110" r="8" fill="${color.main}" opacity="0.4"/>
-        <circle cx="100" cy="110" r="8" fill="${color.main}" opacity="0.4"/>
-        <circle cx="130" cy="110" r="8" fill="${color.main}" opacity="0.4"/>
-        <path d="M100 30 L104 40 L114 42 L106 50 L108 60 L100 55 L92 60 L94 50 L86 42 L96 40 Z" fill="${color.main}"/>
+        <rect x="38" y="48" width="124" height="104" rx="20" fill="${color.soft}" stroke="${color.main}" stroke-width="4" stroke-dasharray="2 10" stroke-linecap="round"/>
+        <circle cx="70" cy="82" r="9" fill="none" stroke="${color.main}" stroke-width="3.5"/>
+        <circle cx="100" cy="82" r="9" fill="none" stroke="${color.main}" stroke-width="3.5"/>
+        <circle cx="130" cy="82" r="9" fill="none" stroke="${color.main}" stroke-width="3.5"/>
+        <circle cx="70" cy="114" r="9" fill="none" stroke="${color.main}" stroke-width="3.5"/>
+        <circle cx="100" cy="114" r="9" fill="${color.main}"/>
+        <circle cx="130" cy="114" r="9" fill="none" stroke="${color.main}" stroke-width="3.5"/>
+        <path d="M100 22 L104 34 L116 36 L107 44 L109 56 L100 50 L91 56 L93 44 L84 36 L96 34 Z" fill="#FFB23F"/>
       </svg>`;
   return `
     <div class="empty-state">
@@ -3386,7 +3421,7 @@ function exportPolaroid(btn) {
     } else {
       // Gradient background + sticker
       const grad = ctx.createLinearGradient(PAD, PAD, PAD + SIZE, PAD + SIZE);
-      grad.addColorStop(0, '#FFF8F0');
+      grad.addColorStop(0, '#FCF7EA');
       grad.addColorStop(1, '#FEF0CC');
       ctx.fillStyle = grad;
       ctx.fillRect(PAD, PAD, SIZE, SIZE);
@@ -3409,7 +3444,7 @@ function exportPolaroid(btn) {
     ctx.stroke();
 
     // Message
-    ctx.fillStyle = '#2B2A33';
+    ctx.fillStyle = '#221F2E';
     ctx.font = `bold 17px -apple-system, "PingFang TC", sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'alphabetic';
@@ -3559,178 +3594,38 @@ function compressImageFile(file, maxSize) {
   });
 }
 
-// ---- Stamp dialog (reason + photo + sticker) ----
+// ---- Stamp dialog (tap a sticker → stamp immediately) ----
 function openStampDialog(tid) {
   const t = state.themes.find(x => x.id === tid);
   if (!t) return;
-  const draft = {
-    sticker: t.sticker || '⭐',
-    reason: '',
-    photo: '',
-  };
 
   // All available stickers (bundled + emoji + custom, no categories)
   const allStickers = getAllForCategory('stickers', STICKERS);
 
   openModal(`
     <div class="modal-handle"></div>
-
-    <!-- ==== FORM VIEW ==== -->
-    <div id="stampFormView">
-      <div class="modal-title">蓋一個章 <span class="modal-title-sticker" id="titleSticker">${renderStickerHTML(draft.sticker, {size:24})}</span></div>
-      <div class="modal-sub">為「${escapeHtml(t.title)}」記錄這次的好表現吧（都可以略過）</div>
-
-      <div class="field">
-        <label class="field-label">這次的貼紙</label>
-        <button type="button" class="sticker-trigger" id="openStickerPickerBtn">
-          <span class="sticker-trigger-icon" id="triggerStickerPreview">${renderStickerHTML(draft.sticker, {size:'80%'})}</span>
-          <span class="sticker-trigger-text">
-            <div class="sticker-trigger-label">點此選貼紙</div>
-            <div class="sticker-trigger-hint">${allStickers.length} 個可選</div>
-          </span>
-          <span class="sticker-trigger-arrow">›</span>
-        </button>
-      </div>
-
-      <div class="field">
-        <label class="field-label">理由 / 心情（選填）</label>
-        <textarea class="textarea" id="stampReason" placeholder="例如：今晚自己睡到天亮 🌙"></textarea>
-      </div>
-
-      <div class="field">
-        <label class="field-label">紀念照片（選填）</label>
-        <div class="photo-row" id="photoRow">
-          <button class="photo-btn" id="photoBtn" type="button">
-            <span class="icon">📷</span>
-            <span>選擇照片<br/>或拍張紀念照</span>
-          </button>
-          <input type="file" id="photoFile" accept="image/*" style="display:none">
-        </div>
-        <div class="help">可以從相簿選擇或現場拍一張，照片會自動壓縮存在本機</div>
-      </div>
-
-      <div class="modal-actions">
-        <button class="btn btn-cancel" id="stampCancel">取消</button>
-        <button class="btn btn-primary" id="stampSave">蓋章！</button>
-      </div>
+    <div class="big-picker-header" style="padding:0 0 12px; border-bottom:1px solid var(--line-soft);">
+      <div class="big-picker-title">選個貼紙蓋章吧！</div>
     </div>
-
-    <!-- ==== STICKER PICKER VIEW ==== -->
-    <div class="big-picker-view" id="stampPickerView">
-      <div class="big-picker-header">
-        <button class="big-picker-back" id="pickerBackBtn" type="button">‹</button>
-        <div class="big-picker-title">選個貼紙吧</div>
-        <div class="big-picker-current" id="pickerCurrentBadge">
-          <span id="pickerCurrentIcon">${renderStickerHTML(draft.sticker, {size:18})}</span>
-          <span>目前</span>
-        </div>
-      </div>
-      <div class="big-sticker-grid" id="bigStickerGrid">
-        ${allStickers.map(item => `
-          <button type="button" class="big-sticker-cell ${item.value===draft.sticker?'active':''}" data-v="${escapeAttr(item.value)}">
-            ${item.type==='image' ? `<img src="${escapeAttr(item.src)}" alt="">` : item.value}
-          </button>
-        `).join('')}
-      </div>
+    <div class="modal-sub" style="margin-top:10px;">為「${escapeHtml(t.title)}」點一個貼紙，馬上蓋章</div>
+    <div class="big-sticker-grid" id="bigStickerGrid" style="padding:4px 0 8px;">
+      ${allStickers.map(item => `
+        <button type="button" class="big-sticker-cell" data-v="${escapeAttr(item.value)}">
+          ${item.type==='image' ? `<img src="${escapeAttr(item.src)}" alt="">` : item.value}
+        </button>
+      `).join('')}
     </div>
   `);
 
-  const formView = document.getElementById('stampFormView');
-  const pickerView = document.getElementById('stampPickerView');
-  const titleSticker = document.getElementById('titleSticker');
-  const triggerStickerPreview = document.getElementById('triggerStickerPreview');
-  const pickerCurrentIcon = document.getElementById('pickerCurrentIcon');
-
-  function setSticker(s) {
-    draft.sticker = s;
-    titleSticker.innerHTML = renderStickerHTML(s, {size:24});
-    triggerStickerPreview.innerHTML = renderStickerHTML(s, {size:'80%'});
-    pickerCurrentIcon.innerHTML = renderStickerHTML(s, {size:18});
-  }
-
-  function showPicker() {
-    formView.style.display = 'none';
-    pickerView.classList.add('show');
-    // Scroll modal to top so the picker header is visible
-    const modal = document.querySelector('.modal');
-    if (modal) modal.scrollTop = 0;
-  }
-  function showForm() {
-    pickerView.classList.remove('show');
-    formView.style.display = 'block';
-    const modal = document.querySelector('.modal');
-    if (modal) modal.scrollTop = 0;
-  }
-
-  document.getElementById('openStickerPickerBtn').onclick = showPicker;
-  document.getElementById('pickerBackBtn').onclick = showForm;
-
-  // Sticker cell click: select + auto-back to form
+  // Tap a sticker: select + stamp immediately
   document.querySelectorAll('#bigStickerGrid .big-sticker-cell').forEach(cell => {
     cell.onclick = () => {
-      document.querySelectorAll('#bigStickerGrid .big-sticker-cell').forEach(x => x.classList.remove('active'));
       cell.classList.add('active');
-      setSticker(cell.dataset.v);
-      // Small delay so the user sees the selection highlight
-      setTimeout(showForm, 220);
+      const sticker = cell.dataset.v;
+      closeModal();
+      commitStamp(tid, { sticker, reason: '', photo: '' });
     };
   });
-
-  // Photo handling
-  const fileInput = document.getElementById('photoFile');
-  const photoRow = document.getElementById('photoRow');
-  document.getElementById('photoBtn').onclick = () => fileInput.click();
-  fileInput.onchange = async () => {
-    const f = fileInput.files && fileInput.files[0];
-    if (!f) return;
-    try {
-      photoRow.innerHTML = `<div class="photo-preview" style="display:grid;place-items:center;color:var(--ink-soft);font-size:13px;">壓縮中…</div>`;
-      const dataUrl = await compressImageFile(f);
-      draft.photo = dataUrl;
-      photoRow.innerHTML = `
-        <div class="photo-preview">
-          <img src="${dataUrl}" alt="預覽">
-          <button class="photo-remove" id="photoRemove" type="button">✕</button>
-        </div>
-        <button class="photo-btn" id="photoReplace" type="button">
-          <span class="icon">🔄</span>
-          <span>換一張</span>
-        </button>
-      `;
-      document.getElementById('photoRemove').onclick = () => {
-        draft.photo = '';
-        renderPhotoEmpty();
-      };
-      document.getElementById('photoReplace').onclick = () => fileInput.click();
-    } catch (e) {
-      toast(e.message || '照片處理失敗');
-      renderPhotoEmpty();
-    }
-    fileInput.value = '';
-  };
-  function renderPhotoEmpty() {
-    photoRow.innerHTML = `
-      <button class="photo-btn" id="photoBtn" type="button">
-        <span class="icon">📷</span>
-        <span>選擇照片<br/>或拍張紀念照</span>
-      </button>
-      <input type="file" id="photoFile" accept="image/*" style="display:none">
-    `;
-    const newInput = document.getElementById('photoFile');
-    document.getElementById('photoBtn').onclick = () => newInput.click();
-    newInput.onchange = fileInput.onchange;
-  }
-
-  document.getElementById('stampCancel').onclick = closeModal;
-  document.getElementById('stampSave').onclick = () => {
-    const reason = document.getElementById('stampReason').value.trim();
-    commitStamp(tid, {
-      sticker: draft.sticker,
-      reason,
-      photo: draft.photo,
-    });
-    closeModal();
-  };
 }
 
 // ---- Stamp detail (view a specific stamp) ----
@@ -4014,7 +3909,7 @@ function openRedeemDialog(tid) {
 
     <div class="modal-actions">
       <button class="btn btn-cancel" id="redeemCancel">取消</button>
-      <button class="btn btn-success" id="redeemConfirm" style="background:linear-gradient(135deg, #FFD66B, #FFB5BA); box-shadow:0 4px 14px rgba(255,143,163,0.45);">🎁 完成兌換！</button>
+      <button class="btn btn-success" id="redeemConfirm" style="background:linear-gradient(135deg, #FFB23F, #FFAFD1); box-shadow:0 4px 14px rgba(255,79,160,0.45);">🎁 完成兌換！</button>
     </div>
   `);
 
@@ -4444,7 +4339,7 @@ function openConfirm({ icon='❓', title, text, confirmLabel='確定', danger=fa
       <div class="confirm-text">${escapeHtml(text || '')}</div>
       <div class="confirm-actions">
         <button class="btn btn-cancel" id="cfCancel">取消</button>
-        <button class="btn ${danger?'btn-delete':'btn-primary'}" id="cfOk" style="${danger?'background:#FF6B6B;color:#fff;border:none;':''}">${escapeHtml(confirmLabel)}</button>
+        <button class="btn ${danger?'btn-delete':'btn-primary'}" id="cfOk" style="${danger?'background:#FF5A5A;color:#fff;border:none;':''}">${escapeHtml(confirmLabel)}</button>
       </div>
     </div>
   `);
@@ -4533,7 +4428,7 @@ function openBackupModal() {
       </label>
     </div>
 
-    <div style="background:#FFF8F0; border-radius:var(--r); padding:12px 14px; font-size:12px; color:var(--ink-soft); line-height:1.6;">
+    <div style="background:#FCF7EA; border-radius:var(--r); padding:12px 14px; font-size:12px; color:var(--ink-soft); line-height:1.6;">
       💡 <strong>小提示：</strong>建議定期匯出備份，或換裝置/瀏覽器前先匯出，再在新瀏覽器裡匯入。照片和自訂圖庫也會一起備份。
     </div>
 
