@@ -2166,12 +2166,9 @@ const MANIFEST_URL = 'assets/manifest.json';
 let bundledLib = { stickers:[], avatars:[], trophies:[], illustrations:{} };
 let customLib = { stickers:[], avatars:[], trophies:[], illustrations:{} };
 
-const STICKERS = [
-  '⭐','❤️','🌟','✨','🌈','🎈','🎀','🌸',
-  '🍓','🦋','🐱','🐶','🐰','🦄','🐻','🐼',
-  '🎁','🍩','🍭','🧁','🍪','🌻','🌺','🍀',
-  '⚽','🏀','🚗','✈️','🚀','🎵','🎨','📚'
-];
+// Sticker emoji defaults removed per user request — stickers now come only
+// from the bundled image library (assets/manifest.json) and custom uploads.
+const STICKERS = [];
 
 // Sticker category maps for the picker tabs
 const STICKER_CATS_MAP = {
