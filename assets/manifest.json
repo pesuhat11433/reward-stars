@@ -1,365 +1,57 @@
 {
-  "_comment": "集點寶貝的圖檔清單。每張圖可用 {id, src, label} 描述。bundled 圖載入後永久顯示於選單。",
   "stickers": [
-    {
-      "id": "B01",
-      "src": "stickers/B01.png",
-      "label": "黃星"
-    },
-    {
-      "id": "B02",
-      "src": "stickers/B02.png",
-      "label": "粉星"
-    },
-    {
-      "id": "B03",
-      "src": "stickers/B03.png",
-      "label": "藍星"
-    },
-    {
-      "id": "B04",
-      "src": "stickers/B04.png",
-      "label": "紅心"
-    },
-    {
-      "id": "B05",
-      "src": "stickers/B05.png",
-      "label": "粉心"
-    },
-    {
-      "id": "B06",
-      "src": "stickers/B06.png",
-      "label": "紫心"
-    },
-    {
-      "id": "B07",
-      "src": "stickers/B07.png",
-      "label": "黃晶"
-    },
-    {
-      "id": "B08",
-      "src": "stickers/B08.png",
-      "label": "粉晶"
-    },
-    {
-      "id": "B09",
-      "src": "stickers/B09.png",
-      "label": "白雲"
-    },
-    {
-      "id": "B10",
-      "src": "stickers/B10.png",
-      "label": "彩虹"
-    },
-    {
-      "id": "B11",
-      "src": "stickers/B11.png",
-      "label": "月亮"
-    },
-    {
-      "id": "B12",
-      "src": "stickers/B12.png",
-      "label": "蝴蝶結"
-    },
-    {
-      "id": "B13",
-      "src": "stickers/B13.png",
-      "label": "氣球"
-    },
-    {
-      "id": "B14",
-      "src": "stickers/B14.png",
-      "label": "禮物盒"
-    },
-    {
-      "id": "B15",
-      "src": "stickers/B15.png",
-      "label": "糖果"
-    },
-    {
-      "id": "B16",
-      "src": "stickers/B16.png",
-      "label": "冰淇淋"
-    },
-    {
-      "id": "B17",
-      "src": "stickers/B17.png",
-      "label": "杯子蛋糕"
-    },
-    {
-      "id": "B18",
-      "src": "stickers/B18.png",
-      "label": "蘋果"
-    },
-    {
-      "id": "B19",
-      "src": "stickers/B19.png",
-      "label": "草莓"
-    },
-    {
-      "id": "B20",
-      "src": "stickers/B20.png",
-      "label": "藍音符"
-    },
-    {
-      "id": "B21",
-      "src": "stickers/B21.png",
-      "label": "粉音符"
-    },
-    {
-      "id": "B22",
-      "src": "stickers/B22.png",
-      "label": "愛心信"
-    },
-    {
-      "id": "B23",
-      "src": "stickers/B23.png",
-      "label": "鉛筆"
-    },
-    {
-      "id": "B24",
-      "src": "stickers/B24.png",
-      "label": "藍書"
-    },
-    {
-      "id": "B25",
-      "src": "stickers/B25.png",
-      "label": "相機"
-    },
-    {
-      "id": "B26",
-      "src": "stickers/B26.png",
-      "label": "派對帽"
-    },
-    {
-      "id": "B27",
-      "src": "stickers/B27.png",
-      "label": "金皇冠"
-    },
-    {
-      "id": "B28",
-      "src": "stickers/B28.png",
-      "label": "魔法棒"
-    },
-    {
-      "id": "B29",
-      "src": "stickers/B29.png",
-      "label": "綠葉"
-    },
-    {
-      "id": "B30",
-      "src": "stickers/B30.png",
-      "label": "紫蝴蝶"
-    },
-    {
-      "id": "B31",
-      "src": "stickers/B31.png",
-      "label": "藍鑽石"
-    },
-    {
-      "id": "B32",
-      "src": "stickers/B32.png",
-      "label": "櫻花"
-    }
+    "B1.png",
+    "B2.png",
+    "B3.png",
+    "B4.png",
+    "B5.png",
+    "B6.png",
+    "B7.png",
+    "B8.png",
+    "B9.png",
+    "B10.png",
+    "B11.png",
+    "B12.png",
+    "B13.png",
+    "B14.png",
+    "B15.png",
+    "B16.png",
+    "B17.png",
+    "B18.png",
+    "B19.png",
+    "B20.png",
+    "B21.png",
+    "B22.png",
+    "B23.png",
+    "B24.png",
+    "B25.png",
+    "B26.png",
+    "B27.png",
+    "B28.png",
+    "B29.png",
+    "B30.png",
+    "B31.png",
+    "B32.png",
+    "B33.png",
+    "B34.png",
+    "B35.png",
+    "B36.png",
+    "B37.png",
+    "B38.png",
+    "B39.png",
+    "B40.png",
+    "B41.png",
+    "B42.png",
+    "B43.png",
+    "B44.png",
+    "B45.png",
+    "B46.png",
+    "B47.png",
+    "B48.png",
+    "B49.png",
+    "B50.png"
   ],
-  "avatars": [
-    {
-      "id": "C01",
-      "src": "avatars/C01.png",
-      "label": "小熊"
-    },
-    {
-      "id": "C02",
-      "src": "avatars/C02.png",
-      "label": "橘貓"
-    },
-    {
-      "id": "C03",
-      "src": "avatars/C03.png",
-      "label": "柴犬"
-    },
-    {
-      "id": "C04",
-      "src": "avatars/C04.png",
-      "label": "兔兔"
-    },
-    {
-      "id": "C05",
-      "src": "avatars/C05.png",
-      "label": "狐狸"
-    },
-    {
-      "id": "C06",
-      "src": "avatars/C06.png",
-      "label": "熊貓"
-    },
-    {
-      "id": "C07",
-      "src": "avatars/C07.png",
-      "label": "無尾熊"
-    },
-    {
-      "id": "C08",
-      "src": "avatars/C08.png",
-      "label": "獅子"
-    },
-    {
-      "id": "C09",
-      "src": "avatars/C09.png",
-      "label": "老虎"
-    },
-    {
-      "id": "C10",
-      "src": "avatars/C10.png",
-      "label": "小豬"
-    },
-    {
-      "id": "C11",
-      "src": "avatars/C11.png",
-      "label": "青蛙"
-    },
-    {
-      "id": "C12",
-      "src": "avatars/C12.png",
-      "label": "猴子"
-    },
-    {
-      "id": "C13",
-      "src": "avatars/C13.png",
-      "label": "企鵝"
-    },
-    {
-      "id": "C14",
-      "src": "avatars/C14.png",
-      "label": "小雞"
-    },
-    {
-      "id": "C15",
-      "src": "avatars/C15.png",
-      "label": "獨角獸"
-    },
-    {
-      "id": "C16",
-      "src": "avatars/C16.png",
-      "label": "恐龍"
-    },
-    {
-      "id": "C17",
-      "src": "avatars/C17.png",
-      "label": "警車"
-    },
-    {
-      "id": "C18",
-      "src": "avatars/C18.png",
-      "label": "紫髮女孩"
-    },
-    {
-      "id": "C19",
-      "src": "avatars/C19.png",
-      "label": "粉髮女孩"
-    },
-    {
-      "id": "C20",
-      "src": "avatars/C20.png",
-      "label": "消防車"
-    },
-    {
-      "id": "C21",
-      "src": "avatars/C21.png",
-      "label": "獨角獸"
-    },
-    {
-      "id": "C22",
-      "src": "avatars/C22.png",
-      "label": "酷洛米"
-    }
-  ],
-  "trophies": [
-    {
-      "id": "D01",
-      "src": "trophies/D01.png",
-      "label": "粉禮物"
-    },
-    {
-      "id": "D02",
-      "src": "trophies/D02.png",
-      "label": "藍禮物"
-    },
-    {
-      "id": "D03",
-      "src": "trophies/D03.png",
-      "label": "泰迪熊"
-    },
-    {
-      "id": "D04",
-      "src": "trophies/D04.png",
-      "label": "樂高"
-    },
-    {
-      "id": "D05",
-      "src": "trophies/D05.png",
-      "label": "紅車車"
-    },
-    {
-      "id": "D06",
-      "src": "trophies/D06.png",
-      "label": "娃娃"
-    },
-    {
-      "id": "D07",
-      "src": "trophies/D07.png",
-      "label": "故事書"
-    },
-    {
-      "id": "D08",
-      "src": "trophies/D08.png",
-      "label": "蠟筆"
-    },
-    {
-      "id": "D09",
-      "src": "trophies/D09.png",
-      "label": "滑步車"
-    },
-    {
-      "id": "D10",
-      "src": "trophies/D10.png",
-      "label": "直排輪"
-    },
-    {
-      "id": "D11",
-      "src": "trophies/D11.png",
-      "label": "足球"
-    },
-    {
-      "id": "D12",
-      "src": "trophies/D12.png",
-      "label": "生日蛋糕"
-    },
-    {
-      "id": "D13",
-      "src": "trophies/D13.png",
-      "label": "糖果袋"
-    },
-    {
-      "id": "D14",
-      "src": "trophies/D14.png",
-      "label": "機器人"
-    },
-    {
-      "id": "D15",
-      "src": "trophies/D15.png",
-      "label": "拼圖"
-    },
-    {
-      "id": "D16",
-      "src": "trophies/D16.png",
-      "label": "公主皇冠"
-    }
-  ],
-  "illustrations": {
-    "character": "illustrations/character.png",
-    "welcome": "illustrations/welcome.png",
-    "empty": "illustrations/empty.png",
-    "logo": "illustrations/logo.png"
-  }
+  "avatars": [],
+  "trophies": [],
+  "illustrations": {}
 }
