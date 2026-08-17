@@ -2242,21 +2242,28 @@ function loadState() {
   });
   // Migration v2 → v3: strip huge base64 photos from history events.
   // Photos are now looked up from theme.stamps[i] via stampId at render time.
+  let migrated = false;
   if ((data.schemaVersion || 0) < 3) {
     let saved = 0;
     (data.history || []).forEach(h => {
-      if (h.photo) { saved += h.photo.length; delete h.photo; }
-      if (h.trophyPhoto) { saved += h.trophyPhoto.length; delete h.trophyPhoto; }
+      if (h.photo) { saved += h.photo.length; delete h.photo; migrated = true; }
+      if (h.trophyPhoto) { saved += h.trophyPhoto.length; delete h.trophyPhoto; migrated = true; }
       // Also strip huge reason if somehow >2KB (unlikely but safe)
-      if (h.reason && h.reason.length > 2048) delete h.reason;
+      if (h.reason && h.reason.length > 2048) { delete h.reason; migrated = true; }
     });
     if (saved > 0) console.info('[migration] stripped', Math.round(saved/1024), 'KB of duplicated photo data from history');
+    migrated = true;
   }
   // Also cap history to 500 entries (was 2000) — long history isn't super useful
   if (Array.isArray(data.history) && data.history.length > 500) {
     data.history.length = 500;
+    migrated = true;
   }
   data.schemaVersion = 3;
+  // Persist migrated data immediately so it doesn't have to re-run every load
+  if (migrated) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e) {}
+  }
   return data;
 }
 
