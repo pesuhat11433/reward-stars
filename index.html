@@ -2057,6 +2057,206 @@
   }
   .manifest-status.loaded { background: var(--mint-soft); color: #2C8262; }
   .manifest-status.no-bundle { background: var(--line-soft); }
+
+  /* === Points hero (點數餘額) === */
+  .points-hero {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--r-xl);
+    padding: 22px 20px 20px;
+    margin: 6px 0 20px;
+    color: #fff;
+    background:
+      radial-gradient(ellipse at 15% 20%, rgba(255,214,107,0.55) 0%, transparent 55%),
+      radial-gradient(ellipse at 85% 15%, rgba(255,143,163,0.5) 0%, transparent 55%),
+      linear-gradient(140deg, #3D2A5F 0%, #2D1F4F 55%, #1A1B3A 100%);
+    box-shadow: 0 12px 30px rgba(43, 26, 95, 0.28);
+  }
+  .points-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(1.5px 1.5px at 20% 30%, #fff, transparent),
+      radial-gradient(1px 1px at 70% 20%, #fff, transparent),
+      radial-gradient(1.5px 1.5px at 85% 60%, rgba(255,214,107,0.9), transparent),
+      radial-gradient(1px 1px at 40% 75%, #fff, transparent),
+      radial-gradient(1px 1px at 55% 45%, rgba(255,143,163,0.9), transparent);
+    opacity: 0.7;
+    animation: twinkle 4s ease-in-out infinite;
+    pointer-events: none;
+  }
+  .points-hero-inner { position: relative; z-index: 2; }
+  .points-hero-label {
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.75);
+    font-weight: 700;
+    margin-bottom: 2px;
+  }
+  .points-hero-value {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .points-hero-num {
+    font-size: 52px;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -1px;
+    color: #FFD66B;
+    text-shadow: 0 0 22px rgba(255,214,107,0.5);
+  }
+  .points-hero-unit {
+    font-size: 16px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.85);
+  }
+  .points-hero-actions {
+    display: flex;
+    gap: 10px;
+  }
+  .points-hero-actions .btn { flex: 1; }
+  .btn-earn {
+    background: linear-gradient(135deg, #FFD66B, #FFB5BA);
+    color: #2B2A33;
+    box-shadow: 0 4px 14px rgba(255,143,163,0.4);
+  }
+  .btn-earn:hover { transform: translateY(-1px); }
+  .btn-deduct {
+    background: rgba(255,255,255,0.12);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.25);
+    flex: 0 0 auto !important;
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+  .btn-deduct:hover { background: rgba(255,255,255,0.2); }
+
+  /* === Section title === */
+  .section-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--ink);
+    margin: 0 2px 12px;
+  }
+  .section-title .count {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ink-faint);
+  }
+
+  /* === Gift store === */
+  .gift-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+  @media (max-width: 420px) {
+    .gift-list { grid-template-columns: 1fr; }
+  }
+  .gift-card {
+    background: var(--surface);
+    border-radius: var(--r-lg);
+    padding: 16px 14px 14px;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: transform 0.2s;
+  }
+  .gift-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: var(--gift-color, var(--primary));
+  }
+  .gift-card.affordable { cursor: default; }
+  .gift-card.locked { opacity: 0.72; }
+  .gift-menu {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    border: none;
+    background: var(--line-soft);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    color: var(--ink-soft);
+    font-size: 15px;
+    z-index: 3;
+  }
+  .gift-menu:hover { background: var(--line); color: var(--ink); }
+  .gift-visual {
+    width: 68px;
+    height: 68px;
+    border-radius: 18px;
+    background: var(--gift-color-soft, var(--primary-soft));
+    display: grid;
+    place-items: center;
+    font-size: 38px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .gift-visual img { width: 100%; height: 100%; object-fit: cover; }
+  .gift-name {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--ink);
+    line-height: 1.3;
+    word-break: break-word;
+  }
+  .gift-cost {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    align-self: flex-start;
+    background: var(--gift-color-soft, var(--primary-soft));
+    color: var(--gift-color, var(--primary));
+    font-weight: 800;
+    font-size: 13px;
+    padding: 4px 10px;
+    border-radius: 100px;
+  }
+  .gift-redeem-btn {
+    width: 100%;
+    margin-top: auto;
+  }
+  .btn-redeem-ready {
+    background: linear-gradient(135deg, #8DD9C0, #6BC9A8);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(141, 217, 192, 0.4);
+  }
+  .btn-redeem-ready:hover { transform: translateY(-1px); }
+  .btn-redeem-locked {
+    background: var(--line-soft);
+    color: var(--ink-faint);
+    cursor: not-allowed;
+  }
+  .gift-progress {
+    height: 6px;
+    border-radius: 100px;
+    background: var(--line-soft);
+    overflow: hidden;
+    margin-top: 2px;
+  }
+  .gift-progress > span {
+    display: block;
+    height: 100%;
+    border-radius: 100px;
+    background: var(--gift-color, var(--primary));
+    transition: width 0.4s;
+  }
 </style>
 </head>
 <body>
@@ -2080,7 +2280,7 @@
       <button class="lib-button" id="libBtn" title="我的圖庫">🖼️</button>
       <button class="lib-button" id="backupBtn" title="備份 / 還原資料">💾</button>
       <div class="tabs" role="tablist">
-        <button class="tab-btn active" data-tab="cards">獎勵卡</button>
+        <button class="tab-btn active" data-tab="cards">集點兌換</button>
         <button class="tab-btn" data-tab="history">小寶盒</button>
       </div>
     </div>
@@ -2221,13 +2421,30 @@ let state = loadState();
 let view = { tab: 'cards', kidId: null, openMenuId: null };
 
 function loadState() {
-  let data = { kids: [], themes: [], history: [], schemaVersion: 3 };
+  let data = { kids: [], themes: [], gifts: [], earns: [], history: [], schemaVersion: 4 };
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) data = JSON.parse(raw);
   } catch(e) { console.warn('load failed', e); }
-  // Migration: ensure each theme has a stamps array
-  (data.themes || []).forEach(t => {
+  const migrated = migrateData(data);
+  // Persist migrated data immediately so it doesn't have to re-run every load
+  if (migrated) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e) {}
+  }
+  return data;
+}
+
+// Shared migration — runs on both boot and backup-import so old data upgrades safely.
+function migrateData(data) {
+  let migrated = false;
+  data.kids = Array.isArray(data.kids) ? data.kids : [];
+  data.themes = Array.isArray(data.themes) ? data.themes : [];
+  data.gifts = Array.isArray(data.gifts) ? data.gifts : [];
+  data.earns = Array.isArray(data.earns) ? data.earns : [];
+  data.history = Array.isArray(data.history) ? data.history : [];
+
+  // Ensure each theme has a stamps array (legacy stamp cards → kept for history/trophies)
+  data.themes.forEach(t => {
     if (!Array.isArray(t.stamps)) {
       const count = Math.max(0, t.points || 0);
       const baseAt = t.createdAt || Date.now();
@@ -2237,34 +2454,49 @@ function loadState() {
         sticker: t.sticker || '⭐',
       }));
     }
-    // Always derive points
     t.points = t.stamps.length;
   });
-  // Migration v2 → v3: strip huge base64 photos from history events.
-  // Photos are now looked up from theme.stamps[i] via stampId at render time.
-  let migrated = false;
+
+  // v2 → v3: strip huge base64 photos from history events (now looked up via ids).
   if ((data.schemaVersion || 0) < 3) {
-    let saved = 0;
-    (data.history || []).forEach(h => {
-      if (h.photo) { saved += h.photo.length; delete h.photo; migrated = true; }
-      if (h.trophyPhoto) { saved += h.trophyPhoto.length; delete h.trophyPhoto; migrated = true; }
-      // Also strip huge reason if somehow >2KB (unlikely but safe)
+    data.history.forEach(h => {
+      if (h.photo) { delete h.photo; migrated = true; }
+      if (h.trophyPhoto) { delete h.trophyPhoto; migrated = true; }
       if (h.reason && h.reason.length > 2048) { delete h.reason; migrated = true; }
     });
-    if (saved > 0) console.info('[migration] stripped', Math.round(saved/1024), 'KB of duplicated photo data from history');
     migrated = true;
   }
-  // Also cap history to 500 entries (was 2000) — long history isn't super useful
-  if (Array.isArray(data.history) && data.history.length > 500) {
-    data.history.length = 500;
+
+  // v3 → v4: switch to flexible points-pool + gift-store model.
+  // Each kid gets a running point balance; each still-open stamp card becomes a gift,
+  // and its already-earned points are banked into the kid's balance.
+  if ((data.schemaVersion || 0) < 4) {
+    data.kids.forEach(k => { if (typeof k.points !== 'number') k.points = 0; });
+    data.themes.forEach(t => {
+      if (t.redeemedAt || t.migratedToGift) return; // redeemed cards stay as trophies
+      const kid = data.kids.find(k => k.id === t.kidId);
+      if (kid) kid.points = (kid.points || 0) + (t.points || 0);
+      data.gifts.push({
+        id: uid('g'),
+        kidId: t.kidId,
+        name: t.reward || t.title || '禮物',
+        sticker: t.sticker || '🎁',
+        cost: Math.max(1, t.goal || 10),
+        color: t.color || 'pink',
+        photo: '',
+        createdAt: t.createdAt || Date.now(),
+      });
+      t.migratedToGift = true;
+      t.archived = true; // hidden everywhere except history photo lookups
+    });
     migrated = true;
   }
-  data.schemaVersion = 3;
-  // Persist migrated data immediately so it doesn't have to re-run every load
-  if (migrated) {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e) {}
-  }
-  return data;
+
+  // Cap history to 500 entries — long history isn't super useful
+  if (data.history.length > 500) { data.history.length = 500; migrated = true; }
+
+  data.schemaVersion = 4;
+  return migrated;
 }
 
 function saveState() {
@@ -2712,7 +2944,7 @@ function render() {
   renderKidStrip();
   if (view.tab === 'cards') {
     renderCards();
-    document.getElementById('fabLabel').textContent = '新增獎勵主題';
+    document.getElementById('fabLabel').textContent = '新增禮物';
     document.getElementById('fab').style.display = view.kidId ? 'flex' : 'none';
   } else {
     renderHistory();
@@ -2776,52 +3008,113 @@ function renderCards() {
   const kid = state.kids.find(k => k.id === view.kidId);
   if (!kid) { content.innerHTML = ''; return; }
 
-  const themes = state.themes.filter(t => t.kidId === kid.id)
-    .sort((a, b) => {
-      // active first, then completed, then expired
-      const order = { active: 0, completed: 1, expired: 2 };
-      const sa = themeStatus(a), sb = themeStatus(b);
-      if (sa !== sb) return order[sa] - order[sb];
-      return b.createdAt - a.createdAt;
-    });
+  const gifts = (state.gifts || []).filter(g => g.kidId === kid.id)
+    .sort((a, b) => (a.cost - b.cost) || (b.createdAt - a.createdAt));
 
-  if (themes.length === 0) {
-    content.innerHTML = renderEmptyThemes(kid);
-    document.getElementById('newThemeBtn').onclick = () => openThemeEditor(null);
-    return;
-  }
+  content.innerHTML =
+    renderPointsHero(kid) +
+    (gifts.length === 0
+      ? renderEmptyGifts(kid)
+      : `
+        <div class="section-title">
+          <span>🎁 禮物商店</span>
+          <span class="count">${gifts.length} 樣可換</span>
+        </div>
+        <div class="gift-list">
+          ${gifts.map(g => renderGiftCard(g, kid)).join('')}
+        </div>
+      `);
 
-  content.innerHTML = `
-    <div class="themes-list">
-      ${themes.map(renderThemeCard).join('')}
-    </div>
-  `;
-
-  // Bind events on rendered cards
-  content.querySelectorAll('.stamp-cell').forEach(cell => {
-    const tid = cell.dataset.theme;
-    const idx = parseInt(cell.dataset.idx, 10);
-    if (cell.classList.contains('filled')) {
-      cell.onclick = () => openStampDetail(tid, idx);
-    } else {
-      cell.onclick = () => stamp(tid);
-    }
+  // Points hero actions
+  content.querySelectorAll('[data-hero]').forEach(btn => {
+    const act = btn.dataset.hero;
+    btn.onclick = () => { if (act === 'earn') openEarnDialog(kid.id, 1); else openEarnDialog(kid.id, -1); };
   });
+
+  // Empty-state add-gift button
+  const emptyBtn = document.getElementById('newGiftBtn');
+  if (emptyBtn) emptyBtn.onclick = () => openGiftEditor(null);
+
+  // Gift card actions
   content.querySelectorAll('[data-action]').forEach(btn => {
-    const tid = btn.dataset.theme;
+    const gid = btn.dataset.gift;
     const action = btn.dataset.action;
     btn.onclick = (e) => {
       e.stopPropagation();
-      if (action === 'menu') toggleMenu(tid);
-      if (action === 'edit') { closeAllMenus(); openThemeEditor(tid); }
-      if (action === 'delete') { closeAllMenus(); confirmDeleteTheme(tid); }
-      if (action === 'redeem') redeemTheme(tid);
-      if (action === 'stamp') stampFirstEmpty(tid);
-      if (action === 'reset') confirmResetTheme(tid);
-      if (action === 'open-trophy') openTrophyDetail(tid);
+      if (action === 'gift-menu') toggleMenu(gid);
+      if (action === 'gift-edit') { closeAllMenus(); openGiftEditor(gid); }
+      if (action === 'gift-delete') { closeAllMenus(); confirmDeleteGift(gid); }
+      if (action === 'gift-redeem') redeemGift(gid);
     };
   });
   document.addEventListener('click', closeAllMenus);
+}
+
+function renderPointsHero(kid) {
+  const pts = kid.points || 0;
+  return `
+    <div class="points-hero">
+      <div class="points-hero-inner">
+        <div class="points-hero-label">${escapeHtml(kid.name)} 目前擁有</div>
+        <div class="points-hero-value">
+          <span class="points-hero-num">${pts}</span>
+          <span class="points-hero-unit">點</span>
+        </div>
+        <div class="points-hero-actions">
+          <button class="btn btn-earn" data-hero="earn">＋ 加點</button>
+          <button class="btn btn-deduct" data-hero="deduct">－ 扣點</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderEmptyGifts(kid) {
+  const color = COLORS.find(c => c.name === kid.color) || COLORS[0];
+  return `
+    <div class="empty-state" style="margin-top:0;">
+      <svg class="empty-illust" viewBox="0 0 200 200">
+        <rect x="46" y="70" width="108" height="86" rx="12" fill="${color.soft}" stroke="${color.main}" stroke-width="3"/>
+        <rect x="46" y="70" width="108" height="26" rx="12" fill="${color.main}" opacity="0.85"/>
+        <rect x="94" y="70" width="12" height="86" fill="${color.main}" opacity="0.5"/>
+        <path d="M100 70 C 100 52, 78 50, 78 64 C 78 72, 92 70, 100 70 Z" fill="${color.main}"/>
+        <path d="M100 70 C 100 52, 122 50, 122 64 C 122 72, 108 70, 100 70 Z" fill="${color.main}"/>
+      </svg>
+      <div class="empty-title">幫 ${escapeHtml(kid.name)} 設定禮物 🎁</div>
+      <div class="empty-text">先想幾個獎勵，設定各自要多少點<br>集到點數就能自己挑選兌換囉</div>
+      <button class="btn btn-primary" id="newGiftBtn" style="flex:none; padding:12px 28px;">＋ 新增禮物</button>
+    </div>
+  `;
+}
+
+function renderGiftCard(g, kid) {
+  const color = COLORS.find(c => c.name === g.color) || COLORS[0];
+  const pts = kid.points || 0;
+  const cost = Math.max(1, g.cost || 1);
+  const affordable = pts >= cost;
+  const visual = g.photo
+    ? `<img src="${escapeAttr(g.photo)}" alt="">`
+    : renderStickerHTML(g.sticker || '🎁', { size: '80%' });
+  const pct = Math.min(100, Math.round((pts / cost) * 100));
+  const btn = affordable
+    ? `<button class="btn btn-redeem-ready gift-redeem-btn" data-action="gift-redeem" data-gift="${g.id}">🎁 兌換</button>`
+    : `<button class="btn btn-redeem-locked gift-redeem-btn" data-action="gift-redeem" data-gift="${g.id}" disabled>還差 ${cost - pts} 點</button>`;
+
+  return `
+    <div class="gift-card ${affordable ? 'affordable' : 'locked'}"
+         style="--gift-color:${color.main}; --gift-color-soft:${color.soft}">
+      <button class="gift-menu" data-action="gift-menu" data-gift="${g.id}">⋯</button>
+      <div class="dropdown ${view.openMenuId === g.id ? 'show' : ''}" id="menu-${g.id}" style="top:44px; right:10px;">
+        <div class="dropdown-item" data-action="gift-edit" data-gift="${g.id}">✏️ 編輯</div>
+        <div class="dropdown-item danger" data-action="gift-delete" data-gift="${g.id}">🗑️ 刪除</div>
+      </div>
+      <div class="gift-visual">${visual}</div>
+      <div class="gift-name">${escapeHtml(g.name)}</div>
+      <div class="gift-cost">⭐ ${cost} 點</div>
+      ${!affordable ? `<div class="gift-progress"><span style="width:${pct}%"></span></div>` : ''}
+      ${btn}
+    </div>
+  `;
 }
 
 function renderWelcome() {
@@ -3016,10 +3309,10 @@ function renderHistory() {
     .sort((a, b) => b.redeemedAt - a.redeemedAt);
 
   // Stats scoped to current kid
-  const scopedThemes = state.themes.filter(t => !view.kidId || t.kidId === view.kidId);
-  const totalStamps = scopedThemes.reduce((sum, t) => sum + (t.stamps ? t.stamps.length : t.points || 0), 0);
+  const scopedKids = state.kids.filter(k => !view.kidId || k.id === view.kidId);
+  const currentPoints = scopedKids.reduce((sum, k) => sum + (k.points || 0), 0);
   const totalRedeems = trophyThemes.length;
-  const activeThemesCount = scopedThemes.filter(t => themeStatus(t) === 'active' || themeStatus(t) === 'completed-pending').length;
+  const giftCount = (state.gifts || []).filter(g => !view.kidId || g.kidId === view.kidId).length;
 
   // Pad trophy grid with empty slots so grid feels generous
   const slotCount = Math.max(6, Math.ceil((trophyThemes.length + 2) / 3) * 3);
@@ -3061,9 +3354,9 @@ function renderHistory() {
       }
     }
     if (historyFilter === 'all') return true;
-    if (historyFilter === 'stamp') return h.type === 'stamp' || h.type === 'unstamp';
+    if (historyFilter === 'stamp') return h.type === 'earn' || h.type === 'deduct' || h.type === 'stamp' || h.type === 'unstamp';
     if (historyFilter === 'redeem') return h.type === 'redeem';
-    if (historyFilter === 'theme') return h.type === 'create_theme' || h.type === 'delete_theme' || h.type === 'reset_theme';
+    if (historyFilter === 'theme') return ['create_gift','delete_gift','edit_gift','create_theme','delete_theme','reset_theme'].includes(h.type);
     return true;
   });
 
@@ -3084,16 +3377,16 @@ function renderHistory() {
 
         <div class="vault-stats">
           <div class="vault-stat">
-            <div class="vault-stat-value">${totalStamps}</div>
-            <div class="vault-stat-label">累計集點</div>
+            <div class="vault-stat-value">${currentPoints}</div>
+            <div class="vault-stat-label">目前點數</div>
           </div>
           <div class="vault-stat">
             <div class="vault-stat-value">${totalRedeems}</div>
             <div class="vault-stat-label">寶物數量</div>
           </div>
           <div class="vault-stat">
-            <div class="vault-stat-value">${activeThemesCount}</div>
-            <div class="vault-stat-label">進行中</div>
+            <div class="vault-stat-value">${giftCount}</div>
+            <div class="vault-stat-label">禮物種類</div>
           </div>
         </div>
 
@@ -3104,7 +3397,7 @@ function renderHistory() {
           <div class="vault-empty">
             <div class="vault-empty-icon">🪐</div>
             <div class="vault-empty-title">寶盒還是空的喔</div>
-            <div class="vault-empty-text">集滿一張卡兌換獎勵，<br>就會出現在這個小宇宙裡</div>
+            <div class="vault-empty-text">用點數兌換禮物之後，<br>就會出現在這個小宇宙裡</div>
           </div>
         `}
 
@@ -3113,9 +3406,9 @@ function renderHistory() {
         <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
           <div class="history-filters" style="margin-bottom:0;">
             <button class="filter-chip ${historyFilter==='all'?'active':''}" data-f="all">全部</button>
-            <button class="filter-chip ${historyFilter==='stamp'?'active':''}" data-f="stamp">集點</button>
+            <button class="filter-chip ${historyFilter==='stamp'?'active':''}" data-f="stamp">加/扣點</button>
             <button class="filter-chip ${historyFilter==='redeem'?'active':''}" data-f="redeem">兌換</button>
-            <button class="filter-chip ${historyFilter==='theme'?'active':''}" data-f="theme">主題變更</button>
+            <button class="filter-chip ${historyFilter==='theme'?'active':''}" data-f="theme">禮物變更</button>
           </div>
           <button class="polaroid-export-all-btn" onclick="exportAllPolaroids()">📥 全部匯出</button>
         </div>
@@ -3302,8 +3595,39 @@ function renderHistoryItem(h) {
   // Look up the actual stamp record from the theme so we can render reason + photo
   // without having to store them in the history event itself (keeps storage small).
   const stampRec = h.stampId && t ? (t.stamps || []).find(s => s.id === h.stampId) : null;
+  // Earn records live in state.earns, referenced by earnId (same size-saving idea).
+  const earnRec = h.earnId ? (state.earns || []).find(e => e.id === h.earnId) : null;
 
   switch (h.type) {
+    case 'earn': {
+      const amt = (earnRec && earnRec.amount) || h.amount || 0;
+      const eReason = (earnRec && earnRec.reason) || '';
+      icon = (earnRec && earnRec.sticker) || h.sticker || '⭐';
+      msg = eReason || `${kidName} ＋${Math.abs(amt)} 點`;
+      caption = eReason ? `${kidName} ＋${Math.abs(amt)} 點` : '';
+      photo = (earnRec && earnRec.photo) || '';
+      break;
+    }
+    case 'deduct': {
+      const amt = (earnRec && earnRec.amount) || h.amount || 0;
+      const dReason = (earnRec && earnRec.reason) || '';
+      icon = '➖';
+      msg = dReason ? `${dReason}` : `${kidName} －${Math.abs(amt)} 點`;
+      caption = dReason ? `${kidName} －${Math.abs(amt)} 點` : '';
+      break;
+    }
+    case 'create_gift':
+      icon = '🎁';
+      msg = `新禮物：${h.giftName}${h.cost ? `（${h.cost} 點）` : ''}`;
+      break;
+    case 'edit_gift':
+      icon = '✏️';
+      msg = `更新禮物：${h.giftName}`;
+      break;
+    case 'delete_gift':
+      icon = '🗑️';
+      msg = `刪除禮物：${h.giftName}`;
+      break;
     case 'stamp':
       icon = (stampRec && stampRec.sticker) || h.sticker || (t && t.sticker) || '⭐';
       const rReason = (stampRec && stampRec.reason) || h.reason || '';
@@ -4001,10 +4325,353 @@ function pickIllustrationFile(key) {
   inp.click();
 }
 
+// ============================================================
+// Points earning + gift redemption (flexible model)
+// ============================================================
+
+// ---- Earn / deduct points dialog ----
+function openEarnDialog(kidId, sign) {
+  const kid = state.kids.find(k => k.id === kidId);
+  if (!kid) return;
+  const deduct = sign < 0;
+  const draft = { amount: deduct ? 1 : 1, sticker: '⭐', reason: '', photo: '' };
+  const presets = deduct ? [1, 2, 3, 5] : [1, 2, 5, 10];
+  const allStickers = getAllForCategory('stickers', STICKERS);
+  const accent = deduct ? 'var(--danger)' : 'var(--primary)';
+
+  openModal(`
+    <div class="modal-handle"></div>
+
+    <div id="earnFormView">
+      <div class="modal-title">${deduct ? '－ 扣除點數' : '＋ 加點數'} <span id="titleSticker">${renderStickerHTML(draft.sticker, {size:24})}</span></div>
+      <div class="modal-sub">${deduct
+        ? `幫 ${escapeHtml(kid.name)} 修正點數（例如記錯了）`
+        : `${escapeHtml(kid.name)} 做得很棒！給幾點獎勵吧`}</div>
+
+      <div class="field">
+        <label class="field-label">${deduct ? '要扣幾點' : '要加幾點'}</label>
+        <div class="chip-group" id="amountChips">
+          ${presets.map(n => `<button class="chip ${draft.amount===n?'active':''}" data-v="${n}">${deduct?'－':'＋'}${n}</button>`).join('')}
+          <button class="chip ${!presets.includes(draft.amount)?'active':''}" data-v="custom">自訂</button>
+        </div>
+        <input class="input" id="amountCustom" type="number" min="1" max="999"
+               value="${draft.amount}" placeholder="自訂點數"
+               style="margin-top:8px; display:${!presets.includes(draft.amount)?'block':'none'}"/>
+      </div>
+
+      <div class="field">
+        <label class="field-label">貼紙</label>
+        <button type="button" class="sticker-trigger" id="openStickerPickerBtn">
+          <span class="sticker-trigger-icon" id="triggerStickerPreview">${renderStickerHTML(draft.sticker, {size:'80%'})}</span>
+          <span class="sticker-trigger-text">
+            <div class="sticker-trigger-label">點此選貼紙</div>
+            <div class="sticker-trigger-hint">${allStickers.length} 個可選</div>
+          </span>
+          <span class="sticker-trigger-arrow">›</span>
+        </button>
+      </div>
+
+      <div class="field">
+        <label class="field-label">理由 / 心情（選填）</label>
+        <textarea class="textarea" id="earnReason" placeholder="${deduct ? '例如：更正上次多加的點' : '例如：今天主動收玩具 🧸'}"></textarea>
+      </div>
+
+      ${deduct ? '' : `
+      <div class="field">
+        <label class="field-label">紀念照片（選填）</label>
+        <div class="photo-row" id="photoRow">
+          <button class="photo-btn" id="photoBtn" type="button">
+            <span class="icon">📷</span>
+            <span>選擇照片<br/>或拍張紀念照</span>
+          </button>
+          <input type="file" id="photoFile" accept="image/*" style="display:none">
+        </div>
+        <div class="help">照片會自動壓縮存在本機</div>
+      </div>`}
+
+      <div class="modal-actions">
+        <button class="btn btn-cancel" id="earnCancel">取消</button>
+        <button class="btn btn-primary" id="earnSave" style="background:${accent};">${deduct ? '扣點' : '加點！'}</button>
+      </div>
+    </div>
+
+    <div class="big-picker-view" id="earnPickerView">
+      <div class="big-picker-header">
+        <button class="big-picker-back" id="pickerBackBtn" type="button">‹</button>
+        <div class="big-picker-title">選個貼紙吧</div>
+        <div class="big-picker-current">
+          <span id="pickerCurrentIcon">${renderStickerHTML(draft.sticker, {size:18})}</span>
+          <span>目前</span>
+        </div>
+      </div>
+      <div class="big-sticker-grid" id="bigStickerGrid">
+        ${allStickers.map(item => `
+          <button type="button" class="big-sticker-cell ${item.value===draft.sticker?'active':''}" data-v="${escapeAttr(item.value)}">
+            ${item.type==='image' ? `<img src="${escapeAttr(item.src)}" alt="">` : item.value}
+          </button>
+        `).join('')}
+      </div>
+    </div>
+  `);
+
+  const formView = document.getElementById('earnFormView');
+  const pickerView = document.getElementById('earnPickerView');
+  const titleSticker = document.getElementById('titleSticker');
+  const triggerStickerPreview = document.getElementById('triggerStickerPreview');
+  const pickerCurrentIcon = document.getElementById('pickerCurrentIcon');
+
+  // Amount chips
+  document.querySelectorAll('#amountChips .chip').forEach(c => {
+    c.onclick = () => {
+      document.querySelectorAll('#amountChips .chip').forEach(x => x.classList.remove('active'));
+      c.classList.add('active');
+      const input = document.getElementById('amountCustom');
+      if (c.dataset.v === 'custom') { input.style.display = 'block'; input.focus(); }
+      else { input.value = c.dataset.v; input.style.display = 'none'; }
+    };
+  });
+
+  function setSticker(s) {
+    draft.sticker = s;
+    titleSticker.innerHTML = renderStickerHTML(s, {size:24});
+    triggerStickerPreview.innerHTML = renderStickerHTML(s, {size:'80%'});
+    pickerCurrentIcon.innerHTML = renderStickerHTML(s, {size:18});
+  }
+  function showPicker() { formView.style.display = 'none'; pickerView.classList.add('show'); const m=document.querySelector('.modal'); if(m)m.scrollTop=0; }
+  function showForm() { pickerView.classList.remove('show'); formView.style.display = 'block'; const m=document.querySelector('.modal'); if(m)m.scrollTop=0; }
+
+  document.getElementById('openStickerPickerBtn').onclick = showPicker;
+  document.getElementById('pickerBackBtn').onclick = showForm;
+  document.querySelectorAll('#bigStickerGrid .big-sticker-cell').forEach(cell => {
+    cell.onclick = () => {
+      document.querySelectorAll('#bigStickerGrid .big-sticker-cell').forEach(x => x.classList.remove('active'));
+      cell.classList.add('active');
+      setSticker(cell.dataset.v);
+      setTimeout(showForm, 220);
+    };
+  });
+
+  // Photo (earn only)
+  if (!deduct) {
+    const fileInput = document.getElementById('photoFile');
+    const photoRow = document.getElementById('photoRow');
+    const bindEmpty = () => {
+      document.getElementById('photoBtn').onclick = () => fileInput.click();
+    };
+    bindEmpty();
+    fileInput.onchange = async () => {
+      const f = fileInput.files && fileInput.files[0];
+      if (!f) return;
+      try {
+        photoRow.innerHTML = `<div class="photo-preview" style="display:grid;place-items:center;color:var(--ink-soft);font-size:13px;">壓縮中…</div>`;
+        const dataUrl = await compressImageFile(f);
+        draft.photo = dataUrl;
+        photoRow.innerHTML = `
+          <div class="photo-preview">
+            <img src="${dataUrl}" alt="預覽">
+            <button class="photo-remove" id="photoRemove" type="button">✕</button>
+          </div>
+          <button class="photo-btn" id="photoReplace" type="button"><span class="icon">🔄</span><span>換一張</span></button>
+        `;
+        document.getElementById('photoRemove').onclick = () => {
+          draft.photo = '';
+          photoRow.innerHTML = `
+            <button class="photo-btn" id="photoBtn" type="button"><span class="icon">📷</span><span>選擇照片<br/>或拍張紀念照</span></button>
+            <input type="file" id="photoFile2" accept="image/*" style="display:none">`;
+          document.getElementById('photoBtn').onclick = () => fileInput.click();
+        };
+        document.getElementById('photoReplace').onclick = () => fileInput.click();
+      } catch (e) {
+        toast(e.message || '照片處理失敗');
+      }
+      fileInput.value = '';
+    };
+  }
+
+  document.getElementById('earnCancel').onclick = closeModal;
+  document.getElementById('earnSave').onclick = () => {
+    const amount = Math.max(1, Math.min(999, parseInt(document.getElementById('amountCustom').value, 10) || 1));
+    const reason = document.getElementById('earnReason').value.trim();
+    commitEarn(kid.id, deduct ? -amount : amount, { sticker: draft.sticker, reason, photo: draft.photo });
+    closeModal();
+  };
+}
+
+function commitEarn(kidId, delta, payload) {
+  const kid = state.kids.find(k => k.id === kidId);
+  if (!kid) return;
+  payload = payload || {};
+  if (delta < 0 && (kid.points || 0) + delta < 0) {
+    // don't go negative — clamp the deduction to current balance
+    delta = -(kid.points || 0);
+    if (delta === 0) { toast('目前沒有點數可以扣'); return; }
+  }
+  kid.points = (kid.points || 0) + delta;
+
+  // Store the earn record separately (id-referenced) to keep history events small.
+  const rec = {
+    id: uid('e'),
+    kidId,
+    at: Date.now(),
+    amount: delta,
+    sticker: payload.sticker || '⭐',
+    reason: payload.reason || '',
+    photo: payload.photo || '',
+  };
+  state.earns = state.earns || [];
+  state.earns.push(rec);
+
+  logEvent(delta >= 0 ? 'earn' : 'deduct', {
+    kidId,
+    earnId: rec.id,
+    amount: delta,
+    balance: kid.points,
+    sticker: rec.sticker,
+  });
+  saveState();
+  render();
+  if (delta > 0) playStampAnimation(rec.sticker, { color: kid.color });
+}
+
 function redeemTheme(tid) {
   const t = state.themes.find(x => x.id === tid);
   if (!t) return;
   openRedeemDialog(tid);
+}
+
+// ---- Redeem a gift from the store ----
+function redeemGift(gid) {
+  const g = (state.gifts || []).find(x => x.id === gid);
+  if (!g) return;
+  const kid = state.kids.find(k => k.id === g.kidId);
+  if (!kid) return;
+  const cost = Math.max(1, g.cost || 1);
+  if ((kid.points || 0) < cost) { toast(`還差 ${cost - (kid.points || 0)} 點才能兌換`); return; }
+  openRedeemGiftDialog(gid);
+}
+
+function openRedeemGiftDialog(gid) {
+  const g = (state.gifts || []).find(x => x.id === gid);
+  if (!g) return;
+  const kid = state.kids.find(k => k.id === g.kidId);
+  if (!kid) return;
+  const cost = Math.max(1, g.cost || 1);
+  const draft = { name: g.name || '', photo: g.photo || '', emoji: g.sticker || '🎁' };
+
+  openModal(`
+    <div class="modal-handle"></div>
+    <div class="modal-title">🎉 兌換禮物</div>
+    <div class="modal-sub">用 <strong>${cost}</strong> 點換「${escapeHtml(g.name)}」，兌換後會收進小寶盒</div>
+
+    <div class="field">
+      <label class="field-label">寶物照片（建議拍一張！）</label>
+      <div id="rewardPhotoWrap"></div>
+      <input type="file" id="rewardFile" accept="image/*" style="display:none">
+      <div class="help">沒拍照也沒關係，會用下方的圖示當icon</div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">沒照片時用什麼當icon？</label>
+      <div class="sticker-grid" id="rewardEmojiGrid">
+        ${getAllForCategory('trophies', ['🎁','🧸','🎮','⚽','🚗','🎨','📚','🍰','🍦','🎈','🎀','🏆','💎','👑','🎵','🎂','🌹','🦄','🎪','🛼','🪁','🎢']).map(item => `<button class="sticker-opt ${item.value===draft.emoji?'active':''}" data-v="${escapeAttr(item.value)}">${item.type==='image' ? `<img src="${escapeAttr(item.src)}" alt="">` : item.value}</button>`).join('')}
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">獎勵名稱</label>
+      <input class="input" id="rewardName" value="${escapeHtml(draft.name)}" placeholder="例如：500元玩具" maxlength="40"/>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-cancel" id="redeemCancel">取消</button>
+      <button class="btn btn-success" id="redeemConfirm" style="background:linear-gradient(135deg, #FFD66B, #FFB5BA); box-shadow:0 4px 14px rgba(255,143,163,0.45);">🎁 用 ${cost} 點兌換！</button>
+    </div>
+  `);
+
+  const wrap = document.getElementById('rewardPhotoWrap');
+  const fileInput = document.getElementById('rewardFile');
+  function showPicker() {
+    wrap.innerHTML = `
+      <button class="reward-photo-pick" id="rewardPickBtn" type="button">
+        <div style="font-size:36px; margin-bottom:8px;">📸</div>
+        <div style="font-weight:800; font-size:15px; color:var(--ink);">拍下這次的寶物</div>
+        <div style="font-size:12px; color:var(--ink-soft); margin-top:4px;">讓寶盒裡有專屬的紀念照</div>
+      </button>`;
+    document.getElementById('rewardPickBtn').onclick = () => fileInput.click();
+  }
+  function showPreview(dataUrl) {
+    wrap.innerHTML = `
+      <div class="reward-photo-pick has-photo">
+        <div class="reward-photo-preview-wrap">
+          <img src="${dataUrl}" alt="寶物">
+          <div class="reward-photo-celebrate">✨ 寶物紀念照</div>
+          <button class="photo-remove" id="rewardRemove" type="button">✕</button>
+        </div>
+        <button class="small-icon-btn" id="rewardReplace" type="button" style="margin-top:8px;">🔄 換一張</button>
+      </div>`;
+    document.getElementById('rewardRemove').onclick = () => { draft.photo = ''; showPicker(); };
+    document.getElementById('rewardReplace').onclick = () => fileInput.click();
+  }
+  if (draft.photo) showPreview(draft.photo); else showPicker();
+  fileInput.onchange = async () => {
+    const f = fileInput.files && fileInput.files[0];
+    if (!f) return;
+    wrap.innerHTML = `<div style="text-align:center;padding:30px;color:var(--ink-soft);">壓縮中…</div>`;
+    try {
+      const dataUrl = await compressImageFile(f);
+      draft.photo = dataUrl;
+      showPreview(dataUrl);
+    } catch (e) { toast(e.message || '照片處理失敗'); showPicker(); }
+    fileInput.value = '';
+  };
+
+  upgradeStickerGrid('rewardEmojiGrid');
+  document.querySelectorAll('#rewardEmojiGrid .sticker-opt').forEach(b => {
+    b.onclick = () => {
+      document.querySelectorAll('#rewardEmojiGrid .sticker-opt').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+      draft.emoji = b.dataset.v;
+    };
+  });
+
+  document.getElementById('redeemCancel').onclick = closeModal;
+  document.getElementById('redeemConfirm').onclick = () => {
+    // Re-check balance at commit time
+    if ((kid.points || 0) < cost) { toast('點數不足'); return; }
+    const name = document.getElementById('rewardName').value.trim() || g.name || '神秘寶物';
+    kid.points = (kid.points || 0) - cost;
+    // Store the redemption as a "trophy theme" so the 小寶盒 & trophy detail work unchanged.
+    const trophyTheme = {
+      id: uid('t'),
+      kidId: kid.id,
+      title: name,
+      reward: name,
+      goal: cost,
+      points: cost,
+      sticker: g.sticker || '🎁',
+      color: g.color || 'pink',
+      stamps: [],
+      redeemedAt: Date.now(),
+      trophy: { name, photo: draft.photo || '', emoji: draft.emoji || '🎁' },
+      createdAt: Date.now(),
+      archived: true,
+      fromGift: true,
+    };
+    state.themes.push(trophyTheme);
+    logEvent('redeem', {
+      themeId: trophyTheme.id,
+      themeTitle: name,
+      kidId: kid.id,
+      reward: name,
+      cost,
+      trophyEmoji: trophyTheme.trophy.emoji,
+    });
+    saveState();
+    closeModal();
+    burstConfetti();
+    toast(`🎉 ${name} 入手！收進小寶盒了！`);
+    render();
+  };
 }
 
 // New: redeem dialog with trophy photo
@@ -4165,6 +4832,155 @@ function confirmResetTheme(tid) {
       render();
     }
   });
+}
+
+// ---- Gift delete ----
+function confirmDeleteGift(gid) {
+  const g = (state.gifts || []).find(x => x.id === gid);
+  if (!g) return;
+  openConfirm({
+    icon: '🗑️',
+    title: '刪除這個禮物？',
+    text: `「${g.name}」會從商店移除（已兌換的紀錄不受影響）`,
+    confirmLabel: '刪除',
+    danger: true,
+    onConfirm: () => {
+      state.gifts = state.gifts.filter(x => x.id !== gid);
+      logEvent('delete_gift', { giftName: g.name, kidId: g.kidId });
+      saveState();
+      closeModal();
+      toast('已刪除');
+      render();
+    }
+  });
+}
+
+// ---- Gift Editor (新增 / 編輯禮物) ----
+function openGiftEditor(gid) {
+  const editing = gid ? (state.gifts || []).find(g => g.id === gid) : null;
+  const kid = state.kids.find(k => k.id === view.kidId);
+  if (!kid) return;
+  const draft = editing ? {...editing} : {
+    name: '',
+    cost: 10,
+    sticker: '🎁',
+    color: kid.color || 'pink',
+    photo: '',
+  };
+  const presets = [5, 10, 20, 30];
+
+  openModal(`
+    <div class="modal-handle"></div>
+    <div class="modal-title">${editing ? '編輯禮物' : '新增禮物'}</div>
+    <div class="modal-sub">幫 ${escapeHtml(kid.name)} 設定一個可以兌換的獎勵 🎁</div>
+
+    <div class="field">
+      <label class="field-label">禮物名稱</label>
+      <input class="input" id="gName" placeholder="例如：一起看電影、扭蛋一次" value="${escapeHtml(draft.name)}" maxlength="40"/>
+    </div>
+
+    <div class="field">
+      <label class="field-label">需要幾點兌換</label>
+      <div class="chip-group" id="costChips">
+        ${presets.map(n => `<button class="chip ${draft.cost===n?'active':''}" data-v="${n}">${n} 點</button>`).join('')}
+        <button class="chip ${!presets.includes(draft.cost)?'active':''}" data-v="custom">自訂</button>
+      </div>
+      <input class="input" id="gCostCustom" type="number" min="1" max="999" placeholder="自訂點數"
+             value="${draft.cost}" style="margin-top:8px; display:${!presets.includes(draft.cost)?'block':'none'}"/>
+    </div>
+
+    <div class="field">
+      <label class="field-label">選一個圖示</label>
+      <div class="sticker-grid" id="giftStickerGrid">
+        ${getAllForCategory('trophies', ['🎁','🧸','🎮','⚽','🚗','🎨','📚','🍰','🍦','🎈','🎀','🏆','💎','👑','🎵','🎂','🌹','🦄','🎪','🛼','🪁','🎢']).map(item => `<button class="sticker-opt ${item.value===draft.sticker?'active':''}" data-v="${escapeAttr(item.value)}">${item.type==='image' ? `<img src="${escapeAttr(item.src)}" alt="">` : item.value}</button>`).join('')}
+      </div>
+      <input class="input" id="gStickerCustom" placeholder="或自訂圖示（貼上 emoji、單字）"
+             value="${!['🎁','🧸','🎮','⚽','🚗','🎨','📚','🍰','🍦','🎈','🎀','🏆','💎','👑','🎵','🎂','🌹','🦄','🎪','🛼','🪁','🎢'].includes(draft.sticker)?escapeHtml(draft.sticker):''}" maxlength="6" style="margin-top:8px;"/>
+    </div>
+
+    <div class="field">
+      <label class="field-label">卡片顏色</label>
+      <div class="color-row" id="gColorRow">
+        ${COLORS.map(c => `<button class="color-opt ${c.name===draft.color?'active':''}" data-v="${c.name}" style="background:${c.main}"></button>`).join('')}
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      ${editing ? `<button class="btn btn-delete" id="gDelete">刪除</button>` : ''}
+      <button class="btn btn-cancel" id="gCancel">取消</button>
+      <button class="btn btn-primary" id="gSave">${editing ? '儲存' : '建立'}</button>
+    </div>
+  `);
+
+  document.querySelectorAll('#costChips .chip').forEach(c => {
+    c.onclick = () => {
+      document.querySelectorAll('#costChips .chip').forEach(x => x.classList.remove('active'));
+      c.classList.add('active');
+      const input = document.getElementById('gCostCustom');
+      if (c.dataset.v === 'custom') { input.style.display = 'block'; input.focus(); }
+      else { input.value = c.dataset.v; input.style.display = 'none'; }
+    };
+  });
+
+  upgradeStickerGrid('giftStickerGrid');
+  document.querySelectorAll('#giftStickerGrid .sticker-opt').forEach(b => {
+    b.onclick = () => {
+      document.querySelectorAll('#giftStickerGrid .sticker-opt').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+      draft.sticker = b.dataset.v;
+      document.getElementById('gStickerCustom').value = '';
+    };
+  });
+  document.getElementById('gStickerCustom').oninput = (e) => {
+    if (e.target.value.trim()) {
+      document.querySelectorAll('#giftStickerGrid .sticker-opt').forEach(x => x.classList.remove('active'));
+      draft.sticker = e.target.value.trim();
+    }
+  };
+
+  document.querySelectorAll('#gColorRow .color-opt').forEach(b => {
+    b.onclick = () => {
+      document.querySelectorAll('#gColorRow .color-opt').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+      draft.color = b.dataset.v;
+    };
+  });
+
+  document.getElementById('gCancel').onclick = closeModal;
+  document.getElementById('gSave').onclick = () => {
+    const name = document.getElementById('gName').value.trim();
+    const cost = Math.max(1, Math.min(999, parseInt(document.getElementById('gCostCustom').value, 10) || 10));
+    if (!name) { toast('請輸入禮物名稱'); return; }
+
+    if (editing) {
+      Object.assign(editing, { name, cost, sticker: draft.sticker || '🎁', color: draft.color });
+      logEvent('edit_gift', { giftName: name, kidId: editing.kidId });
+      toast('已更新');
+    } else {
+      const g = {
+        id: uid('g'),
+        kidId: view.kidId,
+        name, cost,
+        sticker: draft.sticker || '🎁',
+        color: draft.color,
+        photo: '',
+        createdAt: Date.now(),
+      };
+      state.gifts.push(g);
+      logEvent('create_gift', { giftName: g.name, cost: g.cost, kidId: g.kidId });
+      toast('已新增禮物 🎁');
+    }
+    saveState();
+    closeModal();
+    render();
+  };
+
+  if (editing) {
+    document.getElementById('gDelete').onclick = () => {
+      closeModal();
+      setTimeout(() => confirmDeleteGift(editing.id), 200);
+    };
+  }
 }
 
 // ---- Kid Editor ----
@@ -4520,7 +5336,7 @@ document.getElementById('fab').onclick = () => {
   if (state.kids.length === 0) {
     openKidEditor(null);
   } else {
-    openThemeEditor(null);
+    openGiftEditor(null);
   }
 };
 
@@ -4530,8 +5346,8 @@ document.getElementById('libBtn').onclick = openLibrary;
 // ---- Backup / Restore ----
 function openBackupModal() {
   const kids = state.kids.length;
-  const themes = state.themes.length;
-  const stamps = state.themes.reduce((s, t) => s + (t.stamps ? t.stamps.length : 0), 0);
+  const gifts = (state.gifts || []).length;
+  const totalPoints = state.kids.reduce((s, k) => s + (k.points || 0), 0);
   const bytes = JSON.stringify(state).length;
   const kb = (bytes / 1024).toFixed(1);
   const d = new Date();
@@ -4546,8 +5362,8 @@ function openBackupModal() {
       <div style="font-size:13px; color:var(--ink-soft); margin-bottom:8px; font-weight:700;">目前的資料</div>
       <div style="display:flex; gap:16px; flex-wrap:wrap;">
         <span style="font-size:13px;">👶 ${kids} 位小朋友</span>
-        <span style="font-size:13px;">📋 ${themes} 個主題</span>
-        <span style="font-size:13px;">⭐ ${stamps} 個集點</span>
+        <span style="font-size:13px;">🎁 ${gifts} 個禮物</span>
+        <span style="font-size:13px;">⭐ ${totalPoints} 點</span>
         <span style="font-size:13px; color:var(--ink-faint);">${kb} KB</span>
       </div>
     </div>
@@ -4617,27 +5433,19 @@ function openBackupModal() {
       const text = await file.text();
       const backup = JSON.parse(text);
       // Basic validation
-      if (!backup.state || !backup.state.kids || !backup.state.themes) {
+      if (!backup.state || !Array.isArray(backup.state.kids)) {
         toast('檔案格式不對，請選擇集點寶貝備份檔');
         return;
       }
-      // Run migration on imported state
-      (backup.state.themes || []).forEach(t => {
-        if (!Array.isArray(t.stamps)) {
-          t.stamps = Array.from({ length: Math.max(0, t.points || 0) }, (_, i) => ({
-            id: uid('s'), at: (t.createdAt || Date.now()) + i * 60000,
-            sticker: t.sticker || '⭐',
-          }));
-        }
-        t.points = t.stamps.length;
-      });
+      // Run migration on imported state (upgrades old backups to the points model)
+      migrateData(backup.state);
       // Confirm before overwriting
       closeModal();
       setTimeout(() => {
         openConfirm({
           icon: '📥',
           title: '確定要匯入備份？',
-          text: `將會覆蓋現有的 ${kids} 位小朋友、${themes} 個主題的資料`,
+          text: `將會覆蓋現有的 ${kids} 位小朋友、${gifts} 個禮物的資料`,
           confirmLabel: '確定匯入',
           danger: true,
           onConfirm: () => {
