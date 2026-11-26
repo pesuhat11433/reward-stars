@@ -2685,6 +2685,10 @@
   }
   .kid-edit svg { width: 18px; height: 18px; }
   .kid-chip.active:hover .kid-edit { transform: rotate(-12deg) scale(1.1); transition: transform .4s var(--spring); }
+
+  /* full-body chibi preview */
+  .avm-preview { width: 176px !important; height: 250px !important; border-radius: 28px !important; }
+  .avm-preview svg { width: 100%; height: 100%; }
 </style>
 </head>
 <body>
@@ -5282,13 +5286,232 @@ function avFeatures(p) {
   return out;
 }
 
+// ============================================================
+// Chibi body · 全身 Q 版身體、造型、配件、更多髮型
+// Head stays in the same 0..200 box, so head-only crops (chips, helmet) keep working;
+// the body is drawn below the chin and only shows in the taller full-body viewBox.
+// ============================================================
+const AV_FULL_VIEWBOX = '0 0 200 284';
+const AS = `stroke="${AV_INK}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"`;
+const ARM_L = 'M77,180 L63,220', ARM_R = 'M123,180 L137,220';
+const ARM_L_SHORT = 'M77,180 L71,196', ARM_R_SHORT = 'M123,180 L129,196';
+function limb(d, color, w) {
+  w = w || 9;
+  return `<path d="${d}" stroke="${AV_INK}" stroke-width="${w + 4.4}" stroke-linecap="round" fill="none"/><path d="${d}" stroke="${color}" stroke-width="${w}" stroke-linecap="round" fill="none"/>`;
+}
+const TORSO = 'M80,175 C82,169 90,166 100,166 C110,166 118,169 120,175 L123,208 L77,208Z';
+const BOTTOMS = {
+  skirtA: 'M79,204 L121,204 L138,246 C120,253 80,253 62,246Z',
+  skirtKnee: 'M79,204 L121,204 L134,240 C118,246 82,246 66,240Z',
+  skirtBall: 'M79,204 L121,204 C130,222 148,246 150,266 C120,274 80,274 50,266 C52,246 70,222 79,204Z',
+  skirtLong: 'M79,204 L121,204 L134,266 C112,272 88,272 66,266Z',
+  pants: 'M77,204 L123,204 L122,252 L103,252 L100,228 L97,252 L78,252Z',
+  shorts: 'M77,204 L123,204 L124,232 L103,232 L100,220 L97,232 L76,232Z',
+  harem: 'M77,204 L123,204 C131,230 125,252 114,256 L104,256 L100,228 L96,256 L86,256 C75,252 69,230 77,204Z',
+  tail: 'M80,204 L120,204 C126,226 118,246 105,256 L116,274 C106,272 101,268 100,265 C99,268 94,272 84,274 L95,256 C82,246 74,226 80,204Z',
+};
+function sparkle(x, y, r, c) {
+  return `<path d="M${x},${y - r} Q${x},${y} ${x + r},${y} Q${x},${y} ${x},${y + r} Q${x},${y} ${x - r},${y} Q${x},${y} ${x},${y - r}Z" fill="${c || '#fff'}"/>`;
+}
+function dots(list, r, c) { return list.map(([x, y]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${c}"/>`).join(''); }
+
+// o: { top, sleeve: 'puff'|'long'|'short'|'none'|'wide', sleeveColor, bottom, bottomColor, shoe, barefoot, noLegs, crop, offShoulder, back(p), extra(p) }
+const OUTFITS = {
+  // ---------- 女生 ----------
+  g_ice:      { label: '冰雪禮服', acc: 'tiara', top: '#8CCBEB', sleeve: 'long', sleeveColor: '#D3ECF9', bottom: 'skirtLong', bottomColor: '#BFE3F5', shoe: '#9FD2EE',
+                back: () => `<path d="M78,176 L122,176 L152,270 C112,280 88,280 48,270Z" fill="#E6F5FC" opacity=".9" ${AS}/>`,
+                extra: () => sparkle(88, 228, 4) + sparkle(112, 246, 5) + sparkle(96, 256, 3) + sparkle(118, 222, 3) + sparkle(100, 186, 3.5) },
+  g_tower:    { label: '紫色蕾絲裙', acc: 'flower', top: '#9B7BD0', sleeve: 'puff', sleeveColor: '#F4B7D0', bottom: 'skirtA', bottomColor: '#B9A0E6', shoe: '#F4B7D0',
+                extra: () => `<path d="M94,178 L106,186 L94,194 L106,202" stroke="#F4B7D0" stroke-width="2" fill="none"/><path d="M64,242 C88,250 112,250 136,242" stroke="#F4B7D0" stroke-width="5" fill="none"/>` },
+  g_mermaid:  { label: '小美人魚', acc: 'flower', top: null, sleeve: 'none', bottom: 'tail', bottomColor: '#4FBF9F', noLegs: true,
+                extra: () => `<path d="M84,190 C84,180 98,180 98,190Z M102,190 C102,180 116,180 116,190Z" fill="#B48FE0" ${AS}/>` +
+                  [[90, 220], [104, 220], [97, 232], [111, 232], [90, 244], [104, 244]].map(([x, y]) => `<path d="M${x - 6},${y} Q${x},${y + 6} ${x + 6},${y}" stroke="#2F8F73" stroke-width="1.6" fill="none"/>`).join('') },
+  g_gold:     { label: '金色舞會裙', acc: 'none', top: '#F6D25A', offShoulder: true, sleeve: 'none', bottom: 'skirtBall', bottomColor: '#F6D25A', shoe: '#E8B93C',
+                extra: () => `<path d="M62,232 C86,242 114,242 138,232 M54,254 C84,264 116,264 146,254" stroke="#E0B03A" stroke-width="2.2" fill="none"/>` },
+  g_rose:     { label: '粉紅長禮服', acc: 'crown', top: '#F4A6C8', sleeve: 'long', sleeveColor: '#F4A6C8', bottom: 'skirtBall', bottomColor: '#F7B9D3', shoe: '#E07FA9',
+                extra: () => `<path d="M88,168 L100,182 L112,168" fill="#FFFDF8" ${AS}/><path d="M60,240 Q70,250 80,240 Q90,250 100,240 Q110,250 120,240 Q130,250 140,240" stroke="#E691B6" stroke-width="2" fill="none"/>` },
+  g_sky:      { label: '天藍舞會裙', acc: 'headband', top: '#9CC9F0', sleeve: 'puff', sleeveColor: '#D6ECFB', bottom: 'skirtBall', bottomColor: '#A9D2F3', shoe: '#7DB5E6',
+                extra: () => `<path d="M84,206 C94,232 106,232 116,206 L124,250 C108,258 92,258 76,250Z" fill="#D6ECFB" opacity=".85"/><path d="M93,162 L107,162" stroke="#2B2622" stroke-width="3"/>` },
+  g_apple:    { label: '蘋果洋裝', acc: 'bow', top: '#E5453A', sleeve: 'puff', sleeveColor: '#FFFDF8', bottom: 'skirtKnee', bottomColor: '#FFF3D9', shoe: '#E5453A',
+                extra: () => `<path d="M86,168 C90,176 110,176 114,168 L110,166 C106,170 94,170 90,166Z" fill="#FFFDF8" ${AS}/>` + dots([[82, 222], [100, 230], [118, 220], [90, 238], [112, 238], [124, 232], [74, 236]], 2.6, '#E5453A') },
+  g_folk:     { label: '北國披風裙', acc: 'none', top: '#2F2F3A', sleeve: 'long', sleeveColor: '#BFE0F2', bottom: 'skirtA', bottomColor: '#3B4F8C', shoe: '#2F2F3A',
+                back: () => `<path d="M74,176 L126,176 L134,218 C112,226 88,226 66,218Z" fill="#8C3B7A" ${AS}/>`,
+                extra: () => dots([[92, 186], [108, 186], [100, 196]], 2.4, '#F4A6C8') + `<path d="M66,240 C88,248 112,248 134,240" stroke="#E8B93C" stroke-width="2" fill="none"/>` },
+  g_hanfu:    { label: '古風長裙', acc: 'flower', top: '#7FB89A', sleeve: 'wide', sleeveColor: '#7FB89A', bottom: 'skirtLong', bottomColor: '#F6D98A', shoe: '#3B5BA5',
+                extra: () => `<path d="M84,170 L104,196 M116,170 L96,196" stroke="#FFFDF8" stroke-width="3"/><rect x="77" y="198" width="46" height="10" fill="#3B5BA5" ${AS}/><path d="M102,208 L98,228 M104,208 L110,226" stroke="#E5453A" stroke-width="3"/>` },
+  g_desert:   { label: '沙漠褲裝', acc: 'headband', top: '#4FC3B8', crop: true, sleeve: 'none', bottom: 'harem', bottomColor: '#8FE0D8', shoe: '#E8B93C',
+                extra: () => `<rect x="77" y="202" width="46" height="5" fill="#E8B93C" ${AS}/>` },
+  g_island:   { label: '海島草裙', acc: 'flower', top: '#E5453A', crop: true, sleeve: 'none', bottom: 'skirtKnee', bottomColor: '#F5E6C8', barefoot: true,
+                extra: () => `<path d="M70,226 L78,236 L86,226 L94,236 L102,226 L110,236 L118,226 L126,236 L132,228" stroke="#A0522D" stroke-width="2" fill="none"/>` + dots([[90, 170], [100, 173], [110, 170]], 2.6, '#FFFDF8') },
+  g_fringe:   { label: '流蘇洋裝', acc: 'none', top: '#E3BC8A', sleeve: 'none', bottom: 'skirtA', bottomColor: '#E3BC8A', shoe: '#B5845A',
+                extra: () => `<path d="M64,246 L68,254 L72,246 L76,254 L80,246 L84,254 L88,246 L92,254 L96,246 L100,254 L104,246 L108,254 L112,246 L116,254 L120,246 L124,254 L128,246 L132,254 L136,246" stroke="#B5845A" stroke-width="2" fill="none"/><circle cx="100" cy="176" r="4" fill="#3FB8AF" ${AS}/>` },
+  // ---------- 男生 ----------
+  b_prince:   { label: '小王子', acc: 'crown', top: '#3C5DA8', sleeve: 'long', sleeveColor: '#3C5DA8', bottom: 'pants', bottomColor: '#FFFDF8', shoe: '#2B2622',
+                extra: () => `<path d="M80,174 L120,206" stroke="#E5453A" stroke-width="6"/>` + dots([[100, 182], [100, 192], [100, 202]], 2, '#F6C244') + `<rect x="72" y="172" width="12" height="7" rx="3" fill="#F6C244" ${AS}/><rect x="116" y="172" width="12" height="7" rx="3" fill="#F6C244" ${AS}/>` },
+  b_dino:     { label: '恐龍裝', acc: 'dino', top: '#79C267', sleeve: 'long', sleeveColor: '#79C267', bottom: 'pants', bottomColor: '#79C267', shoe: '#5FA552',
+                back: () => `<path d="M114,226 C136,226 150,236 162,252 C146,250 132,248 116,244Z" fill="#79C267" ${AS}/><path d="M136,232 l4,-7 l3,8 M148,240 l5,-6 l2,8" stroke="${AV_INK}" stroke-width="1.6" fill="#F6D25A"/>`,
+                extra: () => `<ellipse cx="100" cy="200" rx="13" ry="18" fill="#F6E7A1" ${AS}/>` },
+  b_racer:    { label: '賽車手', acc: 'none', top: '#E5453A', sleeve: 'long', sleeveColor: '#E5453A', bottom: 'pants', bottomColor: '#E5453A', shoe: '#2B2622',
+                extra: () => `<circle cx="100" cy="188" r="8" fill="#FFFDF8" ${AS}/><path d="M98,184 L101,182 L101,194" stroke="${AV_INK}" stroke-width="2" fill="none"/>` +
+                  Array.from({ length: 8 }, (_, i) => `<rect x="${78 + i * 5.6}" y="${i % 2 ? 203 : 206}" width="5.6" height="3" fill="#2B2622"/>`).join('') + `<path d="M80,212 L80,250 M120,212 L120,250" stroke="#FFFDF8" stroke-width="3"/>` },
+  b_astro:    { label: '太空人', acc: 'none', top: '#FFFDF8', sleeve: 'long', sleeveColor: '#FFFDF8', bottom: 'pants', bottomColor: '#FFFDF8', shoe: '#A9A49E',
+                extra: () => `<rect x="90" y="182" width="20" height="13" rx="3" fill="#E4DED4" ${AS}/>` + dots([[95, 188]], 2, '#E5453A') + dots([[101, 188]], 2, '#FBC444') + dots([[107, 188]], 2, '#4A7FD0') + `<rect x="77" y="203" width="46" height="6" fill="#A9A49E" ${AS}/>` },
+  b_knight:   { label: '小騎士', acc: 'none', top: '#3C5DA8', sleeve: 'long', sleeveColor: '#BDBAB6', bottom: 'pants', bottomColor: '#BDBAB6', shoe: '#8D8984',
+                extra: () => `<path d="M84,172 L116,172 L118,196 C110,204 90,204 82,196Z" fill="#D9D6D1" ${AS}/><path d="M100,176 L100,198 M90,186 L110,186" stroke="#F6C244" stroke-width="3"/>` },
+  b_pirate:   { label: '小海盜', acc: 'pirate', top: '#FFFDF8', sleeve: 'short', sleeveColor: '#FFFDF8', bottom: 'shorts', bottomColor: '#8E6149', shoe: '#2B2622',
+                extra: () => `<path d="M80,180 H120 M79,188 H121 M78,196 H122" stroke="#E5453A" stroke-width="2.6"/><path d="M80,174 L90,170 L92,208 L77,208Z M120,174 L110,170 L108,208 L123,208Z" fill="#2B2622" ${AS}/><rect x="77" y="203" width="46" height="6" fill="#5A3B2C" ${AS}/><rect x="96" y="202" width="8" height="8" fill="#F6C244" ${AS}/>` },
+  b_fire:     { label: '消防員', acc: 'fire', top: '#F6C244', sleeve: 'long', sleeveColor: '#F6C244', bottom: 'pants', bottomColor: '#2B2622', shoe: '#2B2622',
+                extra: () => `<path d="M78,196 H122 M69,206 L73,200 M131,206 L127,200" stroke="#E4DED4" stroke-width="4"/><path d="M80,238 H96 M104,238 H120" stroke="#F6C244" stroke-width="3"/>` },
+  b_police:   { label: '小警察', acc: 'police', top: '#4A6FB5', sleeve: 'short', sleeveColor: '#4A6FB5', bottom: 'pants', bottomColor: '#2B2F45', shoe: '#2B2622',
+                extra: () => `<path d="M100,168 L96,196 L100,200 L104,196Z" fill="#2B2F45" ${AS}/>` + sparkle(112, 182, 5, '#F6C244') },
+  b_hero:     { label: '超級英雄', acc: 'none', top: '#4A7FD0', sleeve: 'long', sleeveColor: '#4A7FD0', bottom: 'pants', bottomColor: '#4A7FD0', shoe: '#E5453A',
+                back: () => `<path d="M80,174 L120,174 L142,262 C112,270 88,270 58,262Z" fill="#E5453A" ${AS}/>`,
+                extra: () => `<path d="M100,178 L103,186 L111,186 L105,191 L107,199 L100,194 L93,199 L95,191 L89,186 L97,186Z" fill="#F6C244" ${AS}/><rect x="77" y="203" width="46" height="5" fill="#E5453A" ${AS}/>` },
+  b_train:    { label: '火車長', acc: 'conductor', top: '#FFFDF8', sleeve: 'long', sleeveColor: '#FFFDF8', bottom: 'pants', bottomColor: '#4A6FB5', shoe: '#8E6149',
+                extra: () => `<rect x="86" y="184" width="28" height="24" fill="#4A6FB5" ${AS}/><path d="M86,184 L80,172 M114,184 L120,172" stroke="#4A6FB5" stroke-width="4"/><path d="M92,184 V252 M100,184 V226 M108,184 V252" stroke="#FFFDF8" stroke-width="1.4" opacity=".8"/><path d="M90,166 L100,178 L110,166Z" fill="#E5453A" ${AS}/>` },
+  b_cartee:   { label: '汽車T恤', acc: 'none', top: '#FBC444', sleeve: 'short', sleeveColor: '#FBC444', bottom: 'pants', bottomColor: '#4A6FB5', shoe: '#FFFDF8',
+                extra: () => `<path d="M86,194 L88,186 L96,184 L102,178 L110,178 L114,186 L116,194Z" fill="#E5453A" ${AS}/><circle cx="92" cy="195" r="3.4" fill="#2B2622"/><circle cx="110" cy="195" r="3.4" fill="#2B2622"/>` },
+  b_chef:     { label: '小廚師', acc: 'chef', top: '#FFFDF8', sleeve: 'long', sleeveColor: '#FFFDF8', bottom: 'pants', bottomColor: '#3A3434', shoe: '#2B2622',
+                extra: () => dots([[94, 182], [106, 182], [94, 194], [106, 194]], 2, '#BDBAB6') + `<path d="M90,166 L100,176 L110,166Z" fill="#E5453A" ${AS}/>` +
+                  Array.from({ length: 6 }, (_, i) => `<rect x="${79 + (i % 3) * 14}" y="${214 + Math.floor(i / 3) * 16}" width="7" height="7" fill="#FFFDF8" opacity=".9"/>`).join('') },
+};
+const GIRL_OUTFITS = Object.keys(OUTFITS).filter(k => k.startsWith('g_'));
+const BOY_OUTFITS = Object.keys(OUTFITS).filter(k => k.startsWith('b_'));
+
+function avOutfitBack(p) {
+  const o = OUTFITS[p.outfit];
+  return o && o.back ? o.back(p) : '';
+}
+function avBody(p) {
+  const o = OUTFITS[p.outfit] || OUTFITS.g_apple;
+  const skin = p.skin;
+  let s = '';
+  // legs + feet
+  if (!o.noLegs) {
+    s += `<rect x="85" y="226" width="11" height="38" rx="5" fill="${skin}" ${AS}/><rect x="104" y="226" width="11" height="38" rx="5" fill="${skin}" ${AS}/>`;
+  }
+  // arms (skin), then sleeves
+  s += limb(ARM_L, skin) + limb(ARM_R, skin);
+  if (o.sleeve === 'long') s += limb('M77,180 L65,214', o.sleeveColor) + limb('M123,180 L135,214', o.sleeveColor);
+  if (o.sleeve === 'wide') s += limb('M77,180 L66,212', o.sleeveColor, 16) + limb('M123,180 L134,212', o.sleeveColor, 16);
+  if (o.sleeve === 'short') s += limb(ARM_L_SHORT, o.sleeveColor, 11) + limb(ARM_R_SHORT, o.sleeveColor, 11);
+  s += `<circle cx="62" cy="223" r="5.6" fill="${skin}" ${AS}/><circle cx="138" cy="223" r="5.6" fill="${skin}" ${AS}/>`;
+  // neck + bare torso underneath
+  s += `<rect x="93" y="154" width="14" height="20" fill="${skin}" ${AS}/>`;
+  s += `<path d="${TORSO}" fill="${skin}" ${AS}/>`;
+  // top
+  if (o.top) {
+    if (o.offShoulder) s += `<path d="M78,184 C90,180 110,180 122,184 L123,208 L77,208Z" fill="${o.top}" ${AS}/>`;
+    else if (o.crop) s += `<path d="M80,175 C82,169 90,166 100,166 C110,166 118,169 120,175 L121,192 C110,196 90,196 79,192Z" fill="${o.top}" ${AS}/>`;
+    else s += `<path d="${TORSO}" fill="${o.top}" ${AS}/>`;
+  }
+  if (o.sleeve === 'puff') {
+    s += `<ellipse cx="77" cy="180" rx="9" ry="8" fill="${o.sleeveColor}" ${AS}/><ellipse cx="123" cy="180" rx="9" ry="8" fill="${o.sleeveColor}" ${AS}/>`;
+  }
+  // bottom
+  s += `<path d="${BOTTOMS[o.bottom]}" fill="${o.bottomColor}" ${AS}/>`;
+  if (o.bottom === 'tail') s += `<path d="M84,274 C92,266 98,264 100,265 C102,264 108,266 116,274 C110,280 104,276 100,270 C96,276 90,280 84,274Z" fill="#7FD6BB" ${AS}/>`;
+  // shoes
+  if (!o.noLegs) {
+    if (o.barefoot) s += `<ellipse cx="90" cy="265" rx="7" ry="4.5" fill="${skin}" ${AS}/><ellipse cx="110" cy="265" rx="7" ry="4.5" fill="${skin}" ${AS}/>`;
+    else s += `<ellipse cx="89" cy="266" rx="9.5" ry="5.6" fill="${o.shoe}" ${AS}/><ellipse cx="111" cy="266" rx="9.5" ry="5.6" fill="${o.shoe}" ${AS}/>`;
+  }
+  if (o.extra) s += o.extra(p);
+  return s;
+}
+
+// ---------- 配件 ----------
+function avAcc(p) {
+  const c = p.hairColor;
+  switch (p.acc) {
+    case 'crown': return `<path d="M72,48 L74,20 L88,34 L100,14 L112,34 L126,20 L128,48Z" fill="#F6C244" ${AS}/>` + dots([[100, 38]], 3.4, '#E5453A') + dots([[84, 42], [116, 42]], 2.4, '#4A7FD0');
+    case 'tiara': return `<path d="M76,50 C86,40 114,40 124,50 L118,38 L110,44 L100,30 L90,44 L82,38Z" fill="#DCEAF5" ${AS}/>` + dots([[100, 40]], 2.8, '#4A7FD0');
+    case 'bow': return `<path d="M128,46 C116,30 104,40 110,50 C116,58 124,52 128,46 C140,30 152,40 146,50 C140,58 132,52 128,46Z" fill="#E5453A" ${AS}/><circle cx="128" cy="46" r="4" fill="#C93A30" ${AS}/>`;
+    case 'headband': return `<path d="M44,92 C46,52 80,40 100,40 C120,40 154,52 156,92" stroke="${AV_INK}" stroke-width="9" fill="none" stroke-linecap="round"/><path d="M44,92 C46,52 80,40 100,40 C120,40 154,52 156,92" stroke="#E5453A" stroke-width="5" fill="none" stroke-linecap="round"/>`;
+    case 'flower': return [0, 72, 144, 216, 288].map(a => `<ellipse cx="62" cy="62" rx="6" ry="9" transform="rotate(${a} 62 70)" fill="#F7A8C4" ${AS}/>`).join('') + `<circle cx="62" cy="70" r="4" fill="#FBC444" ${AS}/>`;
+    case 'catears': return `<path d="M50,64 L56,30 L80,48Z M150,64 L144,30 L120,48Z" fill="${c}" ${AS}/><path d="M57,52 L59,38 L71,48Z M143,52 L141,38 L129,48Z" fill="#F7B6C2"/>`;
+    case 'dino': return `<path fill-rule="evenodd" d="M22,124 C18,48 182,48 178,124 C178,176 148,198 100,198 C52,198 22,176 22,124Z M100,64 C132,64 152,86 152,116 C152,146 130,164 100,164 C70,164 48,146 48,116 C48,86 68,64 100,64Z" fill="#79C267" ${AS}/>` +
+        [[52, 50, 60, 32, 70, 48], [74, 40, 86, 22, 94, 38], [100, 36, 112, 18, 122, 38], [126, 42, 140, 26, 146, 48]].map(([a, b, cx, cy, d, e]) => `<path d="M${a},${b} L${cx},${cy} L${d},${e}Z" fill="#F6D25A" ${AS}/>`).join('');
+    case 'fire': return `<path d="M42,86 C42,30 158,30 158,86Z" fill="#E5453A" ${AS}/><path d="M30,86 C60,96 140,96 170,86 L170,92 C140,104 60,104 30,92Z" fill="#C93A30" ${AS}/><path d="M92,46 L108,46 L108,64 L100,70 L92,64Z" fill="#F6C244" ${AS}/>`;
+    case 'police': return `<path d="M44,78 C42,40 158,40 156,78Z" fill="#2B2F45" ${AS}/><path d="M44,78 C70,90 130,90 156,78 L160,86 C130,100 70,100 40,86Z" fill="#1E1E22" ${AS}/>` + sparkle(100, 58, 7, '#F6C244');
+    case 'pirate': return `<path d="M28,74 C40,40 70,24 100,30 C130,24 160,40 172,74 C140,62 60,62 28,74Z" fill="#2B2622" ${AS}/><circle cx="100" cy="46" r="7" fill="#FFFDF8"/><circle cx="97" cy="45" r="1.6" fill="#2B2622"/><circle cx="103" cy="45" r="1.6" fill="#2B2622"/>`;
+    case 'chef': return `<path d="M62,70 C50,50 60,28 78,32 C82,14 118,14 122,32 C140,28 150,50 138,70Z" fill="#FFFDF8" ${AS}/><rect x="62" y="66" width="76" height="14" rx="4" fill="#FFFDF8" ${AS}/>`;
+    case 'conductor': return `<path d="M46,76 C44,42 156,42 154,76Z" fill="#4A6FB5" ${AS}/><path d="M58,52 V74 M74,46 V74 M90,44 V74 M106,44 V74 M122,46 V74 M138,52 V74" stroke="#FFFDF8" stroke-width="2"/><path d="M46,76 C70,86 130,86 154,76 L158,84 C130,96 70,96 42,84Z" fill="#2B2622" ${AS}/>`;
+    default: return '';
+  }
+}
+
+// ---------- 更多髮型 ----------
+const AV_EXTRA_HAIR = {
+  sidebraid: {
+    back: p => `<path d="M38,112 C32,56 66,40 100,40 C134,40 168,56 162,112 L160,150 L40,150Z" fill="${p.hairColor}" ${AS}/>`,
+    front: p => `<path d="M38,112 C34,56 70,40 100,40 C134,40 168,56 162,112 C152,92 132,76 98,78 C76,82 56,94 38,112Z" fill="${p.hairColor}" ${AS}/>` +
+      [[150, 128], [148, 146], [146, 164], [145, 182], [145, 200], [146, 216]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="11" ry="10.5" fill="${p.hairColor}" ${AS}/>`).join('') + `<circle cx="146" cy="228" r="4" fill="#4A7FD0" ${AS}/>`,
+  },
+  verylong: {
+    back: p => `<path d="M34,110 C30,52 66,38 100,38 C134,38 170,52 166,110 L178,262 C150,274 50,274 22,262Z" fill="${p.hairColor}" ${AS}/>`,
+    front: p => avHairFront(Object.assign({}, p, { hair: 'long' })),
+  },
+  curly: {
+    back: p => [[44, 100], [36, 126], [38, 152], [44, 176], [54, 198], [156, 100], [164, 126], [162, 152], [156, 176], [146, 198], [60, 62], [140, 62], [100, 46], [78, 50], [122, 50]]
+      .map(([x, y]) => `<circle cx="${x}" cy="${y}" r="20" fill="${p.hairColor}" ${AS}/>`).join(''),
+    front: p => `<path d="M42,104 C40,60 70,44 100,44 C130,44 160,60 158,104 C150,92 140,84 128,80 C122,90 110,92 100,84 C90,92 78,90 72,80 C60,84 50,92 42,104Z" fill="${p.hairColor}" ${AS}/>`,
+  },
+  wavy: {
+    back: p => `<path d="M36,110 C30,52 66,38 100,38 C134,38 170,52 164,110 C176,130 160,150 172,170 C182,190 164,206 166,222 C130,230 70,230 34,222 C36,206 18,190 28,170 C40,150 24,130 36,110Z" fill="${p.hairColor}" ${AS}/>`,
+    front: p => `<path d="M38,112 C34,54 70,40 102,40 C136,40 168,58 162,112 C156,94 146,84 136,78 C118,76 92,70 78,58 C66,74 52,92 38,112Z" fill="${p.hairColor}" ${AS}/>`,
+  },
+  ponytail: {
+    back: p => `<path d="M128,46 C160,40 176,80 168,120 C162,150 170,176 158,200 C148,170 150,140 146,110 C142,84 136,64 126,56Z" fill="${p.hairColor}" ${AS}/><circle cx="130" cy="50" r="6" fill="#E5453A" ${AS}/>`,
+    front: p => `<path d="M40,110 C36,56 70,42 100,42 C132,42 164,56 160,110 C154,98 152,94 150,86 L50,86 C48,94 46,98 40,110Z" fill="${p.hairColor}" ${AS}/>`,
+  },
+  updo: {
+    back: p => `<ellipse cx="100" cy="32" rx="30" ry="20" fill="${p.hairColor}" ${AS}/>`,
+    front: p => `<path d="M38,112 C34,58 68,44 100,44 C132,44 166,58 162,112 C152,90 136,78 112,74 C96,80 72,80 58,74 C48,88 42,100 38,112Z" fill="${p.hairColor}" ${AS}/><path d="M74,46 C90,40 112,40 128,46" stroke="#4A7FD0" stroke-width="5" fill="none" stroke-linecap="round"/>`,
+  },
+  curlyshort: {
+    back: () => '',
+    front: p => [[44, 104], [42, 84], [52, 64], [70, 50], [90, 44], [112, 44], [132, 50], [150, 64], [158, 84], [156, 104], [72, 72], [96, 66], [120, 68], [140, 80], [60, 84]]
+      .map(([x, y]) => `<circle cx="${x}" cy="${y}" r="13" fill="${p.hairColor}" ${AS}/>`).join(''),
+  },
+  sidepart: {
+    back: () => '',
+    front: p => `<path d="M38,108 C34,52 72,38 104,38 C140,38 166,58 162,106 C156,90 148,80 138,74 C120,72 86,70 62,82 C52,90 44,98 38,108Z" fill="${p.hairColor}" ${AS}/><path d="M74,44 C76,56 70,68 62,80" stroke="${AV_INK}" stroke-width="1.6" fill="none"/>`,
+  },
+};
+const AV_EXTRA_HAIR_OPTS = [
+  { v: 'sidebraid', label: '側辮子' }, { v: 'verylong', label: '超長髮' }, { v: 'curly', label: '捲捲長髮' },
+  { v: 'wavy', label: '波浪長髮' }, { v: 'ponytail', label: '馬尾' }, { v: 'updo', label: '盤髮' },
+  { v: 'curlyshort', label: '捲短髮' }, { v: 'sidepart', label: '旁分頭' },
+];
+const AV_ACC_OPTS = [
+  { v: 'none', label: '沒有' }, { v: 'crown', label: '皇冠' }, { v: 'tiara', label: '小皇冠' }, { v: 'bow', label: '蝴蝶結' },
+  { v: 'headband', label: '髮箍' }, { v: 'flower', label: '小花' }, { v: 'catears', label: '貓耳' }, { v: 'dino', label: '恐龍帽' },
+  { v: 'fire', label: '消防帽' }, { v: 'police', label: '警察帽' }, { v: 'pirate', label: '海盜帽' }, { v: 'chef', label: '廚師帽' },
+  { v: 'conductor', label: '列車長帽' },
+];
+
+AV_OPTIONS.hair.push(...AV_EXTRA_HAIR_OPTS);
+AV_OPTIONS.acc = AV_ACC_OPTS;
+AV_OPTIONS.outfit = Object.keys(OUTFITS).map(k => ({ v: k, label: OUTFITS[k].label }));
+AV_TABS.splice(1, 0, { key: 'outfit', label: '造型' }, { key: 'acc', label: '配件' });
+function defaultOutfit(gender) { return gender === 'boy' ? 'b_cartee' : 'g_apple'; }
+
 function avatarSVG(parts, opts) {
   const p = Object.assign({}, AV_DEFAULT, parts || {});
+  if (!OUTFITS[p.outfit]) p.outfit = defaultOutfit(p.gender);
+  if (!p.acc) p.acc = 'none';
+  // hats sit flat on the head: tall hairstyles would poke through them
+  if (['fire', 'police', 'pirate', 'chef', 'conductor'].includes(p.acc)) {
+    if (p.hair === 'spiky') p.hair = 'short';
+    if (p.hair === 'bun' || p.hair === 'updo') p.hair = 'long';
+  }
   const vb = (opts && opts.viewBox) || '0 0 200 200';
+  const xh = AV_EXTRA_HAIR[p.hair];
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${vb}">` +
-    avHairBack(p) +
+    avOutfitBack(p) + (xh ? xh.back(p) : avHairBack(p)) + avBody(p) +
     `<path d="${avFacePath(p.face)}" fill="${p.skin}" stroke="${AV_INK}" stroke-width="2.4" stroke-linejoin="round"/>` +
-    avFeatures(p) + avHairFront(p) + `</svg>`;
+    avFeatures(p) + (xh ? xh.front(p) : avHairFront(p)) + avAcc(p) + `</svg>`;
   // later attributes override earlier ones (duplicate attrs make the SVG invalid as an <img>)
   return svg.replace(/<([a-z]+)((?:\s+[a-z-]+="[^"]*")+)\s*(\/?)>/gi, (m, tag, attrs, sl) => {
     const map = new Map();
@@ -5303,19 +5526,24 @@ function randomAvatarParts() {
   const pick = k => AV_OPTIONS[k][Math.floor(Math.random() * AV_OPTIONS[k].length)].v;
   const out = {};
   Object.keys(AV_OPTIONS).forEach(k => out[k] = pick(k));
+  const list = out.gender === 'boy' ? BOY_OUTFITS : GIRL_OUTFITS;
+  out.outfit = list[Math.floor(Math.random() * list.length)];
+  out.acc = Math.random() < 0.6 ? OUTFITS[out.outfit].acc : pick('acc');
   return out;
 }
 
 // Mount the maker UI inside `host`; calls onChange(parts) on every edit.
 function mountAvatarMaker(host, initialParts, onChange) {
   const parts = Object.assign({}, AV_DEFAULT, initialParts || {});
+  if (!OUTFITS[parts.outfit]) parts.outfit = defaultOutfit(parts.gender);
+  if (!parts.acc) parts.acc = 'none';
   let tab = 'gender';
-  const CROP = { eyes: '40 82 120 64', iris: '40 82 120 64', nose: '60 100 80 60', mouth: '60 110 80 60', brows: '40 70 120 60', blush: '36 96 128 64' };
+  const CROP = { gender: AV_FULL_VIEWBOX, outfit: '24 140 152 144', acc: '10 -6 180 150', hair: '0 0 200 240', eyes: '40 82 120 64', iris: '40 82 120 64', nose: '60 100 80 60', mouth: '60 110 80 60', brows: '40 70 120 60', blush: '36 96 128 64' };
 
   host.innerHTML = `
     <div class="avm">
       <div class="avm-stage">
-        <div class="avm-preview" id="avmPreview">${avatarSVG(parts)}</div>
+        <div class="avm-preview" id="avmPreview">${avatarSVG(parts, { viewBox: AV_FULL_VIEWBOX })}</div>
         <button type="button" class="avm-dice" id="avmDice" aria-label="隨機">🎲</button>
       </div>
       <div class="avm-tabs" id="avmTabs">
@@ -5327,7 +5555,7 @@ function mountAvatarMaker(host, initialParts, onChange) {
   const optsEl = host.querySelector('#avmOpts');
 
   function boing() {
-    preview.innerHTML = avatarSVG(parts);
+    preview.innerHTML = avatarSVG(parts, { viewBox: AV_FULL_VIEWBOX });
     preview.classList.remove('boing'); void preview.offsetWidth; preview.classList.add('boing');
   }
   function renderOpts() {
@@ -5336,9 +5564,11 @@ function mountAvatarMaker(host, initialParts, onChange) {
     if (def.color) {
       html = `<div class="avm-swatches">${AV_OPTIONS[tab].map(o => `<button type="button" class="avm-swatch ${parts[tab] === o.v ? 'on' : ''}" data-v="${o.v}" style="background:${o.v}"></button>`).join('')}</div>`;
     } else {
-      html = `<div class="avm-grid">${AV_OPTIONS[tab].map(o => {
+      const list = tab === 'outfit' ? AV_OPTIONS.outfit.filter(o => o.v.startsWith(parts.gender === 'boy' ? 'b_' : 'g_')) : AV_OPTIONS[tab];
+      html = `<div class="avm-grid">${list.map(o => {
         const trial = Object.assign({}, parts, { [tab]: o.v });
-        if (tab === 'gender' && parts.gender !== o.v) trial.hair = o.v === 'boy' ? 'short' : 'long';
+        if (tab === 'gender' && parts.gender !== o.v) { trial.hair = o.v === 'boy' ? 'short' : 'long'; trial.outfit = defaultOutfit(o.v); trial.acc = OUTFITS[trial.outfit].acc; }
+        if (tab === 'outfit') trial.acc = OUTFITS[o.v].acc;
         return `<button type="button" class="avm-opt ${parts[tab] === o.v ? 'on' : ''}" data-v="${o.v}">
           <span class="avm-thumb">${avatarSVG(trial, { viewBox: CROP[tab] })}</span>
           <span class="avm-name">${o.label}</span></button>`;
@@ -5353,7 +5583,10 @@ function mountAvatarMaker(host, initialParts, onChange) {
       const v = b.dataset.v;
       if (tab === 'gender' && parts.gender !== v) {
         parts.hair = v === 'boy' ? 'short' : 'long';
+        parts.outfit = defaultOutfit(v);
+        parts.acc = OUTFITS[parts.outfit].acc;
       }
+      if (tab === 'outfit') parts.acc = OUTFITS[v].acc;
       parts[tab] = v;
       update();
     });
