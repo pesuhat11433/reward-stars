@@ -2685,6 +2685,20 @@
   }
   .kid-edit svg { width: 18px; height: 18px; }
   .kid-chip.active:hover .kid-edit { transform: rotate(-12deg) scale(1.1); transition: transform .4s var(--spring); }
+
+  /* full-body chibi preview */
+  .avm-preview { width: 176px !important; height: 250px !important; border-radius: 28px !important; }
+  .avm-preview svg { width: 100%; height: 100%; }
+
+  .avm-groups { display: flex; gap: 6px; margin: 2px 0 8px; }
+  .avm-group {
+    flex: 1; border: none; border-radius: 16px; padding: 10px 0; font-family: var(--font-title); font-size: 16px;
+    background: #fff; color: var(--ink-soft); cursor: pointer; transition: transform .4s var(--spring), background .2s, color .2s;
+  }
+  .avm-group:active { transform: scale(.9); }
+  .avm-group.on { background: var(--ink); color: #fff; }
+  .avm-tabs .avm-tab { font-size: 14px; padding: 8px 14px; }
+  .avm-tabs .avm-tab.on { background: var(--accent); color: #fff; }
 </style>
 </head>
 <body>
@@ -5191,37 +5205,10 @@ function avFacePath(f) {
   }
 }
 
-function avEye(cx, cy, p, mirror) {
-  const s = `stroke="${AV_INK}" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"`;
-  const lash = p.gender === 'girl'
-    ? (mirror
-        ? `<path d="M${cx+13},${cy-9} l6,-5 M${cx+15},${cy-4} l7,-2" ${s} fill="none"/>`
-        : `<path d="M${cx-13},${cy-9} l-6,-5 M${cx-15},${cy-4} l-7,-2" ${s} fill="none"/>`)
-    : '';
-  if (p.eyes === 'smile') {
-    return `<path d="M${cx-11},${cy+3} Q${cx},${cy-10} ${cx+11},${cy+3}" ${s} fill="none" stroke-width="3"/>` + lash;
-  }
-  let dx = 0, dy = 0;
-  if (p.eyes === 'side') dx = 4;
-  if (p.eyes === 'sleepy') dy = 3;
-  const ir = p.eyes === 'sparkle' ? 14 : 13;
-  // sketchy scribble across the iris (like the hand-drawn reference)
-  const ix = cx + dx, iy = cy + dy;
-  const scribble = `<path d="M${ix-9},${iy-6} L${ix+7},${iy-10} M${ix-11},${iy} L${ix+10},${iy-4} M${ix-10},${iy+6} L${ix+10},${iy+2} M${ix-6},${iy+10} L${ix+8},${iy+8}" stroke="#000" stroke-opacity=".28" stroke-width="1.6" stroke-linecap="round" fill="none"/>`;
-  const spark = p.eyes === 'sparkle'
-    ? `<path d="M${ix-5},${iy-11} l1.6,4 4,1.6 -4,1.6 -1.6,4 -1.6,-4 -4,-1.6 4,-1.6Z" fill="#fff"/><circle cx="${ix+5}" cy="${iy+5}" r="2.4" fill="#fff"/>`
-    : `<circle cx="${ix-4}" cy="${iy-5}" r="4.2" fill="#fff"/><circle cx="${ix+5}" cy="${iy+5}" r="2" fill="#fff"/>`;
-  const lid = p.eyes === 'sleepy'
-    ? `<path d="M${cx-17},${cy-4} Q${cx},${cy-10} ${cx+17},${cy-4} L${cx+17},${cy-20} L${cx-17},${cy-20}Z" fill="${p.skin}"/><path d="M${cx-17},${cy-4} Q${cx},${cy-10} ${cx+17},${cy-4}" ${s} fill="none"/>`
-    : '';
-  return `<circle cx="${cx}" cy="${cy}" r="16.5" fill="#fff" ${s}/>` +
-    `<circle cx="${ix}" cy="${iy}" r="${ir}" fill="${p.iris}"/>` + scribble + spark + lid + lash;
-}
-
 function avHairBack(p) {
   const c = p.hairColor, s = `stroke="${AV_INK}" stroke-width="2.3" stroke-linejoin="round"`;
   switch (p.hair) {
-    case 'long': return `<path d="M36,110 C30,54 66,38 100,38 C134,38 170,54 164,110 L168,190 L32,190Z" fill="${c}" ${s}/>`;
+    case 'long': return `<path d="M36,110 C30,54 66,38 100,38 C134,38 170,54 164,110 L170,204 C150,218 50,218 30,204Z" fill="${c}" ${s}/>`;
     case 'bob':  return `<path d="M34,112 C30,54 66,38 100,38 C134,38 170,54 166,112 L166,160 C150,166 50,166 34,160Z" fill="${c}" ${s}/>`;
     case 'twintails': return `<path d="M38,110 C32,54 66,38 100,38 C134,38 168,54 162,110 L158,150 L42,150Z" fill="${c}" ${s}/>` +
       [[34,150],[30,170],[28,190]].map(([x,y]) => `<ellipse cx="${x}" cy="${y}" rx="11" ry="12" fill="${c}" ${s}/>`).join('') +
@@ -5250,45 +5237,452 @@ function avHairFront(p) {
   }
 }
 
+// ============================================================
+// Chibi body · 2.5D 全身 Q 版：上衣、下身、鞋子、披風、配件自由組合
+// Head stays in the same 0..200 box, so head-only crops (chips, helmet) keep working;
+// the body is drawn below the chin and only shows in the taller full-body viewBox.
+// ============================================================
+const AV_FULL_VIEWBOX = '0 0 200 284';
+const AS = `stroke="${AV_INK}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"`;
+
+// ---- colour helpers (2.5D shading) ----
+function avHex(h) { return [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16)); }
+function avMix(h, t, k) { const a = avHex(h), b = avHex(t); return '#' + a.map((v, i) => Math.round(v + (b[i] - v) * k).toString(16).padStart(2, '0')).join(''); }
+const avLight = (h, k) => avMix(h, '#ffffff', k == null ? .22 : k);
+const avDark = (h, k) => avMix(h, '#2a1a14', k == null ? .2 : k);
+
+function limb(d, color, w) {
+  w = w || 9;
+  return `<path d="${d}" stroke="${avDark(color, .25)}" stroke-width="${w + 2}" stroke-linecap="round" fill="none"/>` +
+    `<path d="${d}" stroke="${color}" stroke-width="${w}" stroke-linecap="round" fill="none"/>` +
+    `<path d="${d}" stroke="${avLight(color, .45)}" stroke-width="${(w * .3).toFixed(1)}" stroke-linecap="round" fill="none" opacity=".55" transform="translate(-1.5,0)"/>`;
+}
+function sparkle(x, y, r, c) {
+  return `<path d="M${x},${y - r} Q${x},${y} ${x + r},${y} Q${x},${y} ${x},${y + r} Q${x},${y} ${x - r},${y} Q${x},${y} ${x},${y - r}Z" fill="${c || '#fff'}"/>`;
+}
+function dots(list, r, c) { return list.map(([x, y]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${c}"/>`).join(''); }
+
+const ARM_L = 'M77,180 L63,220', ARM_R = 'M123,180 L137,220';
+const TORSO = 'M80,175 C82,169 90,166 100,166 C110,166 118,169 120,175 L123,208 L77,208Z';
+const CLOTH_COLORS = ['#E5453A', '#F26FAE', '#F7B9D3', '#F6D25A', '#F59A5E', '#79C267', '#4FBF9F', '#8CCBEB', '#4A6FB5', '#9B7BD0', '#FFFDF8', '#3A3434', '#E3BC8A', '#8E6149'];
+
+// ---------- 上衣 ----------
+// base: 'full' | 'crop' | 'off' | 'none';  sleeve: 'short' | 'long' | 'puff' | 'wide' | 'none'
+const TOPS = {
+  tee:     { label: 'T恤', base: 'full', sleeve: 'short', def: '#F6D25A', extra: c => `<path d="M90,168 C94,174 106,174 110,168" stroke="${avDark(c, .25)}" stroke-width="2" fill="none"/>` },
+  longtee: { label: '長袖上衣', base: 'full', sleeve: 'long', def: '#8CCBEB' },
+  puff:    { label: '泡泡袖', base: 'full', sleeve: 'puff', def: '#F26FAE', extra: () => `<path d="M86,168 C90,176 110,176 114,168 L110,166 C106,170 94,170 90,166Z" fill="#FFFDF8" ${AS}/>` },
+  off:     { label: '露肩上衣', base: 'off', sleeve: 'none', def: '#F6D25A' },
+  crop:    { label: '短版上衣', base: 'crop', sleeve: 'none', def: '#4FBF9F' },
+  heart:   { label: '愛心上衣', base: 'none', sleeve: 'none', def: '#79C267',
+             extra: c => `<path d="M100,206 C92,200 80,192 80,182 C80,174 90,172 100,180 C110,172 120,174 120,182 C120,192 108,200 100,206Z" fill="${c}" ${AS}/><path d="M92,170 L100,180 L108,170" stroke="${c}" stroke-width="2.6" fill="none"/>` },
+  shell:   { label: '貝殼上衣', base: 'none', sleeve: 'none', def: '#B48FE0', extra: c => `<path d="M84,190 C84,180 98,180 98,190Z M102,190 C102,180 116,180 116,190Z" fill="${c}" ${AS}/>` },
+  prince:  { label: '王子外套', base: 'full', sleeve: 'long', def: '#4A6FB5',
+             extra: () => `<path d="M80,174 L120,206" stroke="#E5453A" stroke-width="6"/>` + dots([[100, 182], [100, 192], [100, 202]], 2, '#F6C244') + `<rect x="72" y="172" width="12" height="7" rx="3" fill="#F6C244" ${AS}/><rect x="116" y="172" width="12" height="7" rx="3" fill="#F6C244" ${AS}/>` },
+  hanfu:   { label: '古風交領', base: 'full', sleeve: 'wide', def: '#79C267',
+             extra: () => `<path d="M84,170 L104,196 M116,170 L96,196" stroke="#FFFDF8" stroke-width="3"/><rect x="77" y="198" width="46" height="9" fill="#4A6FB5" ${AS}/>` },
+  stripe:  { label: '條紋衫', base: 'full', sleeve: 'short', def: '#FFFDF8', extra: () => `<path d="M80,180 H120 M79,188 H121 M78,196 H122 M78,203 H122" stroke="#E5453A" stroke-width="2.6"/>` },
+  vest:    { label: '小背心', base: 'full', sleeve: 'none', def: '#3A3434', extra: () => `<path d="M92,166 L100,184 L108,166" fill="#FFFDF8" ${AS}/>` },
+  coat:    { label: '消防外套', base: 'full', sleeve: 'long', def: '#F6C244', extra: () => `<path d="M78,196 H122" stroke="#E4DED4" stroke-width="4"/>` },
+  space:   { label: '太空衣', base: 'full', sleeve: 'long', def: '#FFFDF8',
+             extra: () => `<rect x="90" y="182" width="20" height="13" rx="3" fill="#E4DED4" ${AS}/>` + dots([[95, 188]], 2, '#E5453A') + dots([[101, 188]], 2, '#FBC444') + dots([[107, 188]], 2, '#4A7FD0') },
+  chef:    { label: '廚師服', base: 'full', sleeve: 'long', def: '#FFFDF8', extra: () => dots([[94, 182], [106, 182], [94, 194], [106, 194]], 2, '#BDBAB6') + `<path d="M90,166 L100,176 L110,166Z" fill="#E5453A" ${AS}/>` },
+  dino:    { label: '恐龍上衣', base: 'full', sleeve: 'long', def: '#79C267', extra: () => `<ellipse cx="100" cy="194" rx="12" ry="14" fill="#F6E7A1" ${AS}/>` },
+  hero:    { label: '英雄裝', base: 'full', sleeve: 'long', def: '#4A6FB5', extra: () => `<path d="M100,178 L103,186 L111,186 L105,191 L107,199 L100,194 L93,199 L95,191 L89,186 L97,186Z" fill="#F6C244" ${AS}/>` },
+  armor:   { label: '盔甲', base: 'full', sleeve: 'long', def: '#BDBAB6', extra: () => `<path d="M84,172 L116,172 L118,196 C110,204 90,204 82,196Z" fill="#D9D6D1" ${AS}/><path d="M100,176 L100,198 M90,186 L110,186" stroke="#F6C244" stroke-width="3"/>` },
+  uniform: { label: '制服', base: 'full', sleeve: 'short', def: '#4A6FB5', extra: () => `<path d="M100,168 L96,196 L100,200 L104,196Z" fill="#2B2F45" ${AS}/>` + sparkle(112, 182, 5, '#F6C244') },
+  racer:   { label: '賽車服', base: 'full', sleeve: 'long', def: '#E5453A', extra: () => `<circle cx="100" cy="188" r="8" fill="#FFFDF8" ${AS}/><path d="M98,184 L101,182 L101,194" stroke="${AV_INK}" stroke-width="2" fill="none"/>` },
+  cartee:  { label: '汽車T恤', base: 'full', sleeve: 'short', def: '#F6D25A',
+             extra: () => `<path d="M86,194 L88,186 L96,184 L102,178 L110,178 L114,186 L116,194Z" fill="#E5453A" ${AS}/><circle cx="92" cy="195" r="3.4" fill="#2B2622"/><circle cx="110" cy="195" r="3.4" fill="#2B2622"/>` },
+  sparkly: { label: '星星紗衣', base: 'full', sleeve: 'long', def: '#8CCBEB', extra: () => sparkle(92, 184, 3) + sparkle(108, 196, 3.5) + sparkle(104, 178, 2.5) },
+};
+// ---------- 下身 ----------
+const BOTTOMS = {
+  skirtKnee: { label: '短裙', def: '#F7B9D3', d: 'M79,204 L121,204 L134,240 C118,246 82,246 66,240Z' },
+  skirtA:    { label: '及膝裙', def: '#9B7BD0', d: 'M79,204 L121,204 L138,246 C120,253 80,253 62,246Z' },
+  skirtBall: { label: '蓬蓬裙', def: '#F6D25A', d: 'M79,204 L121,204 C130,222 148,246 150,266 C120,274 80,274 50,266 C52,246 70,222 79,204Z' },
+  tiered:    { label: '層層裙', def: '#F7B9D3', d: 'M79,204 L121,204 C130,222 148,246 150,266 C120,274 80,274 50,266 C52,246 70,222 79,204Z',
+               extra: c => `<path d="M64,230 C86,240 114,240 136,230 M54,250 C84,260 116,260 146,250" stroke="${avDark(c, .2)}" stroke-width="2.2" fill="none"/>` },
+  skirtLong: { label: '長裙', def: '#8CCBEB', d: 'M79,204 L121,204 L134,266 C112,272 88,272 66,266Z' },
+  dots:      { label: '點點裙', def: '#FFFDF8', d: 'M79,204 L121,204 L134,240 C118,246 82,246 66,240Z',
+               extra: () => dots([[82, 222], [100, 230], [118, 220], [90, 236], [112, 236], [124, 230], [74, 234]], 2.6, '#E5453A') },
+  grass:     { label: '草裙', def: '#E3BC8A', d: 'M79,204 L121,204 L134,240 C118,246 82,246 66,240Z',
+               extra: () => `<path d="M70,226 L78,236 L86,226 L94,236 L102,226 L110,236 L118,226 L126,236 L132,228" stroke="#8E6149" stroke-width="2" fill="none"/>` },
+  fringe:    { label: '流蘇裙', def: '#E3BC8A', d: 'M79,204 L121,204 L138,246 C120,253 80,253 62,246Z',
+               extra: c => `<path d="M64,246 ${Array.from({ length: 18 }, (_, i) => `L${66 + i * 4},${i % 2 ? 246 : 254}`).join(' ')}" stroke="${avDark(c, .3)}" stroke-width="2" fill="none"/>` },
+  tail:      { label: '魚尾', def: '#4FBF9F', noLegs: true, d: 'M80,204 L120,204 C126,226 118,246 105,256 L116,274 C106,272 101,268 100,265 C99,268 94,272 84,274 L95,256 C82,246 74,226 80,204Z',
+               extra: c => `<path d="M84,274 C92,266 98,264 100,265 C102,264 108,266 116,274 C110,280 104,276 100,270 C96,276 90,280 84,274Z" fill="${avLight(c, .3)}" ${AS}/>` +
+                 [[90, 220], [104, 220], [97, 232], [111, 232], [90, 244], [104, 244]].map(([x, y]) => `<path d="M${x - 6},${y} Q${x},${y + 6} ${x + 6},${y}" stroke="${avDark(c, .3)}" stroke-width="1.6" fill="none"/>`).join('') },
+  pants:     { label: '長褲', def: '#4A6FB5', d: 'M77,204 L123,204 L122,252 L103,252 L100,228 L97,252 L78,252Z' },
+  shorts:    { label: '短褲', def: '#8E6149', d: 'M77,204 L123,204 L124,232 L103,232 L100,220 L97,232 L76,232Z' },
+  harem:     { label: '燈籠褲', def: '#8CCBEB', d: 'M77,204 L123,204 C131,230 125,252 114,256 L104,256 L100,228 L96,256 L86,256 C75,252 69,230 77,204Z' },
+  checker:   { label: '格子褲', def: '#3A3434', d: 'M77,204 L123,204 L122,252 L103,252 L100,228 L97,252 L78,252Z',
+               extra: () => Array.from({ length: 6 }, (_, i) => `<rect x="${79 + (i % 3) * 14}" y="${214 + Math.floor(i / 3) * 16}" width="7" height="7" fill="#FFFDF8" opacity=".9"/>`).join('') },
+  overalls:  { label: '吊帶褲', def: '#4A6FB5', d: 'M77,204 L123,204 L122,252 L103,252 L100,228 L97,252 L78,252Z',
+               extra: c => `<rect x="86" y="184" width="28" height="22" fill="${c}" ${AS}/><path d="M86,184 L80,172 M114,184 L120,172" stroke="${c}" stroke-width="4"/>` + dots([[90, 188], [110, 188]], 2, '#F6C244') },
+};
+// ---------- 鞋子 ----------
+const SHOES = {
+  sneaker: { label: '布鞋', def: '#FFFDF8' },
+  flats:   { label: '娃娃鞋', def: '#E5453A' },
+  boots:   { label: '靴子', def: '#8E6149' },
+  sandals: { label: '涼鞋', def: '#79C267' },
+  barefoot:{ label: '赤腳', def: null },
+};
+// ---------- 披風 / 背後 ----------
+const BACKS = {
+  none:     { label: '沒有', def: null },
+  cape:     { label: '披風', def: '#E5453A', draw: c => `<path d="M80,174 L120,174 L142,262 C112,270 88,270 58,262Z" fill="${c}" ${AS}/>` },
+  sheer:    { label: '紗披風', def: '#D6ECFB', draw: c => `<path d="M78,176 L122,176 L152,270 C112,280 88,280 48,270Z" fill="${c}" opacity=".85" ${AS}/>` },
+  capelet:  { label: '短斗篷', def: '#9B3B7A', draw: c => `<path d="M74,176 L126,176 L134,218 C112,226 88,226 66,218Z" fill="${c}" ${AS}/>` },
+  dinotail: { label: '恐龍尾巴', def: '#79C267', draw: c => `<path d="M114,226 C136,226 150,236 162,252 C146,250 132,248 116,244Z" fill="${c}" ${AS}/><path d="M136,232 l4,-7 l3,8 M148,240 l5,-6 l2,8" stroke="${AV_INK}" stroke-width="1.6" fill="#F6D25A"/>` },
+  wings:    { label: '小翅膀', def: '#D6ECFB', draw: c => `<path d="M82,186 C60,160 34,168 40,192 C44,206 66,206 82,198Z M118,186 C140,160 166,168 160,192 C156,206 134,206 118,198Z" fill="${c}" opacity=".9" ${AS}/>` },
+  backpack: { label: '小書包', def: '#E5453A', draw: c => `<rect x="70" y="176" width="60" height="42" rx="12" fill="${c}" ${AS}/>` },
+};
+
+function avOutfitBack(p) {
+  const b = BACKS[p.back];
+  return b && b.draw ? b.draw(p.backColor || b.def) : '';
+}
+function avBody(p) {
+  const top = TOPS[p.top] || TOPS.tee, bot = BOTTOMS[p.bottom] || BOTTOMS.pants, shoe = SHOES[p.shoes] || SHOES.sneaker;
+  const tc = p.topColor || top.def, bc = p.bottomColor || bot.def, sc = p.shoeColor || shoe.def;
+  const skin = p.skin, sleeveC = top.sleeve === 'puff' ? avLight(tc, .45) : tc;
+  let s = '';
+  if (!bot.noLegs) {
+    s += `<rect x="85" y="226" width="11" height="38" rx="5" fill="${skin}" ${AS}/><rect x="104" y="226" width="11" height="38" rx="5" fill="${skin}" ${AS}/>`;
+    if (p.shoes === 'boots') s += `<rect x="83" y="242" width="15" height="24" rx="5" fill="${sc}" ${AS}/><rect x="102" y="242" width="15" height="24" rx="5" fill="${sc}" ${AS}/>`;
+  }
+  s += limb(ARM_L, skin) + limb(ARM_R, skin);
+  if (top.sleeve === 'long') s += limb('M77,180 L65,214', sleeveC);
+  if (top.sleeve === 'wide') s += limb('M77,180 L66,212', sleeveC, 16) + limb('M123,180 L134,212', sleeveC, 16);
+  if (top.sleeve === 'long') s += limb('M123,180 L135,214', sleeveC);
+  if (top.sleeve === 'short') s += limb('M77,180 L71,196', sleeveC, 11) + limb('M123,180 L129,196', sleeveC, 11);
+  s += `<circle cx="62" cy="223" r="5.6" fill="${skin}" ${AS}/><circle cx="138" cy="223" r="5.6" fill="${skin}" ${AS}/>`;
+  s += `<rect x="93" y="154" width="14" height="20" fill="${skin}" ${AS}/>`;
+  s += `<path d="${TORSO}" fill="${skin}" ${AS}/>`;
+  if (top.base === 'full') s += `<path d="${TORSO}" fill="${tc}" ${AS}/>`;
+  if (top.base === 'off') s += `<path d="M78,184 C90,180 110,180 122,184 L123,208 L77,208Z" fill="${tc}" ${AS}/>`;
+  if (top.base === 'crop') s += `<path d="M80,175 C82,169 90,166 100,166 C110,166 118,169 120,175 L121,192 C110,196 90,196 79,192Z" fill="${tc}" ${AS}/>`;
+  if (top.sleeve === 'puff') s += `<ellipse cx="77" cy="180" rx="9" ry="8" fill="${sleeveC}" ${AS}/><ellipse cx="123" cy="180" rx="9" ry="8" fill="${sleeveC}" ${AS}/>`;
+  if (top.extra) s += top.extra(tc, p);
+  s += `<path d="${bot.d}" fill="${bc}" ${AS}/>`;
+  if (bot.extra) s += bot.extra(bc, p);
+  if (!bot.noLegs) {
+    if (p.shoes === 'barefoot') s += `<ellipse cx="90" cy="265" rx="7" ry="4.5" fill="${skin}" ${AS}/><ellipse cx="110" cy="265" rx="7" ry="4.5" fill="${skin}" ${AS}/>`;
+    else if (p.shoes === 'sandals') s += `<ellipse cx="90" cy="266" rx="8.5" ry="5" fill="${skin}" ${AS}/><ellipse cx="110" cy="266" rx="8.5" ry="5" fill="${skin}" ${AS}/><path d="M82,264 H98 M102,264 H118" stroke="${sc}" stroke-width="4" stroke-linecap="round"/><ellipse cx="90" cy="270" rx="9.5" ry="3" fill="${sc}"/><ellipse cx="110" cy="270" rx="9.5" ry="3" fill="${sc}"/>`;
+    else if (p.shoes === 'flats') s += `<ellipse cx="89" cy="266" rx="9" ry="5" fill="${sc}" ${AS}/><ellipse cx="111" cy="266" rx="9" ry="5" fill="${sc}" ${AS}/><path d="M84,262 H95 M105,262 H116" stroke="${avDark(sc, .3)}" stroke-width="1.8"/>`;
+    else s += `<ellipse cx="89" cy="266" rx="9.5" ry="5.6" fill="${sc}" ${AS}/><ellipse cx="111" cy="266" rx="9.5" ry="5.6" fill="${sc}" ${AS}/>`;
+  }
+  return s;
+}
+
+// ---------- 配件 ----------
+function avAcc(p) {
+  const c = p.hairColor;
+  switch (p.acc) {
+    case 'crown': return `<path d="M72,48 L74,20 L88,34 L100,14 L112,34 L126,20 L128,48Z" fill="#F6C244" ${AS}/>` + dots([[100, 38]], 3.4, '#E5453A') + dots([[84, 42], [116, 42]], 2.4, '#4A7FD0');
+    case 'tiara': return `<path d="M76,50 C86,40 114,40 124,50 L118,38 L110,44 L100,30 L90,44 L82,38Z" fill="#DCEAF5" ${AS}/>` + dots([[100, 40]], 2.8, '#4A7FD0');
+    case 'bow': return `<path d="M128,46 C116,30 104,40 110,50 C116,58 124,52 128,46 C140,30 152,40 146,50 C140,58 132,52 128,46Z" fill="#E5453A" ${AS}/><circle cx="128" cy="46" r="4" fill="#C93A30" ${AS}/>`;
+    case 'headband': return `<path d="M44,92 C46,52 80,40 100,40 C120,40 154,52 156,92" stroke="#B5352C" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M44,92 C46,52 80,40 100,40 C120,40 154,52 156,92" stroke="#E5453A" stroke-width="4.5" fill="none" stroke-linecap="round"/>`;
+    case 'flower': return [0, 72, 144, 216, 288].map(a => `<ellipse cx="62" cy="62" rx="6" ry="9" transform="rotate(${a} 62 70)" fill="#F7A8C4" ${AS}/>`).join('') + `<circle cx="62" cy="70" r="4" fill="#FBC444" ${AS}/>`;
+    case 'catears': return `<path d="M50,64 L56,30 L80,48Z M150,64 L144,30 L120,48Z" fill="${c}" ${AS}/><path d="M57,52 L59,38 L71,48Z M143,52 L141,38 L129,48Z" fill="#F7B6C2"/>`;
+    case 'dino': return `<path fill-rule="evenodd" d="M22,124 C18,48 182,48 178,124 C178,176 148,198 100,198 C52,198 22,176 22,124Z M100,64 C132,64 152,86 152,116 C152,146 130,164 100,164 C70,164 48,146 48,116 C48,86 68,64 100,64Z" fill="#79C267" ${AS}/>` +
+        [[52, 50, 60, 32, 70, 48], [74, 40, 86, 22, 94, 38], [100, 36, 112, 18, 122, 38], [126, 42, 140, 26, 146, 48]].map(([a, b, cx, cy, d, e]) => `<path d="M${a},${b} L${cx},${cy} L${d},${e}Z" fill="#F6D25A" ${AS}/>`).join('');
+    case 'fire': return `<path d="M42,86 C42,30 158,30 158,86Z" fill="#E5453A" ${AS}/><path d="M30,86 C60,96 140,96 170,86 L170,92 C140,104 60,104 30,92Z" fill="#C93A30" ${AS}/><path d="M92,46 L108,46 L108,64 L100,70 L92,64Z" fill="#F6C244" ${AS}/>`;
+    case 'police': return `<path d="M44,78 C42,40 158,40 156,78Z" fill="#2B2F45" ${AS}/><path d="M44,78 C70,90 130,90 156,78 L160,86 C130,100 70,100 40,86Z" fill="#1E1E22" ${AS}/>` + sparkle(100, 58, 7, '#F6C244');
+    case 'pirate': return `<path d="M28,74 C40,40 70,24 100,30 C130,24 160,40 172,74 C140,62 60,62 28,74Z" fill="#2B2622" ${AS}/><circle cx="100" cy="46" r="7" fill="#FFFDF8"/><circle cx="97" cy="45" r="1.6" fill="#2B2622"/><circle cx="103" cy="45" r="1.6" fill="#2B2622"/>`;
+    case 'chef': return `<path d="M62,70 C50,50 60,28 78,32 C82,14 118,14 122,32 C140,28 150,50 138,70Z" fill="#FFFDF8" ${AS}/><rect x="62" y="66" width="76" height="14" rx="4" fill="#FFFDF8" ${AS}/>`;
+    case 'conductor': return `<path d="M46,76 C44,42 156,42 154,76Z" fill="#4A6FB5" ${AS}/><path d="M58,52 V74 M74,46 V74 M90,44 V74 M106,44 V74 M122,46 V74 M138,52 V74" stroke="#FFFDF8" stroke-width="2"/><path d="M46,76 C70,86 130,86 154,76 L158,84 C130,96 70,96 42,84Z" fill="#2B2622" ${AS}/>`;
+    default: return '';
+  }
+}
+
+// ---------- 更多髮型 ----------
+const AV_EXTRA_HAIR = {
+  sidebraid: {
+    back: p => `<path d="M38,112 C32,56 66,40 100,40 C134,40 168,56 162,112 L160,150 L40,150Z" fill="${p.hairColor}" ${AS}/>`,
+    front: p => `<path d="M38,112 C34,56 70,40 100,40 C134,40 168,56 162,112 C152,92 132,76 98,78 C76,82 56,94 38,112Z" fill="${p.hairColor}" ${AS}/>` +
+      [[150, 128], [148, 146], [146, 164], [145, 182], [145, 200], [146, 216]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="11" ry="10.5" fill="${p.hairColor}" ${AS}/>`).join('') + `<circle cx="146" cy="228" r="4" fill="#4A7FD0" ${AS}/>`,
+  },
+  verylong: {
+    back: p => `<path d="M34,110 C30,52 66,38 100,38 C134,38 170,52 166,110 L178,262 C150,274 50,274 22,262Z" fill="${p.hairColor}" ${AS}/>`,
+    front: p => avHairFront(Object.assign({}, p, { hair: 'long' })),
+  },
+  curly: {
+    back: p => [[44, 100], [36, 126], [38, 152], [44, 176], [54, 198], [156, 100], [164, 126], [162, 152], [156, 176], [146, 198], [60, 62], [140, 62], [100, 46], [78, 50], [122, 50]]
+      .map(([x, y]) => `<circle cx="${x}" cy="${y}" r="20" fill="${p.hairColor}" ${AS}/>`).join(''),
+    front: p => `<path d="M42,104 C40,60 70,44 100,44 C130,44 160,60 158,104 C150,92 140,84 128,80 C122,90 110,92 100,84 C90,92 78,90 72,80 C60,84 50,92 42,104Z" fill="${p.hairColor}" ${AS}/>`,
+  },
+  wavy: {
+    back: p => `<path d="M36,110 C30,52 66,38 100,38 C134,38 170,52 164,110 C176,130 160,150 172,170 C182,190 164,206 166,222 C130,230 70,230 34,222 C36,206 18,190 28,170 C40,150 24,130 36,110Z" fill="${p.hairColor}" ${AS}/>`,
+    front: p => `<path d="M38,112 C34,54 70,40 102,40 C136,40 168,58 162,112 C156,94 146,84 136,78 C118,76 92,70 78,58 C66,74 52,92 38,112Z" fill="${p.hairColor}" ${AS}/>`,
+  },
+  ponytail: {
+    back: p => `<path d="M128,46 C160,40 176,80 168,120 C162,150 170,176 158,200 C148,170 150,140 146,110 C142,84 136,64 126,56Z" fill="${p.hairColor}" ${AS}/><circle cx="130" cy="50" r="6" fill="#E5453A" ${AS}/>`,
+    front: p => `<path d="M40,110 C36,56 70,42 100,42 C132,42 164,56 160,110 C154,98 152,94 150,86 L50,86 C48,94 46,98 40,110Z" fill="${p.hairColor}" ${AS}/>`,
+  },
+  updo: {
+    back: p => `<ellipse cx="100" cy="32" rx="30" ry="20" fill="${p.hairColor}" ${AS}/>`,
+    front: p => `<path d="M38,112 C34,58 68,44 100,44 C132,44 166,58 162,112 C152,90 136,78 112,74 C96,80 72,80 58,74 C48,88 42,100 38,112Z" fill="${p.hairColor}" ${AS}/><path d="M74,46 C90,40 112,40 128,46" stroke="#4A7FD0" stroke-width="5" fill="none" stroke-linecap="round"/>`,
+  },
+  curlyshort: {
+    back: () => '',
+    front: p => [[44, 104], [42, 84], [52, 64], [70, 50], [90, 44], [112, 44], [132, 50], [150, 64], [158, 84], [156, 104], [72, 72], [96, 66], [120, 68], [140, 80], [60, 84]]
+      .map(([x, y]) => `<circle cx="${x}" cy="${y}" r="13" fill="${p.hairColor}" ${AS}/>`).join(''),
+  },
+  sidepart: {
+    back: () => '',
+    front: p => `<path d="M38,108 C34,52 72,38 104,38 C140,38 166,58 162,106 C156,90 148,80 138,74 C120,72 86,70 62,82 C52,90 44,98 38,108Z" fill="${p.hairColor}" ${AS}/><path d="M74,44 C76,56 70,68 62,80" stroke="${avDark(p.hairColor, .4)}" stroke-width="1.6" fill="none"/>`,
+  },
+};
+const AV_EXTRA_HAIR_OPTS = [
+  { v: 'sidebraid', label: '側辮子' }, { v: 'verylong', label: '超長髮' }, { v: 'curly', label: '捲捲長髮' },
+  { v: 'wavy', label: '波浪長髮' }, { v: 'ponytail', label: '馬尾' }, { v: 'updo', label: '盤髮' },
+  { v: 'curlyshort', label: '捲短髮' }, { v: 'sidepart', label: '旁分頭' },
+];
+const AV_ACC_OPTS = [
+  { v: 'none', label: '沒有' }, { v: 'crown', label: '皇冠' }, { v: 'tiara', label: '小皇冠' }, { v: 'bow', label: '蝴蝶結' },
+  { v: 'headband', label: '髮箍' }, { v: 'flower', label: '小花' }, { v: 'catears', label: '貓耳' }, { v: 'dino', label: '恐龍帽' },
+  { v: 'fire', label: '消防帽' }, { v: 'police', label: '警察帽' }, { v: 'pirate', label: '海盜帽' }, { v: 'chef', label: '廚師帽' },
+  { v: 'conductor', label: '列車長帽' },
+];
+
+// ---------- 2.5D face: glossy eyes, soft lips, radial skin ----------
 function avFeatures(p) {
-  const s = `stroke="${AV_INK}" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" fill="none"`;
+  const pf = p._pfx || 'a';
   let out = '';
-  // blush
-  if (p.blush === 'pink') out += `<ellipse cx="64" cy="136" rx="11" ry="7" fill="#FF9EB2" opacity=".55"/><ellipse cx="136" cy="136" rx="11" ry="7" fill="#FF9EB2" opacity=".55"/>`;
-  if (p.blush === 'peach') out += `<ellipse cx="64" cy="136" rx="15" ry="10" fill="#FFB48C" opacity=".45"/><ellipse cx="136" cy="136" rx="15" ry="10" fill="#FFB48C" opacity=".45"/>`;
-  if (p.blush === 'lines') out += `<ellipse cx="64" cy="136" rx="12" ry="7" fill="#FF9EB2" opacity=".4"/><ellipse cx="136" cy="136" rx="12" ry="7" fill="#FF9EB2" opacity=".4"/><path d="M57,139 l4,-6 M63,139 l4,-6 M69,139 l4,-6 M129,139 l4,-6 M135,139 l4,-6 M141,139 l4,-6" stroke="#E46F86" stroke-width="1.6" stroke-linecap="round"/>`;
-  if (p.blush === 'freckles') out += [[58,134],[64,138],[70,133],[130,133],[136,138],[142,134]].map(([x,y]) => `<circle cx="${x}" cy="${y}" r="1.6" fill="#B07858"/>`).join('');
+  // blush (soft radial)
+  if (p.blush === 'pink' || p.blush === 'lines') out += `<ellipse cx="64" cy="136" rx="15" ry="10" fill="url(#${pf}blushP)"/><ellipse cx="136" cy="136" rx="15" ry="10" fill="url(#${pf}blushP)"/>`;
+  if (p.blush === 'peach') out += `<ellipse cx="64" cy="136" rx="19" ry="13" fill="url(#${pf}blushO)"/><ellipse cx="136" cy="136" rx="19" ry="13" fill="url(#${pf}blushO)"/>`;
+  if (p.blush === 'lines') out += `<path d="M58,139 l4,-6 M64,139 l4,-6 M70,139 l4,-6 M130,139 l4,-6 M136,139 l4,-6 M142,139 l4,-6" stroke="#E47A8E" stroke-width="1.6" stroke-linecap="round" opacity=".8"/>`;
+  if (p.blush === 'freckles') out += `<ellipse cx="64" cy="136" rx="14" ry="9" fill="url(#${pf}blushP)" opacity=".6"/><ellipse cx="136" cy="136" rx="14" ry="9" fill="url(#${pf}blushP)" opacity=".6"/>` + [[58, 134], [64, 138], [70, 133], [130, 133], [136, 138], [142, 134]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1.5" fill="#B07858" opacity=".7"/>`).join('');
+  if (p.blush === 'hearts') out += avHeart(64, 136, 5, '#F48A9A') + avHeart(136, 136, 5, '#F48A9A');
+  if (p.blush === 'stars') out += sparkle(64, 136, 6, '#F6C244') + sparkle(136, 136, 6, '#F6C244');
   // eyes
   out += avEye(76, 116, p, false) + avEye(124, 116, p, true);
-  if (p.eyes === 'glasses') {
-    out += `<circle cx="76" cy="116" r="21" ${s}/><circle cx="124" cy="116" r="21" ${s}/><path d="M97,114 Q100,111 103,114 M55,112 L44,108 M145,112 L156,108" ${s}/>`;
-  }
-  // brows
-  if (p.brows === 'soft')    out += `<path d="M64,94 Q76,88 88,94 M112,94 Q124,88 136,94" ${s}/>`;
-  if (p.brows === 'thick')   out += `<path d="M68,93 L84,93 M116,93 L132,93" ${s} stroke-width="5"/>`;
-  if (p.brows === 'angry')   out += `<path d="M64,90 L88,97 M136,90 L112,97" ${s} stroke-width="3"/>`;
-  if (p.brows === 'worried') out += `<path d="M64,97 L88,90 M136,97 L112,90" ${s} stroke-width="2.6"/>`;
-  // nose
-  if (p.nose === 'dot')    out += `<ellipse cx="100" cy="132" rx="2.2" ry="1.6" fill="${AV_INK}"/>`;
-  if (p.nose === 'hook')   out += `<path d="M101,126 Q106,133 99,135" ${s}/>`;
-  if (p.nose === 'button') out += `<path d="M95,133 Q100,138 105,133" ${s}/>`;
-  // mouth
+  out += avGlasses(p);
+  // brows (soft, tinted by hair colour)
+  const bc = avDark(p.hairColor === '#F6F2EA' ? '#B9A89A' : p.hairColor, .2);
+  const bs = `stroke="${bc}" stroke-linecap="round" fill="none" opacity=".8"`;
+  if (p.brows === 'soft')    out += `<path d="M64,94 Q76,89 88,94 M112,94 Q124,89 136,94" ${bs} stroke-width="2.6"/>`;
+  if (p.brows === 'thick')   out += `<path d="M68,93 L84,93 M116,93 L132,93" ${bs} stroke-width="5"/>`;
+  if (p.brows === 'angry')   out += `<path d="M64,90 L88,97 M136,90 L112,97" ${bs} stroke-width="3.2"/>`;
+  if (p.brows === 'worried') out += `<path d="M64,97 L88,90 M136,97 L112,90" ${bs} stroke-width="2.8"/>`;
+  if (p.brows === 'round')   out += `<ellipse cx="72" cy="92" rx="5" ry="3.4" fill="${bc}" opacity=".85"/><ellipse cx="128" cy="92" rx="5" ry="3.4" fill="${bc}" opacity=".85"/>`;
+  if (p.brows === 'raised')  out += `<path d="M64,94 Q76,89 88,94 M112,90 Q124,82 136,88" ${bs} stroke-width="2.8"/>`;
+  // nose (soft shading instead of a line)
+  const nose = avDark(p.skin, .12);
+  if (p.nose === 'dot')    out += `<ellipse cx="100" cy="132" rx="3.4" ry="2.4" fill="${nose}"/><ellipse cx="99" cy="131" rx="1.3" ry=".9" fill="#fff" opacity=".6"/>`;
+  if (p.nose === 'hook')   out += `<path d="M101,124 Q106,132 99,135" stroke="${nose}" stroke-width="2.6" fill="none" stroke-linecap="round"/>`;
+  if (p.nose === 'button') out += `<ellipse cx="100" cy="133" rx="6" ry="4" fill="${nose}"/><ellipse cx="98" cy="131.5" rx="2.2" ry="1.3" fill="#fff" opacity=".6"/>`;
+  // mouth (soft lips)
+  const lipLine = '#A8574F', s = `stroke="${lipLine}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" fill="none"`;
   if (p.mouth === 'smile')  out += `<path d="M92,146 Q100,153 108,146" ${s}/>`;
-  if (p.mouth === 'grin')   out += `<path d="M88,143 Q100,162 112,143Z" fill="#E66B6B" stroke="${AV_INK}" stroke-width="2.3" stroke-linejoin="round"/><path d="M92,145 L108,145" stroke="#fff" stroke-width="2.4"/>`;
-  if (p.mouth === 'o')      out += `<ellipse cx="100" cy="148" rx="4.5" ry="5.5" fill="#E66B6B" stroke="${AV_INK}" stroke-width="2.2"/>`;
+  if (p.mouth === 'grin')   out += `<path d="M88,143 Q100,162 112,143Z" fill="url(#${pf}mouth)"/><path d="M92,145 L108,145" stroke="#fff" stroke-width="2.4"/><path d="M94,152 Q100,157 106,152" fill="#F28A9A"/>`;
+  if (p.mouth === 'o')      out += `<ellipse cx="100" cy="148" rx="4.5" ry="5.5" fill="url(#${pf}mouth)"/>`;
   if (p.mouth === 'cat')    out += `<path d="M90,145 Q95,151 100,145 Q105,151 110,145" ${s}/>`;
-  if (p.mouth === 'tongue') out += `<path d="M90,145 Q100,153 110,145" ${s}/><path d="M97,149 Q97,158 102,157 Q106,156 105,148" fill="#F28A9A" stroke="${AV_INK}" stroke-width="2"/>`;
+  if (p.mouth === 'tongue') out += `<path d="M90,145 Q100,153 110,145" ${s}/><path d="M97,149 Q97,158 102,157 Q106,156 105,148" fill="#F28A9A"/>`;
   if (p.mouth === 'flat')   out += `<path d="M94,148 L106,148" ${s}/>`;
+  if (p.mouth === 'pout')   out += `<path d="M91,147 C95,141 99,142 100,144 C101,142 105,141 109,147 C105,150 95,150 91,147Z" fill="#D58C90"/><path d="M91,147 C95,155 105,155 109,147 C105,150 95,150 91,147Z" fill="#C27980"/><path d="M96,151 C99,152.5 101,152.5 104,151" stroke="#fff" stroke-width="1.4" opacity=".6" fill="none" stroke-linecap="round"/>`;
+  if (p.mouth === 'teeth')  out += `<path d="M87,143 Q100,160 113,143Z" fill="url(#${pf}mouth)"/><path d="M88,143 L112,143 L110,148 C104,149 96,149 90,148Z" fill="#fff"/>`;
+  if (p.mouth === 'fang')   out += `<path d="M91,145 Q100,153 109,145" ${s}/><path d="M95,147 L97,152 L99,148Z" fill="#fff" stroke="${lipLine}" stroke-width="1"/>`;
+  if (p.mouth === 'wow')    out += `<ellipse cx="100" cy="149" rx="7" ry="9" fill="url(#${pf}mouth)"/><ellipse cx="100" cy="154" rx="4" ry="3" fill="#F28A9A"/>`;
+  if (p.mouth === 'wavy')   out += `<path d="M90,148 Q93,144 96,148 Q99,152 102,148 Q105,144 108,148" ${s}/>`;
+  if (p.mouth === 'kiss')   out += `<path d="M99,141 Q105,144 100,148 Q105,151 99,155" ${s}/>` + avHeart(116, 142, 3.4, '#F48A9A');
   return out;
 }
 
+// Shared gradient defs for one avatar (prefixed so many inline avatars on one page don't clash)
+function avDefs(p) {
+  const pf = p._pfx;
+  return `<defs>
+    <radialGradient id="${pf}skin" cx=".42" cy=".38" r=".75"><stop offset="0" stop-color="${avLight(p.skin, .35)}"/><stop offset=".6" stop-color="${p.skin}"/><stop offset="1" stop-color="${avDark(p.skin, .14)}"/></radialGradient>
+    <radialGradient id="${pf}scl" cx=".5" cy=".7" r=".75"><stop offset="0" stop-color="#ffffff"/><stop offset=".7" stop-color="#F8F3F2"/><stop offset="1" stop-color="#DCCFCC"/></radialGradient>
+    <radialGradient id="${pf}ir" cx=".5" cy=".7" r=".65"><stop offset="0" stop-color="${avLight(p.iris, .45)}"/><stop offset=".55" stop-color="${p.iris}"/><stop offset="1" stop-color="${avDark(p.iris, .5)}"/></radialGradient>
+    <radialGradient id="${pf}blushP" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#F48A9A" stop-opacity=".6"/><stop offset="1" stop-color="#F48A9A" stop-opacity="0"/></radialGradient>
+    <radialGradient id="${pf}blushO" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#FFA07A" stop-opacity=".55"/><stop offset="1" stop-color="#FFA07A" stop-opacity="0"/></radialGradient>
+    <linearGradient id="${pf}mouth" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#B8434A"/><stop offset="1" stop-color="#7E2A30"/></linearGradient>
+    <linearGradient id="${pf}gloss" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".4"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+  </defs>`;
+}
+
+// Turn every outlined flat shape into a shaded one: fill → vertical gradient of its own colour,
+// black ink outline → a soft darker edge. This is what gives clothes, hair and hats the 2.5D look.
+function av25dShade(svg, pf) {
+  const grads = new Map();
+  const out = svg.replace(/<(path|rect|ellipse|circle)\b([^>]*?)\/>/g, (m, tag, attrs) => {
+    const fill = (attrs.match(/fill="(#[0-9A-Fa-f]{6})"/) || [])[1];
+    if (!fill || !attrs.includes(`stroke="${AV_INK}"`)) return m;
+    const key = fill.slice(1).toLowerCase();
+    if (!grads.has(key)) grads.set(key, `<linearGradient id="${pf}g${key}" x1=".2" y1="0" x2=".5" y2="1"><stop offset="0" stop-color="${avLight(fill, .28)}"/><stop offset=".55" stop-color="${fill}"/><stop offset="1" stop-color="${avDark(fill, .18)}"/></linearGradient>`);
+    const a = attrs.replace(`fill="${fill}"`, `fill="url(#${pf}g${key})"`)
+      .replace(`stroke="${AV_INK}"`, `stroke="${avDark(fill, .22)}"`)
+      .replace(/stroke-width="[\d.]+"/, 'stroke-width="1.3"');
+    return `<${tag}${a}/>`;
+  });
+  return out.replace('</defs>', [...grads.values()].join('') + '</defs>');
+}
+
+AV_OPTIONS.hair.push(...AV_EXTRA_HAIR_OPTS);
+AV_OPTIONS.mouth.push({ v: 'pout', label: '嘟嘴' });
+AV_OPTIONS.acc = AV_ACC_OPTS;
+AV_OPTIONS.top = Object.keys(TOPS).map(k => ({ v: k, label: TOPS[k].label }));
+AV_OPTIONS.bottom = Object.keys(BOTTOMS).map(k => ({ v: k, label: BOTTOMS[k].label }));
+AV_OPTIONS.shoes = Object.keys(SHOES).map(k => ({ v: k, label: SHOES[k].label }));
+AV_OPTIONS.back = Object.keys(BACKS).map(k => ({ v: k, label: BACKS[k].label }));
+AV_TABS.push(
+  { key: 'top', label: '上衣', colorKey: 'topColor' },
+  { key: 'bottom', label: '下身', colorKey: 'bottomColor' },
+  { key: 'shoes', label: '鞋子', colorKey: 'shoeColor' },
+  { key: 'back', label: '披風', colorKey: 'backColor' },
+  { key: 'acc', label: '配件' },
+);
+const AV_CLOTH_DEFAULTS = {
+  girl: { top: 'puff', topColor: '#F26FAE', bottom: 'skirtA', bottomColor: '#F7B9D3', shoes: 'flats', shoeColor: '#E5453A', back: 'none', acc: 'none' },
+  boy:  { top: 'tee', topColor: '#F6D25A', bottom: 'pants', bottomColor: '#4A6FB5', shoes: 'sneaker', shoeColor: '#FFFDF8', back: 'none', acc: 'none' },
+};
+function avFillClothes(p) {
+  const d = AV_CLOTH_DEFAULTS[p.gender === 'boy' ? 'boy' : 'girl'];
+  if (!TOPS[p.top]) { p.top = d.top; p.topColor = d.topColor; }
+  if (!BOTTOMS[p.bottom]) { p.bottom = d.bottom; p.bottomColor = d.bottomColor; }
+  if (!SHOES[p.shoes]) { p.shoes = d.shoes; p.shoeColor = d.shoeColor; }
+  if (!BACKS[p.back]) p.back = 'none';
+  if (!p.acc) p.acc = 'none';
+  return p;
+}
+let AV_SEQ = 0;
+
+
+// ---------- 眼睛拆件：眼型 / 視線 / 睫毛 / 眼神光 / 眼鏡 ----------
+AV_OPTIONS.eyes = [
+  { v: 'round', label: '圓圓眼' }, { v: 'big', label: '大大眼' }, { v: 'almond', label: '杏仁眼' },
+  { v: 'upturn', label: '上揚眼' }, { v: 'droop', label: '下垂眼' }, { v: 'small', label: '豆豆眼' },
+  { v: 'sleepy', label: '想睡眼' }, { v: 'smile', label: '笑瞇瞇' },
+];
+AV_OPTIONS.gaze = [
+  { v: 'center', label: '看前面' }, { v: 'left', label: '看左邊' }, { v: 'right', label: '看右邊' }, { v: 'up', label: '看上面' }, { v: 'down', label: '看下面' },
+];
+AV_OPTIONS.lashes = [
+  { v: 'none', label: '沒有' }, { v: 'short', label: '短睫毛' }, { v: 'flick', label: '眼尾上翹' },
+  { v: 'long', label: '長睫毛' }, { v: 'bottom', label: '下睫毛' }, { v: 'full', label: '上下都有' },
+];
+AV_OPTIONS.shine = [
+  { v: 'classic', label: '圓點光' }, { v: 'sparkle', label: '星星光' }, { v: 'heart', label: '愛心光' }, { v: 'big', label: '大反光' }, { v: 'none', label: '沒有' },
+];
+AV_OPTIONS.glasses = [
+  { v: 'none', label: '沒有' }, { v: 'round', label: '圓眼鏡' }, { v: 'square', label: '方眼鏡' }, { v: 'sun', label: '太陽眼鏡' }, { v: 'star', label: '星星眼鏡' },
+];
+AV_OPTIONS.mouth.push(
+  { v: 'teeth', label: '露齒笑' }, { v: 'fang', label: '小虎牙' }, { v: 'wow', label: '哇！' }, { v: 'wavy', label: '波浪嘴' }, { v: 'kiss', label: '親親' },
+);
+AV_OPTIONS.brows.push({ v: 'round', label: '圓圓眉' }, { v: 'raised', label: '挑眉' });
+AV_OPTIONS.blush.push({ v: 'hearts', label: '愛心' }, { v: 'stars', label: '星星' });
+Object.assign(AV_DEFAULT, { gaze: 'center', lashes: 'flick', shine: 'classic', glasses: 'none' });
+AV_TABS.find(t => t.key === 'eyes').label = '眼型';
+AV_TABS.push({ key: 'gaze', label: '視線' }, { key: 'lashes', label: '睫毛' }, { key: 'shine', label: '眼神光' }, { key: 'glasses', label: '眼鏡' });
+const AV_GROUPS = [
+  { label: '身體', tabs: ['gender', 'face', 'skin'] },
+  { label: '頭髮', tabs: ['hair'] },
+  { label: '眼睛', tabs: ['eyes', 'gaze', 'lashes', 'shine', 'iris', 'glasses'] },
+  { label: '五官', tabs: ['brows', 'nose', 'mouth', 'blush'] },
+  { label: '服裝', tabs: ['top', 'bottom', 'shoes', 'back', 'acc'] },
+];
+
+// Older saved avatars used combined eye presets; map them onto the new parts.
+function avNormalizeFace(p) {
+  if (p.eyes === 'side') { p.eyes = 'round'; if (!p.gaze || p.gaze === 'center') p.gaze = 'right'; }
+  if (p.eyes === 'sparkle') { p.eyes = 'round'; p.shine = 'sparkle'; }
+  if (p.eyes === 'glasses') { p.eyes = 'round'; if (!p.glasses || p.glasses === 'none') p.glasses = 'round'; }
+  if (!p.lashes) p.lashes = p.gender === 'boy' ? 'short' : 'flick';
+  return p;
+}
+
+function avHeart(x, y, r, c) {
+  return `<path d="M${x},${y + r} C${x - r * 1.4},${y} ${x - r},${y - r * 1.1} ${x},${y - r * .35} C${x + r},${y - r * 1.1} ${x + r * 1.4},${y} ${x},${y + r}Z" fill="${c}"/>`;
+}
+
+function avEye(cx, cy, p, mirror) {
+  const lashC = '#2A1F1B', pf = p._pfx || 'a';
+  const outer = mirror ? 1 : -1;                       // which side is the outer corner
+  const [gx, gy] = ({ center: [0, 0], left: [-4, 0], right: [4, 0], up: [0, -3], down: [0, 3] })[p.gaze] || [0, 0];
+  const hasFlick = ['flick', 'long', 'full'].includes(p.lashes);
+  const flick = (x, y) => hasFlick ? `<path d="M${x},${y} l${outer * 6},-5" stroke="${lashC}" stroke-width="3" stroke-linecap="round"/>` : '';
+
+  if (p.eyes === 'smile') {
+    return `<path d="M${cx - 12},${cy + 3} Q${cx},${cy - 10} ${cx + 12},${cy + 3}" stroke="${lashC}" stroke-width="3.4" fill="none" stroke-linecap="round"/>` + flick(cx + outer * 12, cy + 2);
+  }
+  if (p.eyes === 'small') {
+    const x = cx + gx * .6, y = cy + 2 + gy * .6;
+    return `<ellipse cx="${x}" cy="${y}" rx="5.5" ry="7" fill="${avDark(p.iris, .55)}"/>` +
+      (p.shine === 'none' ? '' : `<circle cx="${x + 1.8}" cy="${y - 2.6}" r="1.8" fill="#fff"/>`) + flick(cx + outer * 7, cy - 4);
+  }
+  const S = ({ round: [16, 16.5, 12.5, 0], big: [18.5, 19.5, 15.5, 0], almond: [18, 12.5, 11, 0], upturn: [18, 12.5, 11, 12], droop: [18, 13, 11, -10], sleepy: [16, 16.5, 12.5, 0] })[p.eyes] || [16, 16.5, 12.5, 0];
+  const [rx, ry, ir, tiltDeg] = S;
+  const tilt = tiltDeg * (mirror ? -1 : 1);
+  const ix = cx + gx, iy = cy + gy;
+  const cid = `${pf}ec${mirror ? 1 : 0}`;
+  let s = `<clipPath id="${cid}"><ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}"/></clipPath>`;
+  s += `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="url(#${pf}scl)"/>`;
+  s += `<g clip-path="url(#${cid})">`;
+  s += `<circle cx="${ix}" cy="${iy + 1}" r="${ir}" fill="url(#${pf}ir)"/>`;
+  s += `<circle cx="${ix}" cy="${iy + 1.5}" r="${(ir * .45).toFixed(1)}" fill="${avDark(p.iris, .65)}"/>`;
+  const hx = ix + ir * .36, hy = iy - ir * .3;
+  if (p.shine === 'classic') s += `<ellipse cx="${hx}" cy="${hy}" rx="${(ir * .37).toFixed(1)}" ry="${(ir * .3).toFixed(1)}" fill="#fff"/><circle cx="${ix - ir * .36}" cy="${iy + ir * .48}" r="${(ir * .16).toFixed(1)}" fill="#fff" opacity=".85"/>`;
+  if (p.shine === 'sparkle') s += sparkle(ix - ir * .38, iy - ir * .38, ir * .34) + sparkle(ix + ir * .45, iy + ir * .45, ir * .22) + `<circle cx="${hx}" cy="${hy}" r="${(ir * .16).toFixed(1)}" fill="#fff"/>`;
+  if (p.shine === 'heart') s += avHeart(hx - 1, hy + 1, ir * .32, '#fff') + `<circle cx="${ix - ir * .4}" cy="${iy + ir * .48}" r="${(ir * .14).toFixed(1)}" fill="#fff" opacity=".85"/>`;
+  if (p.shine === 'big') s += `<ellipse cx="${ix + ir * .15}" cy="${iy - ir * .2}" rx="${(ir * .62).toFixed(1)}" ry="${(ir * .42).toFixed(1)}" fill="#fff" opacity=".85" transform="rotate(-25 ${ix} ${iy})"/>`;
+  if (p.eyes === 'sleepy') s += `<rect x="${cx - rx - 2}" y="${cy - ry - 2}" width="${rx * 2 + 4}" height="${ry + 1}" fill="${p.skin}"/>`;
+  s += `</g>`;
+  // upper lash line follows the top of the eye
+  const top = p.eyes === 'sleepy' ? cy - 1 : cy - ry * .78;
+  const lw = p.lashes === 'none' ? 1.8 : (p.lashes === 'short' ? 2.8 : 3.4);
+  const lc = p.lashes === 'none' ? avDark(p.skin, .45) : lashC;
+  s += `<path d="M${cx - rx - .5},${top + ry * .45} C${cx - rx * .6},${top - ry * .25} ${cx + rx * .6},${top - ry * .25} ${cx + rx + .5},${top + ry * .4}" stroke="${lc}" stroke-width="${lw}" fill="none" stroke-linecap="round"/>`;
+  const ox = cx + outer * rx;
+  if (hasFlick) s += `<path d="M${ox},${top + ry * .4} l${outer * 6},-6" stroke="${lashC}" stroke-width="3" stroke-linecap="round"/>`;
+  if (p.lashes === 'long' || p.lashes === 'full') {
+    s += [.15, .45, .75].map(k => { const x = cx + outer * rx * k, y = top - ry * .12 + ry * .1 * k; return `<path d="M${x},${y} l${outer * 3},-6" stroke="${lashC}" stroke-width="2" stroke-linecap="round"/>`; }).join('');
+  }
+  if (p.lashes === 'bottom' || p.lashes === 'full') {
+    s += [.35, .65, .9].map(k => { const x = cx + outer * rx * k, y = cy + ry * .82 - ry * .2 * k; return `<path d="M${x},${y} l${outer * 2.4},4" stroke="${lashC}" stroke-width="1.7" stroke-linecap="round"/>`; }).join('');
+  }
+  return tilt ? `<g transform="rotate(${tilt} ${cx} ${cy})">${s}</g>` : s;
+}
+
+function avGlasses(p) {
+  const fr = p.glasses === 'sun' ? '#2B2622' : p.glasses === 'star' ? '#F26FAE' : '#5A4036';
+  const lens = p.glasses === 'sun' ? `fill="#2B2622" fill-opacity=".82"` : `fill="#fff" fill-opacity=".1"`;
+  const bridge = `<path d="M97,114 Q100,110 103,114" stroke="${fr}" stroke-width="2.6" fill="none"/><path d="M55,112 L44,108 M145,112 L156,108" stroke="${fr}" stroke-width="2.6" stroke-linecap="round"/>`;
+  if (p.glasses === 'round' || p.glasses === 'sun') return `<circle cx="76" cy="116" r="21" stroke="${fr}" stroke-width="2.6" ${lens}/><circle cx="124" cy="116" r="21" stroke="${fr}" stroke-width="2.6" ${lens}/>` + bridge +
+    (p.glasses === 'sun' ? `<path d="M64,106 L72,100 M112,106 L120,100" stroke="#fff" stroke-width="2.4" stroke-linecap="round" opacity=".7"/>` : '');
+  if (p.glasses === 'square') return `<rect x="55" y="99" width="42" height="33" rx="8" stroke="${fr}" stroke-width="2.6" ${lens}/><rect x="103" y="99" width="42" height="33" rx="8" stroke="${fr}" stroke-width="2.6" ${lens}/>` + bridge;
+  if (p.glasses === 'star') {
+    const star = (x, y) => { let d = ''; for (let i = 0; i < 10; i++) { const a = (i * 36 - 90) * Math.PI / 180, r = i % 2 ? 11 : 24; d += (i ? 'L' : 'M') + (x + Math.cos(a) * r).toFixed(1) + ',' + (y + Math.sin(a) * r).toFixed(1); } return `<path d="${d}Z" stroke="${fr}" stroke-width="2.6" stroke-linejoin="round" ${lens}/>`; };
+    return star(76, 117) + star(124, 117) + bridge;
+  }
+  return '';
+}
+
 function avatarSVG(parts, opts) {
-  const p = Object.assign({}, AV_DEFAULT, parts || {});
+  const p = avNormalizeFace(avFillClothes(Object.assign({}, AV_DEFAULT, parts || {})));
+  p._pfx = 'av' + (++AV_SEQ) + '_';
+  // hats sit flat on the head: tall hairstyles would poke through them
+  const hat = ['fire', 'police', 'pirate', 'chef', 'conductor', 'dino'].includes(p.acc);
+  if (hat) {
+    if (p.hair === 'spiky') p.hair = 'short';
+    if (p.hair === 'bun' || p.hair === 'updo') p.hair = 'long';
+    if (p.acc === 'dino' && (p.hair === 'curly' || p.hair === 'curlyshort')) p.hair = 'short';
+  }
   const vb = (opts && opts.viewBox) || '0 0 200 200';
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${vb}">` +
-    avHairBack(p) +
-    `<path d="${avFacePath(p.face)}" fill="${p.skin}" stroke="${AV_INK}" stroke-width="2.4" stroke-linejoin="round"/>` +
-    avFeatures(p) + avHairFront(p) + `</svg>`;
+  const xh = AV_EXTRA_HAIR[p.hair];
+  const hooded = ['hijab', 'bear', 'bunny'].includes(p.hair) || p.acc === 'dino';
+  const gloss = hooded || hat ? '' : `<path d="M68,58 C86,47 114,47 132,58" stroke="#fff" stroke-width="6" stroke-linecap="round" fill="none" opacity=".28"/>`;
+  let svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${vb}">` + avDefs(p) +
+    avOutfitBack(p) + (xh ? xh.back(p) : avHairBack(p)) + avBody(p) +
+    `<path d="${avFacePath(p.face)}" fill="url(#${p._pfx}skin)" stroke="${avDark(p.skin, .2)}" stroke-width="1.3" stroke-linejoin="round"/>` +
+    avFeatures(p) + (xh ? xh.front(p) : avHairFront(p)) + gloss + avAcc(p) + `</svg>`;
+  svg = av25dShade(svg, p._pfx);
   // later attributes override earlier ones (duplicate attrs make the SVG invalid as an <img>)
   return svg.replace(/<([a-z]+)((?:\s+[a-z-]+="[^"]*")+)\s*(\/?)>/gi, (m, tag, attrs, sl) => {
     const map = new Map();
@@ -5303,31 +5697,39 @@ function randomAvatarParts() {
   const pick = k => AV_OPTIONS[k][Math.floor(Math.random() * AV_OPTIONS[k].length)].v;
   const out = {};
   Object.keys(AV_OPTIONS).forEach(k => out[k] = pick(k));
+  const col = () => CLOTH_COLORS[Math.floor(Math.random() * CLOTH_COLORS.length)];
+  out.topColor = col(); out.bottomColor = col(); out.shoeColor = col(); out.backColor = col();
+  if (Math.random() < 0.6) out.back = 'none';
+  if (Math.random() < 0.5) out.acc = 'none';
+  if (Math.random() < 0.8) out.glasses = 'none';
+  if (Math.random() < 0.6) out.gaze = 'center';
   return out;
 }
 
 // Mount the maker UI inside `host`; calls onChange(parts) on every edit.
 function mountAvatarMaker(host, initialParts, onChange) {
   const parts = Object.assign({}, AV_DEFAULT, initialParts || {});
+  avFillClothes(parts);
   let tab = 'gender';
-  const CROP = { eyes: '40 82 120 64', iris: '40 82 120 64', nose: '60 100 80 60', mouth: '60 110 80 60', brows: '40 70 120 60', blush: '36 96 128 64' };
+  const CROP = { gaze: '40 82 120 64', lashes: '40 82 120 64', shine: '50 92 52 44', glasses: '34 80 132 72', gender: AV_FULL_VIEWBOX, top: '44 150 112 74', bottom: '34 196 132 90', shoes: '60 230 80 50', back: '14 140 172 144', acc: '10 -6 180 150', hair: '0 0 200 240', eyes: '40 82 120 64', iris: '40 82 120 64', nose: '60 100 80 60', mouth: '60 110 80 60', brows: '40 70 120 60', blush: '36 96 128 64' };
 
   host.innerHTML = `
     <div class="avm">
       <div class="avm-stage">
-        <div class="avm-preview" id="avmPreview">${avatarSVG(parts)}</div>
+        <div class="avm-preview" id="avmPreview">${avatarSVG(parts, { viewBox: AV_FULL_VIEWBOX })}</div>
         <button type="button" class="avm-dice" id="avmDice" aria-label="隨機">🎲</button>
       </div>
-      <div class="avm-tabs" id="avmTabs">
-        ${AV_TABS.map(t => `<button type="button" class="avm-tab ${t.key === tab ? 'on' : ''}" data-k="${t.key}">${t.label}</button>`).join('')}
+      <div class="avm-groups" id="avmGroups">
+        ${AV_GROUPS.map((g, i) => `<button type="button" class="avm-group ${i === 0 ? 'on' : ''}" data-g="${i}">${g.label}</button>`).join('')}
       </div>
+      <div class="avm-tabs" id="avmTabs"></div>
       <div class="avm-opts" id="avmOpts"></div>
     </div>`;
   const preview = host.querySelector('#avmPreview');
   const optsEl = host.querySelector('#avmOpts');
 
   function boing() {
-    preview.innerHTML = avatarSVG(parts);
+    preview.innerHTML = avatarSVG(parts, { viewBox: AV_FULL_VIEWBOX });
     preview.classList.remove('boing'); void preview.offsetWidth; preview.classList.add('boing');
   }
   function renderOpts() {
@@ -5336,13 +5738,21 @@ function mountAvatarMaker(host, initialParts, onChange) {
     if (def.color) {
       html = `<div class="avm-swatches">${AV_OPTIONS[tab].map(o => `<button type="button" class="avm-swatch ${parts[tab] === o.v ? 'on' : ''}" data-v="${o.v}" style="background:${o.v}"></button>`).join('')}</div>`;
     } else {
-      html = `<div class="avm-grid">${AV_OPTIONS[tab].map(o => {
+      const list = AV_OPTIONS[tab];
+      const pieceDefs = { top: TOPS, bottom: BOTTOMS, shoes: SHOES, back: BACKS };
+      html = `<div class="avm-grid">${list.map(o => {
         const trial = Object.assign({}, parts, { [tab]: o.v });
-        if (tab === 'gender' && parts.gender !== o.v) trial.hair = o.v === 'boy' ? 'short' : 'long';
+        if (tab === 'gender' && parts.gender !== o.v) Object.assign(trial, AV_CLOTH_DEFAULTS[o.v], { hair: o.v === 'boy' ? 'short' : 'long', lashes: o.v === 'boy' ? 'short' : 'flick' });
+        // a new piece shows in its own default colour until the kid picks another
+        if (def.colorKey && parts[tab] !== o.v && pieceDefs[tab][o.v].def) trial[def.colorKey] = pieceDefs[tab][o.v].def;
         return `<button type="button" class="avm-opt ${parts[tab] === o.v ? 'on' : ''}" data-v="${o.v}">
           <span class="avm-thumb">${avatarSVG(trial, { viewBox: CROP[tab] })}</span>
           <span class="avm-name">${o.label}</span></button>`;
       }).join('')}</div>`;
+      if (def.colorKey && (({ top: TOPS, bottom: BOTTOMS, shoes: SHOES, back: BACKS })[tab][parts[tab]] || {}).def) {
+        html += `<div class="avm-sub">顏色</div>
+          <div class="avm-swatches">${CLOTH_COLORS.map(c => `<button type="button" class="avm-swatch ${parts[def.colorKey] === c ? 'on' : ''}" data-cc="${c}" style="background:${c}"></button>`).join('')}</div>`;
+      }
       if (tab === 'hair') {
         html += `<div class="avm-sub">${['hijab','bear','bunny'].includes(parts.hair) ? '帽子／頭巾顏色' : '髮色'}</div>
           <div class="avm-swatches">${AV_OPTIONS.hairColor.map(o => `<button type="button" class="avm-swatch ${parts.hairColor === o.v ? 'on' : ''}" data-hc="${o.v}" style="background:${o.v}"></button>`).join('')}</div>`;
@@ -5353,27 +5763,46 @@ function mountAvatarMaker(host, initialParts, onChange) {
       const v = b.dataset.v;
       if (tab === 'gender' && parts.gender !== v) {
         parts.hair = v === 'boy' ? 'short' : 'long';
+        parts.lashes = v === 'boy' ? 'short' : 'flick';
+        Object.assign(parts, AV_CLOTH_DEFAULTS[v]);
+      }
+      if (def.colorKey && parts[tab] !== v) {
+        const pd = ({ top: TOPS, bottom: BOTTOMS, shoes: SHOES, back: BACKS })[tab][v];
+        if (pd && pd.def) parts[def.colorKey] = pd.def;
       }
       parts[tab] = v;
       update();
     });
     optsEl.querySelectorAll('[data-hc]').forEach(b => b.onclick = () => { parts.hairColor = b.dataset.hc; update(); });
+    optsEl.querySelectorAll('[data-cc]').forEach(b => b.onclick = () => { parts[def.colorKey] = b.dataset.cc; update(); });
   }
   function update() {
     boing(); renderOpts();
     onChange(Object.assign({}, parts));
   }
-  host.querySelectorAll('.avm-tab').forEach(b => b.onclick = () => {
-    tab = b.dataset.k;
-    host.querySelectorAll('.avm-tab').forEach(x => x.classList.toggle('on', x === b));
+  const tabsEl = host.querySelector('#avmTabs');
+  function selectTab(k) {
+    tab = k;
+    tabsEl.querySelectorAll('.avm-tab').forEach(x => x.classList.toggle('on', x.dataset.k === k));
     renderOpts();
     optsEl.classList.remove('swap'); void optsEl.offsetWidth; optsEl.classList.add('swap');
+  }
+  function renderTabs(gi) {
+    const g = AV_GROUPS[gi];
+    tabsEl.innerHTML = g.tabs.map(k => `<button type="button" class="avm-tab" data-k="${k}">${AV_TABS.find(t => t.key === k).label}</button>`).join('');
+    tabsEl.style.display = g.tabs.length > 1 ? '' : 'none';
+    tabsEl.querySelectorAll('.avm-tab').forEach(b => b.onclick = () => selectTab(b.dataset.k));
+    selectTab(g.tabs[0]);
+  }
+  host.querySelectorAll('.avm-group').forEach(b => b.onclick = () => {
+    host.querySelectorAll('.avm-group').forEach(x => x.classList.toggle('on', x === b));
+    renderTabs(+b.dataset.g);
   });
   host.querySelector('#avmDice').onclick = () => {
     Object.assign(parts, randomAvatarParts());
     update();
   };
-  renderOpts();
+  renderTabs(0);
 }
 
 // ---- Kid Editor ----
