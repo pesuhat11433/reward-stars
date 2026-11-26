@@ -2057,6 +2057,328 @@
   }
   .manifest-status.loaded { background: var(--mint-soft); color: #2C8262; }
   .manifest-status.no-bundle { background: var(--line-soft); }
+
+  /* =========================================================
+     Refresh 2026 · 簡約乾爽 + Q彈動畫
+     ========================================================= */
+  :root {
+    --bg: #F3F5F7;
+    --surface: #FFFFFF;
+    --surface-2: #F6F7F9;
+    --ink: #2E3238;
+    --ink-soft: #6E7580;
+    --ink-faint: #A9AFB8;
+    --line: #E6E9ED;
+    --line-soft: #F0F2F5;
+    --accent: #12C26B;
+    --accent-soft: #E4F8EE;
+    --shadow: 0 1px 2px rgba(30, 36, 44, 0.04), 0 6px 18px rgba(30, 36, 44, 0.05);
+    --shadow-lg: 0 2px 6px rgba(30, 36, 44, 0.05), 0 18px 44px rgba(30, 36, 44, 0.10);
+    --spring: cubic-bezier(.34, 1.56, .64, 1);
+    --spring-soft: cubic-bezier(.22, 1.3, .36, 1);
+    --r: 18px;
+    --r-lg: 24px;
+    --r-xl: 30px;
+  }
+  body { background: var(--bg); }
+
+  /* Header: keep everything on one line on phones */
+  .header { gap: 10px; padding: 6px 2px 18px; }
+  .brand-icon {
+    background: var(--ink);
+    box-shadow: none;
+    border-radius: 13px;
+  }
+  .brand-title { font-size: 19px; letter-spacing: -0.3px; white-space: nowrap; }
+  .brand { min-width: 0; }
+  .brand-sub { letter-spacing: 2px; font-size: 10px; }
+  .tabs { box-shadow: none; background: #E9ECEF; flex-shrink: 0; }
+  .tab-btn { white-space: nowrap; padding: 8px 14px; transition: background .25s, color .25s, transform .35s var(--spring); }
+  .tab-btn:active { transform: scale(.9); }
+  .tab-btn.active { background: var(--surface); color: var(--ink); box-shadow: 0 2px 8px rgba(30,36,44,.08); }
+  .lib-button {
+    background: var(--surface) !important;
+    border: none !important;
+    box-shadow: var(--shadow) !important;
+    transition: transform .35s var(--spring) !important;
+  }
+  .lib-button:active { transform: scale(.86) !important; }
+  @media (max-width: 420px) {
+    .brand-sub { display: none; }
+    .tab-btn { padding: 7px 11px; font-size: 13px; }
+    .lib-button { width: 34px !important; height: 34px !important; font-size: 16px !important; }
+  }
+
+  /* Kid chips */
+  .kid-chip { box-shadow: none; border: 2px solid transparent; transition: transform .4s var(--spring), border-color .2s, background .2s; }
+  .kid-chip.active { border-color: var(--ink); transform: none; }
+  .kid-chip:active { transform: scale(.92); }
+  .kid-chip.add { border: 2px dashed #D5DAE0; }
+
+  /* Cards */
+  .empty-state, .theme-card { box-shadow: var(--shadow); border-radius: var(--r-lg); }
+  .theme-card { padding: 20px; animation: card-in .6s var(--spring-soft) both; }
+  .themes-list > .theme-card:nth-child(2) { animation-delay: .05s; }
+  .themes-list > .theme-card:nth-child(3) { animation-delay: .1s; }
+  .themes-list > .theme-card:nth-child(n+4) { animation-delay: .15s; }
+  @keyframes card-in {
+    from { opacity: 0; transform: translateY(24px) scale(.96); }
+    to   { opacity: 1; transform: none; }
+  }
+  .theme-card::before { display: none; }
+  .theme-card.completed { background: linear-gradient(160deg, var(--accent-soft), var(--surface) 60%); }
+  .theme-sticker-big { border-radius: 16px; }
+  .theme-menu { background: var(--surface-2); }
+
+  .stamp-grid { gap: 9px; }
+  .stamp-cell {
+    border-radius: 16px;
+    background: var(--surface-2);
+    border: 2px dashed #DEE2E7;
+    transition: transform .4s var(--spring), background .2s, border-color .2s;
+  }
+  .stamp-cell.filled {
+    background: var(--theme-color-soft, var(--accent-soft));
+    border: 2px solid transparent;
+    animation: pop .55s var(--spring);
+  }
+  .stamp-cell:active { transform: scale(.88) !important; }
+  .stamp-cell:not(.filled):hover { transform: scale(1.06); background: #fff; }
+  @keyframes pop {
+    0% { transform: scale(.3) rotate(-14deg); opacity: 0; }
+    55% { transform: scale(1.18) rotate(4deg); opacity: 1; }
+    75% { transform: scale(.94) rotate(-2deg); }
+    100% { transform: scale(1) rotate(0); }
+  }
+  .progress-text strong { color: var(--accent); }
+
+  /* Buttons — every press squishes and springs back */
+  .btn { transition: transform .4s var(--spring), background .2s, box-shadow .2s; }
+  .btn:active { transform: scale(.93); }
+  .btn-primary:hover, .btn-success:hover { transform: translateY(-1px); }
+  .btn-primary:active, .btn-success:active { transform: scale(.93); }
+  .theme-actions .btn { padding: 15px 18px; font-size: 16px; border-radius: 18px; }
+  .btn-success { background: var(--accent); box-shadow: 0 6px 16px rgba(18,194,107,.28); }
+
+  .fab {
+    border-radius: 20px;
+    box-shadow: 0 10px 26px rgba(30,36,44,.22);
+    transition: transform .45s var(--spring);
+    animation: fab-in .7s var(--spring) both .15s;
+  }
+  .fab:hover { transform: translate(-50%, -2px); }
+  .fab:active { transform: translate(-50%, 0) scale(.9); }
+  @keyframes fab-in { from { transform: translate(-50%, 90px); } to { transform: translate(-50%, 0); } }
+
+  /* Modal sheet with spring */
+  .modal-overlay { background: rgba(30, 36, 44, .32); backdrop-filter: blur(6px); }
+  .modal { padding: 18px 22px 22px; animation: sheet-up .55s var(--spring-soft); }
+  @keyframes sheet-up {
+    from { transform: translateY(70%); }
+    to   { transform: translateY(0); }
+  }
+  .modal-handle { background: #DCE0E5; }
+  .modal-title { font-size: 22px; letter-spacing: -0.4px; }
+  .field-label { letter-spacing: 0; text-transform: none; font-size: 13px; }
+  .input, .textarea, .sticker-trigger, .chip, .photo-btn {
+    background: var(--surface-2) !important;
+    border: 2px solid transparent !important;
+    border-radius: var(--r) !important;
+  }
+  .chip { border-radius: 100px !important; }
+  .chip.active { background: var(--ink) !important; }
+  .input:focus, .textarea:focus { border-color: var(--ink) !important; background: #fff !important; }
+  .photo-btn { border-style: dashed !important; border-color: #D5DAE0 !important; }
+  .modal-actions { border-top: none; }
+
+  /* ---- Stamp dialog ---- */
+  .stamp-modal-close {
+    position: absolute; top: 14px; right: 16px;
+    width: 40px; height: 40px; border-radius: 50%;
+    border: none; background: var(--surface-2); color: var(--ink-soft);
+    font-size: 18px; cursor: pointer; display: grid; place-items: center;
+    transition: transform .4s var(--spring);
+  }
+  .stamp-modal-close:active { transform: scale(.85) rotate(90deg); }
+  #stampFormView { position: relative; }
+  #stampFormView .modal-title, #stampFormView .modal-sub { padding-right: 52px; }
+
+  .sticker-hero {
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    width: 100%; padding: 22px 12px 18px; cursor: pointer;
+    background: var(--surface-2); border: none; border-radius: var(--r-lg);
+    font-family: inherit; color: var(--ink);
+    transition: transform .45s var(--spring);
+  }
+  .sticker-hero:active { transform: scale(.95); }
+  .sticker-hero-card {
+    width: 116px; height: 140px; border-radius: 22px; background: #fff;
+    box-shadow: 0 10px 24px rgba(30,36,44,.10);
+    display: grid; place-items: center; font-size: 64px; position: relative;
+    animation: hero-wobble 3.2s ease-in-out infinite;
+  }
+  .sticker-hero-card img { width: 84px !important; height: 84px !important; }
+  .sticker-hero-card.bump { animation: hero-bump .6s var(--spring); }
+  @keyframes hero-wobble {
+    0%,100% { transform: rotate(-3deg) translateY(0); }
+    50% { transform: rotate(3deg) translateY(-4px); }
+  }
+  @keyframes hero-bump {
+    0% { transform: scale(.6) rotate(-12deg); }
+    60% { transform: scale(1.12) rotate(4deg); }
+    100% { transform: scale(1) rotate(0); }
+  }
+  .sticker-hero-hint { font-size: 14px; font-weight: 700; color: var(--ink-soft); display: flex; align-items: center; gap: 6px; }
+  .sticker-hero-hint b { color: var(--accent); }
+
+  /* Mega stamp button — big & easy for little hands */
+  .stamp-mega-wrap {
+    position: sticky; bottom: -22px; margin: 10px -22px -22px;
+    padding: 30px 16px calc(16px + env(safe-area-inset-bottom));
+    background: linear-gradient(to bottom, rgba(255,255,255,0), #fff 34%);
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .stamp-mega-tip {
+    position: relative; background: var(--ink); color: #fff;
+    font-size: 14px; font-weight: 700; padding: 7px 14px; border-radius: 10px;
+    margin-bottom: 10px; animation: tip-bob 1.6s var(--spring) infinite;
+  }
+  .stamp-mega-tip b { color: #5BE39B; }
+  .stamp-mega-tip::after {
+    content: ''; position: absolute; left: 50%; bottom: -6px; transform: translateX(-50%);
+    border: 6px solid transparent; border-bottom: none; border-top-color: var(--ink);
+  }
+  @keyframes tip-bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+  }
+  .stamp-mega {
+    width: 100%; min-height: 96px; border: none; border-radius: 28px;
+    background: var(--ink); color: #fff; cursor: pointer; font-family: inherit;
+    display: flex; align-items: center; justify-content: center; gap: 14px;
+    font-size: 30px; font-weight: 900; letter-spacing: 2px;
+    box-shadow: 0 14px 30px rgba(30,36,44,.28), inset 0 -6px 0 rgba(0,0,0,.25);
+    transition: transform .45s var(--spring), box-shadow .2s;
+  }
+  .stamp-mega:active {
+    transform: scale(.94) translateY(3px);
+    box-shadow: 0 6px 14px rgba(30,36,44,.22), inset 0 -2px 0 rgba(0,0,0,.25);
+  }
+  .stamp-mega-icon {
+    width: 62px; height: 62px; border-radius: 20px; background: #fff;
+    display: grid; place-items: center; font-size: 38px;
+  }
+  .stamp-mega-icon img { width: 48px !important; height: 48px !important; }
+  .stamp-mega.pressed { animation: mega-squash .5s var(--spring); }
+  @keyframes mega-squash {
+    0% { transform: scale(1, 1); }
+    30% { transform: scale(1.08, .82); }
+    60% { transform: scale(.96, 1.06); }
+    100% { transform: scale(1, 1); }
+  }
+
+  /* ---- Arc card picker (弧形轉動卡片) ---- */
+  .arc-picker {
+    position: fixed; inset: 0; z-index: 300; background: var(--bg);
+    display: flex; flex-direction: column; align-items: center;
+    overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none;
+    animation: arc-in .5s var(--spring-soft);
+  }
+  .arc-picker.closing { animation: arc-out .28s ease-in forwards; }
+  @keyframes arc-in { from { opacity: 0; transform: scale(1.06); } to { opacity: 1; transform: none; } }
+  @keyframes arc-out { to { opacity: 0; transform: scale(.96); } }
+  .arc-top { width: 100%; max-width: 720px; display: flex; justify-content: space-between; padding: 16px 18px 0; }
+  .arc-icon-btn {
+    width: 44px; height: 44px; border-radius: 50%; border: none; background: #fff;
+    box-shadow: var(--shadow); font-size: 22px; color: var(--ink); cursor: pointer;
+    display: grid; place-items: center; transition: transform .4s var(--spring); font-family: inherit;
+  }
+  .arc-icon-btn:active { transform: scale(.85); }
+  .arc-head { text-align: center; margin-top: 4px; }
+  .arc-kicker { font-size: 15px; font-weight: 700; color: var(--ink); }
+  .arc-title { font-size: 40px; font-weight: 900; letter-spacing: -1px; line-height: 1.15; margin-top: 2px; }
+  .arc-count { font-size: 17px; font-weight: 700; color: var(--accent); margin-top: 8px; }
+
+  .arc-stage { position: relative; flex: 1; width: 100%; min-height: 330px; perspective: 1100px; }
+  .arc-card {
+    position: absolute; left: 50%; top: 50%;
+    width: 196px; height: 250px; margin: -125px 0 0 -98px;
+    background: #fff; border-radius: 24px; border: none; padding: 0; cursor: pointer;
+    box-shadow: 0 18px 40px rgba(30,36,44,.10), 0 2px 6px rgba(30,36,44,.05);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-family: inherit; color: var(--ink); will-change: transform;
+    transform-style: preserve-3d;
+  }
+  .arc-card .arc-face { font-size: 104px; line-height: 1; display: grid; place-items: center; width: 140px; height: 140px; }
+  .arc-card .arc-face img { width: 140px !important; height: 140px !important; }
+  .arc-card .arc-no { position: absolute; top: 16px; left: 18px; font-size: 13px; font-weight: 800; color: var(--ink-faint); letter-spacing: 1px; }
+  .arc-card.is-current .arc-face { animation: face-bounce 1.8s var(--spring) infinite; }
+  @keyframes face-bounce {
+    0%, 70%, 100% { transform: translateY(0) scale(1); }
+    80% { transform: translateY(-10px) scale(1.04, .97); }
+    90% { transform: translateY(0) scale(.98, 1.03); }
+  }
+  .arc-card.is-chosen::after {
+    content: '✓'; position: absolute; top: 12px; right: 12px; width: 28px; height: 28px;
+    border-radius: 50%; background: var(--accent); color: #fff; font-weight: 900;
+    display: grid; place-items: center; font-size: 15px;
+  }
+  .arc-pick-me {
+    position: absolute; left: 50%; top: 50%; z-index: 500;
+    transform: translate(-50%, -172px); pointer-events: none;
+    background: var(--ink); color: #fff; font-weight: 800; font-size: 15px; letter-spacing: 1px;
+    padding: 8px 16px; border-radius: 10px; white-space: nowrap;
+    transition: opacity .2s;
+  }
+  .arc-pick-me::after {
+    content: ''; position: absolute; left: 50%; bottom: -6px; transform: translateX(-50%);
+    border: 6px solid transparent; border-bottom: none; border-top-color: var(--ink);
+  }
+  .arc-pick-me.pop { animation: pick-pop .45s var(--spring); }
+  @keyframes pick-pop { from { transform: translate(-50%, -150px) scale(.6); opacity: 0; } to { transform: translate(-50%, -172px) scale(1); opacity: 1; } }
+  .arc-stage.dragging .arc-pick-me { opacity: 0; }
+
+  .arc-hint { font-size: 15px; color: var(--ink-faint); font-weight: 600; margin-bottom: 14px; }
+  .arc-bottom { width: 100%; max-width: 720px; padding: 0 16px calc(18px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; align-items: center; }
+  .arc-confirm {
+    width: 100%; min-height: 84px; border: none; border-radius: 26px; background: var(--ink); color: #fff;
+    font-size: 24px; font-weight: 900; letter-spacing: 1px; cursor: pointer; font-family: inherit;
+    box-shadow: 0 14px 30px rgba(30,36,44,.25), inset 0 -5px 0 rgba(0,0,0,.25);
+    transition: transform .45s var(--spring);
+  }
+  .arc-confirm:active { transform: scale(.94) translateY(3px); }
+  @media (max-height: 700px) {
+    .arc-title { font-size: 32px; }
+    .arc-card { width: 168px; height: 214px; margin: -107px 0 0 -84px; }
+    .arc-card .arc-face, .arc-card .arc-face img { width: 116px !important; height: 116px !important; font-size: 86px; }
+    .arc-pick-me { transform: translate(-50%, -152px); }
+    .arc-confirm { min-height: 72px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+  }
+
+  /* Motion-ref: hand-drawn "boil" jitter on the chosen face + icon strip */
+  .arc-card.is-current .arc-face > * { animation: boil .42s steps(1) infinite; }
+  @keyframes boil {
+    0%   { transform: rotate(-1.6deg) translate(0, 0); }
+    33%  { transform: rotate(1.2deg) translate(1px, -1px); }
+    66%  { transform: rotate(-.4deg) translate(-1px, 1px); }
+  }
+  .arc-face.swap { animation: face-swap .38s var(--spring) !important; }
+  @keyframes face-swap { 0% { transform: scale(.55); } 100% { transform: scale(1); } }
+  .arc-strip {
+    width: 100%; display: flex; gap: 6px; overflow-x: auto; padding: 6px calc(50% - 22px) 14px;
+    scrollbar-width: none; scroll-behavior: smooth;
+  }
+  .arc-strip::-webkit-scrollbar { display: none; }
+  .arc-strip-item {
+    flex: 0 0 44px; height: 44px; border: none; background: transparent; padding: 4px; cursor: pointer;
+    opacity: .28; filter: grayscale(1); transition: opacity .2s, filter .2s, transform .4s var(--spring);
+  }
+  .arc-strip-item img { width: 100%; height: 100%; object-fit: contain; display: block; }
+  .arc-strip-item.on { opacity: 1; filter: none; transform: scale(1.25); }
+  .arc-label { font-size: 15px; font-weight: 800; color: var(--ink); margin-top: 10px; letter-spacing: .5px; }
 </style>
 </head>
 <body>
@@ -2392,8 +2714,9 @@ function S(value, opts) { return renderStickerHTML(value, opts); }
 function getAllForCategory(cat, emojiDefaults) {
   // bundled first, then emoji defaults, then custom uploads
   const bundled = (bundledLib[cat] || []).map(it => ({ value: 'lib:' + it.id, type: 'image', src: it.src, source: 'bundled' }));
-  const emojis = emojiDefaults.map(e => ({ value: e, type: 'emoji', source: 'default' }));
   const custom = (customLib[cat] || []).map(it => ({ value: 'lib:' + it.id, type: 'image', src: it.src, source: 'custom' }));
+  // 有圖片貼紙時就不顯示預設 emoji
+  const emojis = (bundled.length + custom.length) ? [] : emojiDefaults.map(e => ({ value: e, type: 'emoji', source: 'default' }));
   return bundled.concat(emojis).concat(custom);
 }
 
@@ -3589,35 +3912,29 @@ function compressImageFile(file, maxSize) {
 }
 
 // ---- Stamp dialog (reason + photo + sticker) ----
+function firstImageSticker() {
+  const imgs = getAllForCategory('stickers', STICKERS).filter(x => x.type === 'image');
+  return imgs.length ? imgs[0].value : '⭐';
+}
+
 function openStampDialog(tid) {
   const t = state.themes.find(x => x.id === tid);
   if (!t) return;
-  const draft = {
-    sticker: t.sticker || '⭐',
-    reason: '',
-    photo: '',
-  };
-
-  // All available stickers (bundled + emoji + custom, no categories)
   const allStickers = getAllForCategory('stickers', STICKERS);
+  const startSticker = allStickers.some(x => x.value === t.sticker) ? t.sticker : (allStickers[0] ? allStickers[0].value : '⭐');
+  const draft = { sticker: startSticker, reason: '', photo: '' };
 
   openModal(`
     <div class="modal-handle"></div>
-
-    <!-- ==== FORM VIEW ==== -->
     <div id="stampFormView">
-      <div class="modal-title">蓋一個章 <span class="modal-title-sticker" id="titleSticker">${renderStickerHTML(draft.sticker, {size:24})}</span></div>
+      <button type="button" class="stamp-modal-close" id="stampCancel" aria-label="關閉">✕</button>
+      <div class="modal-title">蓋一個章</div>
       <div class="modal-sub">為「${escapeHtml(t.title)}」記錄這次的好表現吧（都可以略過）</div>
 
       <div class="field">
-        <label class="field-label">這次的貼紙</label>
-        <button type="button" class="sticker-trigger" id="openStickerPickerBtn">
-          <span class="sticker-trigger-icon" id="triggerStickerPreview">${renderStickerHTML(draft.sticker, {size:'80%'})}</span>
-          <span class="sticker-trigger-text">
-            <div class="sticker-trigger-label">點此選貼紙</div>
-            <div class="sticker-trigger-hint">${allStickers.length} 個可選</div>
-          </span>
-          <span class="sticker-trigger-arrow">›</span>
+        <button type="button" class="sticker-hero" id="openStickerPickerBtn">
+          <span class="sticker-hero-card" id="heroCard">${renderStickerHTML(draft.sticker, {size:84})}</span>
+          <span class="sticker-hero-hint">點一下換貼紙 · <b>${allStickers.length} 款</b></span>
         </button>
       </div>
 
@@ -3635,108 +3952,63 @@ function openStampDialog(tid) {
           </button>
           <input type="file" id="photoFile" accept="image/*" style="display:none">
         </div>
-        <div class="help">可以從相簿選擇或現場拍一張，照片會自動壓縮存在本機</div>
       </div>
 
-      <div class="modal-actions">
-        <button class="btn btn-cancel" id="stampCancel">取消</button>
-        <button class="btn btn-primary" id="stampSave">蓋章！</button>
-      </div>
-    </div>
-
-    <!-- ==== STICKER PICKER VIEW ==== -->
-    <div class="big-picker-view" id="stampPickerView">
-      <div class="big-picker-header">
-        <button class="big-picker-back" id="pickerBackBtn" type="button">‹</button>
-        <div class="big-picker-title">選個貼紙吧</div>
-        <div class="big-picker-current" id="pickerCurrentBadge">
-          <span id="pickerCurrentIcon">${renderStickerHTML(draft.sticker, {size:18})}</span>
-          <span>目前</span>
-        </div>
-      </div>
-      <div class="big-sticker-grid" id="bigStickerGrid">
-        ${allStickers.map(item => `
-          <button type="button" class="big-sticker-cell ${item.value===draft.sticker?'active':''}" data-v="${escapeAttr(item.value)}">
-            ${item.type==='image' ? `<img src="${escapeAttr(item.src)}" alt="">` : item.value}
-          </button>
-        `).join('')}
+      <div class="stamp-mega-wrap">
+        <div class="stamp-mega-tip">按下去 <b>蓋章</b> 囉！</div>
+        <button type="button" class="stamp-mega" id="stampSave">
+          <span class="stamp-mega-icon" id="megaIcon">${renderStickerHTML(draft.sticker, {size:48})}</span>
+          <span>蓋章！</span>
+        </button>
       </div>
     </div>
   `);
 
-  const formView = document.getElementById('stampFormView');
-  const pickerView = document.getElementById('stampPickerView');
-  const titleSticker = document.getElementById('titleSticker');
-  const triggerStickerPreview = document.getElementById('triggerStickerPreview');
-  const pickerCurrentIcon = document.getElementById('pickerCurrentIcon');
+  const heroCard = document.getElementById('heroCard');
+  const megaIcon = document.getElementById('megaIcon');
 
   function setSticker(s) {
     draft.sticker = s;
-    titleSticker.innerHTML = renderStickerHTML(s, {size:24});
-    triggerStickerPreview.innerHTML = renderStickerHTML(s, {size:'80%'});
-    pickerCurrentIcon.innerHTML = renderStickerHTML(s, {size:18});
+    heroCard.innerHTML = renderStickerHTML(s, {size:84});
+    megaIcon.innerHTML = renderStickerHTML(s, {size:48});
+    heroCard.classList.remove('bump'); void heroCard.offsetWidth; heroCard.classList.add('bump');
+    setTimeout(() => heroCard.classList.remove('bump'), 650);
   }
 
-  function showPicker() {
-    formView.style.display = 'none';
-    pickerView.classList.add('show');
-    // Scroll modal to top so the picker header is visible
-    const modal = document.querySelector('.modal');
-    if (modal) modal.scrollTop = 0;
-  }
-  function showForm() {
-    pickerView.classList.remove('show');
-    formView.style.display = 'block';
-    const modal = document.querySelector('.modal');
-    if (modal) modal.scrollTop = 0;
-  }
-
-  document.getElementById('openStickerPickerBtn').onclick = showPicker;
-  document.getElementById('pickerBackBtn').onclick = showForm;
-
-  // Sticker cell click: select + auto-back to form
-  document.querySelectorAll('#bigStickerGrid .big-sticker-cell').forEach(cell => {
-    cell.onclick = () => {
-      document.querySelectorAll('#bigStickerGrid .big-sticker-cell').forEach(x => x.classList.remove('active'));
-      cell.classList.add('active');
-      setSticker(cell.dataset.v);
-      // Small delay so the user sees the selection highlight
-      setTimeout(showForm, 220);
-    };
-  });
+  document.getElementById('openStickerPickerBtn').onclick = () =>
+    openArcPicker(allStickers, draft.sticker, setSticker);
 
   // Photo handling
-  const fileInput = document.getElementById('photoFile');
   const photoRow = document.getElementById('photoRow');
-  document.getElementById('photoBtn').onclick = () => fileInput.click();
-  fileInput.onchange = async () => {
-    const f = fileInput.files && fileInput.files[0];
-    if (!f) return;
-    try {
-      photoRow.innerHTML = `<div class="photo-preview" style="display:grid;place-items:center;color:var(--ink-soft);font-size:13px;">壓縮中…</div>`;
-      const dataUrl = await compressImageFile(f);
-      draft.photo = dataUrl;
-      photoRow.innerHTML = `
-        <div class="photo-preview">
-          <img src="${dataUrl}" alt="預覽">
-          <button class="photo-remove" id="photoRemove" type="button">✕</button>
-        </div>
-        <button class="photo-btn" id="photoReplace" type="button">
-          <span class="icon">🔄</span>
-          <span>換一張</span>
-        </button>
-      `;
-      document.getElementById('photoRemove').onclick = () => {
-        draft.photo = '';
+  function bindPhotoInput() {
+    const fileInput = document.getElementById('photoFile');
+    document.getElementById('photoBtn').onclick = () => fileInput.click();
+    fileInput.onchange = async () => {
+      const f = fileInput.files && fileInput.files[0];
+      if (!f) return;
+      try {
+        photoRow.innerHTML = `<div class="photo-preview" style="display:grid;place-items:center;color:var(--ink-soft);font-size:13px;">壓縮中…</div><input type="file" id="photoFile" accept="image/*" style="display:none">`;
+        const dataUrl = await compressImageFile(f);
+        draft.photo = dataUrl;
+        photoRow.innerHTML = `
+          <div class="photo-preview">
+            <img src="${dataUrl}" alt="預覽">
+            <button class="photo-remove" id="photoRemove" type="button">✕</button>
+          </div>
+          <button class="photo-btn" id="photoBtn" type="button">
+            <span class="icon">🔄</span>
+            <span>換一張</span>
+          </button>
+          <input type="file" id="photoFile" accept="image/*" style="display:none">
+        `;
+        document.getElementById('photoRemove').onclick = () => { draft.photo = ''; renderPhotoEmpty(); };
+        bindPhotoInput();
+      } catch (e) {
+        toast(e.message || '照片處理失敗');
         renderPhotoEmpty();
-      };
-      document.getElementById('photoReplace').onclick = () => fileInput.click();
-    } catch (e) {
-      toast(e.message || '照片處理失敗');
-      renderPhotoEmpty();
-    }
-    fileInput.value = '';
-  };
+      }
+    };
+  }
   function renderPhotoEmpty() {
     photoRow.innerHTML = `
       <button class="photo-btn" id="photoBtn" type="button">
@@ -3745,21 +4017,209 @@ function openStampDialog(tid) {
       </button>
       <input type="file" id="photoFile" accept="image/*" style="display:none">
     `;
-    const newInput = document.getElementById('photoFile');
-    document.getElementById('photoBtn').onclick = () => newInput.click();
-    newInput.onchange = fileInput.onchange;
+    bindPhotoInput();
   }
+  bindPhotoInput();
 
   document.getElementById('stampCancel').onclick = closeModal;
-  document.getElementById('stampSave').onclick = () => {
+  const saveBtn = document.getElementById('stampSave');
+  let saving = false;
+  saveBtn.onclick = () => {
+    if (saving) return;
+    saving = true;
+    saveBtn.classList.add('pressed');
+    if (navigator.vibrate) { try { navigator.vibrate(15); } catch (e) {} }
     const reason = document.getElementById('stampReason').value.trim();
-    commitStamp(tid, {
-      sticker: draft.sticker,
-      reason,
-      photo: draft.photo,
-    });
-    closeModal();
+    // Let the squash-and-bounce play before the sheet closes
+    setTimeout(() => {
+      commitStamp(tid, { sticker: draft.sticker, reason, photo: draft.photo });
+      closeModal();
+    }, 320);
   };
+}
+
+// ---- Arc card picker (弧形轉動卡片) ----
+function openArcPicker(items, currentValue, onPick) {
+  if (!items.length) { toast('圖庫裡還沒有貼紙'); return; }
+  const n = items.length;
+  let idx = Math.max(0, items.findIndex(x => x.value === currentValue));
+  let pos = idx, target = idx, vel = 0, raf = 0, lastCurrent = -1;
+
+  const wrap = document.createElement('div');
+  wrap.className = 'arc-picker';
+  wrap.innerHTML = `
+    <div class="arc-top">
+      <button type="button" class="arc-icon-btn" data-act="close" aria-label="返回">‹</button>
+      <button type="button" class="arc-icon-btn" data-act="random" aria-label="隨機">🎲</button>
+    </div>
+    <div class="arc-head">
+      <div class="arc-kicker">今天的好表現</div>
+      <div class="arc-title">選一張貼紙</div>
+      <div class="arc-count" id="arcCount"></div>
+    </div>
+    <div class="arc-stage" id="arcStage">
+      <div class="arc-pick-me" id="arcPickMe">PICK ME</div>
+      ${items.map((it, i) => `
+        <button type="button" class="arc-card" data-i="${i}">
+          <span class="arc-face">${it.type === 'image' ? `<img src="${escapeAttr(it.src)}" alt="" draggable="false">` : `<span>${escapeHtml(it.value)}</span>`}</span>
+          <span class="arc-label">No.${String(i + 1).padStart(2, '0')}</span>
+        </button>`).join('')}
+    </div>
+    <div class="arc-hint">左右滑動，點中間的卡片選它</div>
+    <div class="arc-strip" id="arcStrip">
+      ${items.map((it, i) => `<button type="button" class="arc-strip-item" data-i="${i}">${it.type === 'image' ? `<img src="${escapeAttr(it.src)}" alt="" draggable="false">` : escapeHtml(it.value)}</button>`).join('')}
+    </div>
+    <div class="arc-bottom">
+      <button type="button" class="arc-confirm" data-act="confirm">就選這張！</button>
+    </div>
+  `;
+  document.body.appendChild(wrap);
+
+  const stage = wrap.querySelector('#arcStage');
+  const cards = [...wrap.querySelectorAll('.arc-card')];
+  const strip = wrap.querySelector('#arcStrip');
+  const stripItems = [...strip.querySelectorAll('.arc-strip-item')];
+  const pickMe = wrap.querySelector('#arcPickMe');
+  const countEl = wrap.querySelector('#arcCount');
+  const chosenIdx = idx;
+  if (cards[chosenIdx]) cards[chosenIdx].classList.add('is-chosen');
+
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+  function layout() {
+    const w = stage.clientWidth;
+    const spread = Math.min(Math.max(w * 0.42, 140), 230); // horizontal step between cards
+    cards.forEach((c, i) => {
+      const d = i - pos;
+      const ad = Math.abs(d);
+      if (ad > 3.2) { c.style.visibility = 'hidden'; return; }
+      c.style.visibility = 'visible';
+      const a = d * 0.24;                                 // radians along the arc
+      const R = spread / 0.24;                            // arc radius
+      const x = Math.sin(a) * R;
+      const y = (1 - Math.cos(a)) * R * 0.9 + ad * 6;
+      const s = 1 - Math.min(ad, 3) * 0.12;
+      c.style.transform = `translate3d(${x}px, ${y}px, ${-ad * 60}px) rotateZ(${a * 32}deg) rotateY(${-d * 18}deg) scale(${s})`;
+      c.style.zIndex = String(100 - Math.round(ad * 10));
+      c.style.opacity = String(clamp(1.6 - ad * 0.45, 0, 1));
+    });
+    const cur = clamp(Math.round(pos), 0, n - 1);
+    if (cur !== lastCurrent) setCurrent(cur);
+  }
+
+  function setCurrent(cur) {
+    if (lastCurrent >= 0 && cards[lastCurrent]) {
+      cards[lastCurrent].classList.remove('is-current');
+      stripItems[lastCurrent].classList.remove('on');
+    }
+    lastCurrent = cur;
+    cards[cur].classList.add('is-current');
+    stripItems[cur].classList.add('on');
+    const face = cards[cur].querySelector('.arc-face');
+    face.classList.remove('swap'); void face.offsetWidth; face.classList.add('swap');
+    pickMe.classList.remove('pop'); void pickMe.offsetWidth; pickMe.classList.add('pop');
+    countEl.textContent = `${cur + 1} / ${n}`;
+    const si = stripItems[cur];
+    strip.scrollLeft = si.offsetLeft - strip.clientWidth / 2 + si.offsetWidth / 2;
+    if (navigator.vibrate) { try { navigator.vibrate(6); } catch (e) {} }
+  }
+
+  // Under-damped spring → the arc overshoots a little and settles (Q彈)
+  function tick() {
+    const k = 0.085, damping = 0.74;
+    vel = (vel + (target - pos) * k) * damping;
+    pos += vel;
+    if (Math.abs(target - pos) < 0.001 && Math.abs(vel) < 0.001) { pos = target; layout(); raf = 0; return; }
+    layout();
+    raf = requestAnimationFrame(tick);
+  }
+  function go(i) {
+    target = clamp(i, 0, n - 1);
+    if (!raf) raf = requestAnimationFrame(tick);
+  }
+
+  // Drag / swipe
+  let dragging = false, moved = false, startX = 0, startPos = 0, lastX = 0, lastT = 0, flick = 0;
+  stage.addEventListener('pointerdown', e => {
+    dragging = true; moved = false;
+    startX = lastX = e.clientX; startPos = pos; lastT = performance.now(); flick = 0;
+    cancelAnimationFrame(raf); raf = 0; vel = 0;
+  });
+  window.addEventListener('pointermove', onMove);
+  window.addEventListener('pointerup', onUp);
+  window.addEventListener('pointercancel', onUp);
+  function onMove(e) {
+    if (!dragging) return;
+    const dx = e.clientX - startX;
+    if (Math.abs(dx) > 6 && !moved) { moved = true; stage.classList.add('dragging'); }
+    if (!moved) return;
+    const step = Math.min(Math.max(stage.clientWidth * 0.42, 140), 230);
+    let p = startPos - dx / step;
+    if (p < 0) p = p * 0.35;                       // rubber-band at the ends
+    if (p > n - 1) p = (n - 1) + (p - (n - 1)) * 0.35;
+    const now = performance.now();
+    flick = (lastX - e.clientX) / step / Math.max(1, now - lastT) * 16;
+    lastX = e.clientX; lastT = now;
+    pos = p; layout();
+  }
+  function onUp() {
+    if (!dragging) return;
+    dragging = false;
+    stage.classList.remove('dragging');
+    if (moved) go(Math.round(pos + clamp(flick * 5, -3, 3)));
+  }
+
+  stage.addEventListener('wheel', e => {
+    e.preventDefault();
+    go(Math.round(target + Math.sign(e.deltaX || e.deltaY)));
+  }, { passive: false });
+
+  cards.forEach(c => c.addEventListener('click', () => {
+    if (moved) return;
+    const i = +c.dataset.i;
+    if (i === lastCurrent) confirm(); else go(i);
+  }));
+  stripItems.forEach(s => s.addEventListener('click', () => go(+s.dataset.i)));
+
+  function onKey(e) {
+    if (e.key === 'ArrowLeft') go(target - 1);
+    else if (e.key === 'ArrowRight') go(target + 1);
+    else if (e.key === 'Enter') confirm();
+    else if (e.key === 'Escape') close();
+  }
+  window.addEventListener('keydown', onKey);
+
+  function close() {
+    window.removeEventListener('pointermove', onMove);
+    window.removeEventListener('pointerup', onUp);
+    window.removeEventListener('pointercancel', onUp);
+    window.removeEventListener('keydown', onKey);
+    cancelAnimationFrame(raf);
+    wrap.classList.add('closing');
+    setTimeout(() => wrap.remove(), 280);
+  }
+  function confirm() {
+    const cur = lastCurrent;
+    const card = cards[cur];
+    card.animate([
+      { transform: card.style.transform },
+      { transform: card.style.transform + ' scale(1.14)' },
+      { transform: card.style.transform + ' scale(.96)' },
+      { transform: card.style.transform },
+    ], { duration: 380, easing: 'cubic-bezier(.34,1.56,.64,1)' });
+    onPick(items[cur].value);
+    setTimeout(close, 300);
+  }
+
+  wrap.querySelector('[data-act="close"]').onclick = close;
+  wrap.querySelector('[data-act="confirm"]').onclick = confirm;
+  wrap.querySelector('[data-act="random"]').onclick = () => {
+    let r = Math.floor(Math.random() * n);
+    if (n > 1 && r === lastCurrent) r = (r + 1) % n;
+    go(r);
+  };
+
+  layout();
 }
 
 // ---- Stamp detail (view a specific stamp) ----
@@ -4306,7 +4766,7 @@ function openThemeEditor(tid) {
     title: '',
     reward: '',
     goal: 10,
-    sticker: '⭐',
+    sticker: firstImageSticker(),
     color: defaultColor,
     startDate: todayISO(),
     endDate: addDaysISO(todayISO(), 30),
@@ -4343,7 +4803,7 @@ function openThemeEditor(tid) {
         ${getAllForCategory('stickers', STICKERS).map(item => `<button class="sticker-opt ${item.value===draft.sticker?'active':''}" data-v="${escapeAttr(item.value)}">${item.type==='image' ? `<img src="${escapeAttr(item.src)}" alt="">` : item.value}</button>`).join('')}
       </div>
       <input class="input" id="tStickerCustom" placeholder="或自訂貼紙（貼上 emoji、單字、符號）"
-             value="${!STICKERS.includes(draft.sticker)?escapeHtml(draft.sticker):''}" maxlength="6" style="margin-top:8px;"/>
+             value="${!STICKERS.includes(draft.sticker) && !String(draft.sticker).startsWith('lib:')?escapeHtml(draft.sticker):''}" maxlength="6" style="margin-top:8px;${getAllForCategory('stickers', STICKERS).some(x => x.type==='image') ? 'display:none;' : ''}"/>
     </div>
 
     <div class="field">
