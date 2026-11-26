@@ -2676,6 +2676,15 @@
   .bk-stat { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; }
   .bk-ill, .bk-ill svg { width: 24px !important; height: 24px !important; }
   #doExport, #doExport + label { min-height: 52px; font-size: 15px; }
+
+  .kid-chip { position: relative; }
+  .kid-edit {
+    width: 26px; height: 26px; border-radius: 50%; background: var(--surface-2);
+    display: grid; place-items: center; margin-left: 2px; flex-shrink: 0;
+    animation: ill-pop .5s var(--spring) both;
+  }
+  .kid-edit svg { width: 18px; height: 18px; }
+  .kid-chip.active:hover .kid-edit { transform: rotate(-12deg) scale(1.1); transition: transform .4s var(--spring); }
 </style>
 </head>
 <body>
@@ -3361,6 +3370,7 @@ function renderKidStrip() {
       <div class="kid-chip ${view.kidId === k.id ? 'active' : ''}" data-kid="${k.id}">
         <div class="kid-avatar" style="background:${color.soft}">${renderStickerHTML(k.avatar, {size:'85%', round:true})}</div>
         <span class="kid-name">${escapeHtml(k.name)}</span>
+        ${view.kidId === k.id ? `<span class="kid-edit" aria-label="編輯 ${escapeAttr(k.name)}"><svg viewBox="0 0 24 24"><path d="M5,19 L6.2,14.6 L15.6,5.2 L18.8,8.4 L9.4,17.8Z" fill="#FBC444"/><path d="M15.6,5.2 L17,3.8 C17.8,3 19,3 19.8,3.8 L20.2,4.2 C21,5 21,6.2 20.2,7 L18.8,8.4Z" fill="#F26FAE"/><path d="M5,19 L6.2,14.6 L9.4,17.8Z" fill="#2B2622"/></svg></span>` : ''}
       </div>
     `;
   }).join('') + `
@@ -3369,7 +3379,12 @@ function renderKidStrip() {
     </div>
   `;
   strip.querySelectorAll('.kid-chip[data-kid]').forEach(el => {
-    el.onclick = () => { view.kidId = el.dataset.kid; render(); };
+    el.onclick = () => {
+      if (kidLongPressed) { kidLongPressed = false; return; }
+      // tapping the kid who is already selected opens the editor (name, avatar, colour)
+      if (view.kidId === el.dataset.kid) { openKidEditor(el.dataset.kid); return; }
+      view.kidId = el.dataset.kid; render();
+    };
   });
   document.getElementById('addKidChip').onclick = () => openKidEditor(null);
 }
@@ -5377,18 +5392,19 @@ function openKidEditor(kidId) {
     </div>
 
     <div class="field">
-      <label class="field-label">選擇頭像</label>
+      <label class="field-label">頭像</label>
       <div id="avatarPreviewRow" style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
         <div id="avatarPreview" style="width:64px; height:64px; border-radius:50%; overflow:hidden; background:var(--surface-2); display:grid; place-items:center; font-size:36px; border:3px solid var(--ink); flex-shrink:0;">
           ${renderStickerHTML(draft.avatar, {size:'90%', round:true})}
         </div>
-        <button class="btn btn-soft" id="uploadAvatarBtn" type="button" style="flex:0 0 auto; padding:8px 14px; font-size:13px;">📷 上傳照片</button>
+        <button class="btn btn-soft" id="uploadAvatarBtn" type="button" style="flex:0 0 auto; padding:8px 14px; font-size:13px; display:inline-flex; align-items:center; gap:6px; background:var(--surface-2); color:var(--ink);"><span class="btn-ill">${LIB_ICONS.camera}</span>上傳照片</button>
         <input type="file" id="avatarFile" accept="image/*" style="display:none">
       </div>
+      ${(() => { const imgs = getAllForCategory('avatars', []).filter(x => x.type === 'image'); return imgs.length ? `
       <div class="avatar-grid" id="avatarGrid">
-        ${getAllForCategory('avatars', AVATARS).map(item => `<button class="avatar-opt ${item.value===draft.avatar?'active':''}" data-v="${escapeAttr(item.value)}">${item.type==='image' ? `<img src="${escapeAttr(item.src)}" alt="">` : item.value}</button>`).join('')}
-      </div>
-      <div class="avm-head"><label class="field-label" style="margin:0">✨ 自己做頭像</label></div>
+        ${imgs.map(item => `<button class="avatar-opt ${item.value===draft.avatar?'active':''}" data-v="${escapeAttr(item.value)}"><img src="${escapeAttr(item.src)}" alt=""></button>`).join('')}
+      </div>` : ''; })()}
+      <div class="avm-head"><label class="field-label" style="margin:0">自己做頭像</label></div>
       <div id="avatarMaker"></div>
     </div>
 
@@ -5697,11 +5713,14 @@ function escapeHtml(s) {
 
 // ---- Long-press support to edit kid ----
 let pressTimer;
+var kidLongPressed = false;
 document.addEventListener('pointerdown', (e) => {
   const chip = e.target.closest('.kid-chip[data-kid]');
   if (!chip) return;
+  kidLongPressed = false;
   pressTimer = setTimeout(() => {
     pressTimer = null;
+    kidLongPressed = true;
     openKidEditor(chip.dataset.kid);
   }, 600);
 });
