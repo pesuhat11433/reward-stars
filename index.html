@@ -5651,13 +5651,14 @@ const FEET = [[67, 311], [130, 311]];
 
 function avOutfitBack(p) {
   const b = BACKS[p.back];
-  return b && b.draw ? `<g transform="${BACK_T}">${b.draw(p.backColor || b.def)}</g>` : '';
+  return b && b.draw ? `<g transform="${BACK_T}">${noLine(b.draw(p.backColor || b.def))}</g>` : '';
 }
-// skin + the line-art body and ears
-function avBodyBase(p) {
-  return `<g transform="${BODY_T}"><path d="${BODY_ART.skin}" fill="${p.skin}"/><path d="${BODY_ART.outline}" fill="${AV_INK}"/>` +
-    `<path d="${BODY_ART.earLFill}" fill="${p.skin}"/><path d="${BODY_ART.earRFill}" fill="${p.skin}"/>` +
-    `<path d="${BODY_ART.earL}" fill="${AV_INK}"/><path d="${BODY_ART.earR}" fill="${AV_INK}"/></g>`;
+// skin fill, then (after the fitted clothes) the line-art body and ears on top
+function avBodySkin(p) {
+  return `<g transform="${BODY_T}"><path d="${BODY_ART.skin}" fill="${p.skin}"/><path d="${BODY_ART.earLFill}" fill="${p.skin}"/><path d="${BODY_ART.earRFill}" fill="${p.skin}"/></g>`;
+}
+function avBodyLine() {
+  return `<g transform="${BODY_T}" fill="${AV_INK}"><path d="${BODY_ART.outline}"/><path d="${BODY_ART.earL}"/><path d="${BODY_ART.earR}"/></g>`;
 }
 function avHead(p) {
   if (p.face === 'doodle' || !p.face) return `<g transform="${BODY_T}"><path d="${BODY_ART.headFill}" fill="${p.skin}"/><path d="${BODY_ART.headLine}" fill="${AV_INK}"/></g>`;
@@ -5670,44 +5671,61 @@ function avDoodleFeatures(p) {
   if (p.mouth === 'doodle') s += `<path d="${BODY_ART.mouth}"/>`;
   return s ? `<g transform="${BODY_T}" fill="${AV_INK}">${s}</g>` : '';
 }
-// clothes only (the body itself comes from the line art)
+// Clothes have no outlines. Fitted pieces are regions clipped to the body silhouette, so they take the
+// exact shape of the drawn body; flared pieces (skirts, tail, puff sleeves) sit on top as plain shapes.
+const noLine = svg => svg.split(' ' + AS).join('').split(AS).join('');
+const FIT = {
+  long:  'M0,148 H200 V232 H162 L134,254 L64,254 L36,232 H0Z',
+  short: 'M0,148 H200 V206 H156 L134,254 L64,254 L44,206 H0Z',
+  none:  'M66,148 H132 L135,254 L63,254Z',
+  crop:  'M66,148 H132 V220 H66Z',
+  off:   'M58,194 H140 L135,254 L63,254Z',
+  pants:   'M48,234 H150 V308 H48Z',
+  shorts:  'M48,234 H150 V274 H48Z',
+  feet:    'M36,300 H164 V340 H36Z',
+  boots:   'M36,284 H164 V340 H36Z',
+  flats:   'M36,304 H164 V340 H36Z',
+  sandals: 'M36,305 H164 V310 H36Z',
+};
+const SKIRT_T = 'translate(98 236) scale(1.62 1.42) translate(-100 -204)';
 function avBody(p) {
   const top = TOPS[p.top] || TOPS.tee, bot = BOTTOMS[p.bottom] || BOTTOMS.pants;
   const tc = p.topColor || top.def, bc = p.bottomColor || bot.def, sc = p.shoeColor || (SHOES[p.shoes] || {}).def;
-  const sleeveC = top.sleeve === 'puff' ? avLight(tc, .45) : tc;
-  let s = '';
-  // shoes first so long skirts and tails can cover them
-  if (!bot.noLegs) {
-    FEET.forEach(([x, y]) => {
-      if (p.shoes === 'boots') s += `<rect x="${x - 12}" y="${y - 22}" width="24" height="26" rx="7" fill="${sc}" ${AS}/><ellipse cx="${x}" cy="${y + 2}" rx="14" ry="6" fill="${sc}" ${AS}/>`;
-      else if (p.shoes === 'sandals') s += `<ellipse cx="${x}" cy="${y + 5}" rx="13" ry="4" fill="${sc}" ${AS}/><path d="M${x - 9},${y - 1} L${x + 9},${y - 1}" stroke="${sc}" stroke-width="4" stroke-linecap="round"/>`;
-      else if (p.shoes === 'flats') s += `<ellipse cx="${x}" cy="${y + 1}" rx="12" ry="6.5" fill="${sc}" ${AS}/><path d="M${x - 7},${y - 4} L${x + 7},${y - 4}" stroke="${AV_INK}" stroke-width="2.2" stroke-linecap="round"/>`;
-      else if (p.shoes !== 'barefoot') s += `<ellipse cx="${x}" cy="${y + 1}" rx="13.5" ry="7.5" fill="${sc}" ${AS}/><path d="M${x - 12},${y + 3} L${x + 12},${y + 3}" stroke="${AV_INK}" stroke-width="2"/>`;
-    });
+  const clip = `clip-path="url(#${p._pfx}bc)"`;
+  let fitted = '', over = '';
+  // top (fitted to the body)
+  const sl = top.sleeve === 'long' || top.sleeve === 'wide' ? 'long' : (top.sleeve === 'short' || top.sleeve === 'puff') ? 'short' : 'none';
+  const region = top.base === 'crop' ? FIT.crop : top.base === 'off' ? FIT.off : FIT[sl];
+  if (top.base !== 'none') fitted += `<path d="${region}" fill="${tc}"/>`;
+  if (top.extra) fitted += `<g transform="${TOP_T}">${top.extra(tc, p)}</g>`;
+  // bottoms
+  const fitBottom = { pants: FIT.pants, checker: FIT.pants, overalls: FIT.pants, shorts: FIT.shorts }[p.bottom];
+  if (fitBottom) {
+    fitted += `<path d="${fitBottom}" fill="${bc}"/>`;
+    if (bot.extra) fitted += `<g transform="${BOT_T}">${bot.extra(bc, p)}</g>`;
   }
-  // top
-  if (top.base === 'full') s += `<path d="${NEW_TORSO}" fill="${tc}" ${AS}/>`;
-  if (top.base === 'off') s += `<path d="${NEW_OFF}" fill="${tc}" ${AS}/>`;
-  if (top.base === 'crop') s += `<path d="${NEW_CROP}" fill="${tc}" ${AS}/>`;
-  if (SLEEVES[top.sleeve]) s += SLEEVES[top.sleeve].map(d => `<path d="${d}" fill="${sleeveC}" ${AS}/>`).join('');
-  if (top.sleeve === 'puff') s += `<ellipse cx="52" cy="193" rx="15" ry="12" transform="rotate(35 52 193)" fill="${sleeveC}" ${AS}/><ellipse cx="146" cy="193" rx="15" ry="12" transform="rotate(-35 146 193)" fill="${sleeveC}" ${AS}/>`;
-  if (top.extra) s += `<g transform="${TOP_T}">${top.extra(tc, p)}</g>`;
-  // bottom
-  if (NEW_BOTTOM_D[p.bottom]) {
-    s += `<path d="${NEW_BOTTOM_D[p.bottom]}" fill="${bc}" ${AS}/>`;
-    if (p.bottom === 'tail') {
-      s += [[84, 262], [104, 262], [124, 262], [94, 280], [114, 280], [84, 298], [104, 298], [124, 298]]
-        .map(([x, y]) => `<path d="M${x - 9},${y} Q${x},${y + 8} ${x + 9},${y}" stroke="${avDark(bc, .35)}" stroke-width="2" fill="none"/>`).join('');
-    } else if (bot.extra) s += `<g transform="${BOT_T}">${bot.extra(bc, p)}</g>`;
-  } else {
-    s += `<g transform="${BOT_T}"><path d="${bot.d}" fill="${bc}" ${AS}/>${bot.extra ? bot.extra(bc, p) : ''}</g>`;
+  // shoes take the shape of the feet
+  if (!bot.noLegs && p.shoes !== 'barefoot') {
+    fitted += `<path d="${FIT[p.shoes] || FIT.feet}" fill="${sc}"/>`;
+    if (p.shoes === 'sandals') over += FEET.map(([x, y]) => `<ellipse cx="${x}" cy="${y + 5}" rx="13" ry="3.4" fill="${sc}"/>`).join('');
   }
-  return s;
+  // flared pieces on top of the body line
+  if (top.sleeve === 'puff') over += `<ellipse cx="52" cy="193" rx="15" ry="12" transform="rotate(35 52 193)" fill="${avLight(tc, .45)}"/><ellipse cx="146" cy="193" rx="15" ry="12" transform="rotate(-35 146 193)" fill="${avLight(tc, .45)}"/>`;
+  if (top.sleeve === 'wide') over += `<path d="M20,222 L46,232 L40,248 L6,240Z" fill="${tc}"/><path d="M178,222 L152,232 L158,248 L192,240Z" fill="${tc}"/>`;
+  if (p.bottom === 'tail') {
+    over += `<path d="${NEW_BOTTOM_D.tail}" fill="${bc}"/>` + [[84, 262], [104, 262], [124, 262], [94, 280], [114, 280], [84, 298], [104, 298], [124, 298]]
+      .map(([x, y]) => `<path d="M${x - 9},${y} Q${x},${y + 8} ${x + 9},${y}" stroke="${avDark(bc, .3)}" stroke-width="2" fill="none"/>`).join('');
+  } else if (p.bottom === 'harem') {
+    over += `<path d="${NEW_BOTTOM_D.harem}" fill="${bc}"/>`;
+  } else if (!fitBottom) {
+    over += `<g transform="${SKIRT_T}"><path d="${bot.d}" fill="${bc}"/>${bot.extra ? bot.extra(bc, p) : ''}</g>`;
+  }
+  return { fitted: `<g ${clip}>${noLine(fitted)}</g>`, over: noLine(over) };
 }
 // flat colours (line-art look): keep the same gradient ids the face code uses, but as solid fills
 function avDefs(p) {
   const pf = p._pfx, flat = (id, c) => `<linearGradient id="${pf}${id}"><stop offset="0" stop-color="${c}"/></linearGradient>`;
-  return `<defs>${flat('skin', p.skin)}${flat('scl', '#ffffff')}${flat('ir', p.iris)}${flat('mouth', '#C0444C')}
+  return `<defs><clipPath id="${pf}bc"><path d="${BODY_ART.skin}" transform="${BODY_T}"/></clipPath>${flat('skin', p.skin)}${flat('scl', '#ffffff')}${flat('ir', p.iris)}${flat('mouth', '#C0444C')}
     <radialGradient id="${pf}blushP" cx=".5" cy=".5" r=".5"><stop offset=".55" stop-color="#F48A9A" stop-opacity=".55"/><stop offset="1" stop-color="#F48A9A" stop-opacity="0"/></radialGradient>
     <radialGradient id="${pf}blushO" cx=".5" cy=".5" r=".5"><stop offset=".55" stop-color="#FFA07A" stop-opacity=".5"/><stop offset="1" stop-color="#FFA07A" stop-opacity="0"/></radialGradient>
   </defs>`;
@@ -5797,8 +5815,9 @@ function avatarSVG(parts, opts) {
   const vb = (opts && opts.viewBox) || '0 0 200 200';
   const xh = AV_EXTRA_HAIR[p.hair];
   const hooded = ['hijab', 'bear', 'bunny'].includes(p.hair) || p.acc === 'dino';
+  const clothes = avBody(p);
   let svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${vb}">` + avDefs(p) +
-    avOutfitBack(p) + (xh ? xh.back(p) : avHairBack(p)) + avBodyBase(p) + avBody(p) +
+    avOutfitBack(p) + (xh ? xh.back(p) : avHairBack(p)) + avBodySkin(p) + clothes.fitted + avBodyLine() + clothes.over +
     avHead(p) + avFeatures(p) + avDoodleFeatures(p) + (xh ? xh.front(p) : avHairFront(p)) + avAcc(p) + `</svg>`;
   // later attributes override earlier ones (duplicate attrs make the SVG invalid as an <img>)
   return svg.replace(/<([a-z]+)((?:\s+[a-z-]+="[^"]*")+)\s*(\/?)>/gi, (m, tag, attrs, sl) => {
