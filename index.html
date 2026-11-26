@@ -2637,6 +2637,45 @@
   .theme-title { font-size: 19px; }
   .stamp-mega { font-size: 32px; }
   .brand-tile { font-size: 18px; }
+
+  /* ===== 我的圖庫 / 備份：插畫風 icon ===== */
+  .modal-title-ill { display: flex; align-items: center; gap: 10px; }
+  .title-ill { width: 44px; height: 44px; display: inline-grid; place-items: center; animation: ill-pop .6s var(--spring) both; }
+  .title-ill svg { width: 44px; height: 44px; }
+  @keyframes ill-pop { 0% { transform: scale(.4) rotate(-20deg); } 100% { transform: none; } }
+  .manifest-status.loaded { background: var(--surface-2); color: var(--ink-soft); }
+  .manifest-status.loaded::before { content: ''; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #2E5C49; margin-right: 8px; vertical-align: 1px; }
+  .lib-tabs { gap: 8px; }
+  .lib-tab {
+    display: flex; align-items: center; gap: 6px; padding: 7px 14px 7px 8px !important;
+    background: var(--surface-2) !important; color: var(--ink-soft) !important; border: none !important;
+    transition: transform .4s var(--spring), background .2s;
+  }
+  .lib-tab:active { transform: scale(.92); }
+  .lib-tab.active { background: var(--ink) !important; color: #fff !important; }
+  .lib-tab-ill { width: 28px; height: 28px; display: inline-grid; place-items: center; transition: transform .45s var(--spring); }
+  .lib-tab-ill svg { width: 28px; height: 28px; }
+  .lib-tab.active .lib-tab-ill { transform: rotate(-8deg) scale(1.12); }
+  .lib-item { background: var(--surface-2) !important; border: none !important; border-radius: 16px !important; }
+  .lib-item-source.bundled { background: #2E5C49; }
+  .lib-item-source.custom { background: var(--c-pink); }
+  .lib-upload { border: 2px dashed #D9CFC1 !important; background: var(--surface) !important; border-radius: 16px !important; color: var(--ink-soft); transition: transform .4s var(--spring); }
+  .lib-upload:active { transform: scale(.92); }
+  .lib-upload-ill { width: 40px; height: 40px; margin: 0 auto 4px; }
+  .lib-upload-ill svg { width: 40px; height: 40px; }
+  .illust-row { background: var(--surface-2) !important; border: none !important; }
+  .illust-preview { background: var(--surface) !important; border: none !important; }
+  .small-icon-btn { display: inline-flex; align-items: center; gap: 4px; background: var(--surface) !important; }
+  .btn-ill { width: 20px; height: 20px; display: inline-grid; }
+  .btn-ill svg { width: 20px; height: 20px; }
+
+  .illust-builtin { width: 100%; height: 100%; display: grid; place-items: center; }
+  .illust-builtin svg { width: 100% !important; height: 100% !important; animation: none !important; }
+  .illust-builtin .morph-logo { width: 70% !important; height: 70% !important; }
+
+  .bk-stat { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; }
+  .bk-ill, .bk-ill svg { width: 24px !important; height: 24px !important; }
+  #doExport, #doExport + label { min-height: 52px; font-size: 15px; }
 </style>
 </head>
 <body>
@@ -4664,6 +4703,15 @@ const ILLUST_SLOTS = [
   { key:'logo', name:'招牌 LOGO', desc:'標題旁的小圖示' },
 ];
 
+const LIB_ICONS = {
+  stickers: `<svg viewBox="0 0 40 40"><path d="M22.0,8.0 L25.9,16.6 L35.3,17.7 L28.4,24.1 L30.2,33.3 L22.0,28.7 L13.8,33.3 L15.6,24.1 L8.7,17.7 L18.1,16.6Z" fill="#26262B" stroke="#26262B" stroke-width="2.4" stroke-linejoin="round"/><path d="M19.0,5.0 L22.9,13.6 L32.3,14.7 L25.4,21.1 L27.2,30.3 L19.0,25.7 L10.8,30.3 L12.6,21.1 L5.7,14.7 L15.1,13.6Z" fill="#FBC444" stroke="#FBC444" stroke-width="2.4" stroke-linejoin="round"/><circle cx="31" cy="9" r="3" fill="#F26FAE"/></svg>`,
+  avatars: `<svg viewBox="0 0 40 40"><circle cx="22" cy="23" r="14" fill="#26262B"/><circle cx="19" cy="20" r="14" fill="#F6C9A6"/><path d="M5,19 C5,8 13,5 19,5 C27,5 33,9 33,18 C27,14 20,12 12,15 C10,17 8,18 5,19Z" fill="#3B2A28"/><circle cx="14" cy="21" r="1.8" fill="#2B2622"/><circle cx="24" cy="21" r="1.8" fill="#2B2622"/><ellipse cx="11" cy="26" rx="2.6" ry="1.6" fill="#F26FAE" opacity=".7"/><ellipse cx="27" cy="26" rx="2.6" ry="1.6" fill="#F26FAE" opacity=".7"/><path d="M16,27 Q19,30 22,27" stroke="#2B2622" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>`,
+  trophies: `<svg viewBox="0 0 40 40"><rect x="9" y="15" width="27" height="22" fill="#26262B"/><rect x="6" y="12" width="27" height="22" fill="#F26FAE"/><rect x="4" y="10" width="31" height="6" fill="#FF8FC2"/><path d="M19.5,10 V34" stroke="#E5453A" stroke-width="3.6"/><path d="M19.5,10 C14,2 7,6 12,9 C14,10 17,10 19.5,10 C22,2 31,4 27,9 C25,10 22,10 19.5,10" stroke="#FBC444" stroke-width="2.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  illustrations: `<svg viewBox="0 0 40 40"><path d="M21,7 C33,7 38,15 36,22 C34,27 29,25 27,28 C25,32 30,36 23,37 C12,38 6,31 6,22 C6,13 12,7 21,7Z" fill="#26262B"/><path d="M18,4 C30,4 35,12 33,19 C31,24 26,22 24,25 C22,29 27,33 20,34 C9,35 3,28 3,19 C3,10 9,4 18,4Z" fill="#F7F2E6"/><circle cx="11" cy="15" r="3" fill="#E5453A"/><circle cx="19" cy="10" r="3" fill="#FBC444"/><circle cx="27" cy="14" r="3" fill="#4A7FD0"/><circle cx="11" cy="24" r="3" fill="#2E5C49"/></svg>`,
+  camera: `<svg viewBox="0 0 40 40"><rect x="7" y="13" width="30" height="21" rx="4" fill="#26262B"/><rect x="4" y="10" width="30" height="21" rx="4" fill="#4A7FD0"/><rect x="11" y="6" width="10" height="6" rx="2" fill="#4A7FD0"/><circle cx="19" cy="21" r="7" fill="#F7F2E6"/><circle cx="19" cy="21" r="3.6" fill="#2B2622"/><circle cx="29" cy="15" r="1.8" fill="#FBC444"/></svg>`,
+  upload: `<svg viewBox="0 0 40 40"><path d="M11,10 L36,9 L37,36 L12,37Z" fill="#26262B"/><path d="M6,6 L31,5 L32,32 L7,33Z" fill="#DCE8D4"/><path d="M9,9 L28,8.6 L28.5,24 L9.4,24.4Z" fill="#fff"/><path d="M9.4,24.4 L9.4,19 L15,14 L20,19 L23,16.5 L28.5,21 L28.5,24Z" fill="#2E5C49"/><circle cx="24" cy="12.5" r="2.4" fill="#FBC444"/><circle cx="30" cy="30" r="8" fill="#F26FAE"/><path d="M30,26 V34 M26,30 H34" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>`,
+};
+function headerIcon(id) { const svg = document.querySelector('#' + id + ' svg'); return svg ? svg.outerHTML : ''; }
 function openLibrary() {
   // detect manifest status
   const hasBundle = (bundledLib.stickers.length + bundledLib.avatars.length + bundledLib.trophies.length) > 0
@@ -4671,18 +4719,18 @@ function openLibrary() {
 
   openModal(`
     <div class="modal-handle"></div>
-    <div class="modal-title">🖼️ 我的圖庫</div>
+    <div class="modal-title modal-title-ill"><span class="title-ill">${headerIcon('libBtn')}</span>我的圖庫</div>
     <div class="modal-sub">把你生成的圖檔加進來，立刻變成貼紙、頭像或寶物</div>
 
     <div class="manifest-status ${hasBundle ? 'loaded' : 'no-bundle'}">
       ${hasBundle
-        ? `✓ 已自動載入 assets/manifest.json（${bundledLib.stickers.length + bundledLib.avatars.length + bundledLib.trophies.length} 張預設圖）`
+        ? `已自動載入 assets/manifest.json（${bundledLib.stickers.length + bundledLib.avatars.length + bundledLib.trophies.length} 張預設圖）`
         : '尚未偵測到 assets/manifest.json — 部署資料夾的圖檔載入功能仍可使用，或直接在這裡上傳。'}
     </div>
 
     <div class="lib-tabs" id="libTabs">
       ${Object.keys(CAT_LABELS).map(c => `
-        <button class="lib-tab ${libView.cat===c?'active':''}" data-cat="${c}">${CAT_LABELS[c]}</button>
+        <button class="lib-tab ${libView.cat===c?'active':''}" data-cat="${c}"><span class="lib-tab-ill">${LIB_ICONS[c]}</span><span>${CAT_LABELS[c]}</span></button>
       `).join('')}
     </div>
 
@@ -4697,10 +4745,27 @@ function openLibrary() {
     b.onclick = () => { libView.cat = b.dataset.cat; openLibrary(); };
   });
   document.getElementById('libClose').onclick = () => { closeModal(); render(); };
+  const activeTab = document.querySelector('#libTabs .lib-tab.active');
+  if (activeTab) activeTab.scrollIntoView({ block: 'nearest', inline: 'center' });
 
   renderLibraryContent();
 }
 
+function builtinIllustration(key) {
+  try {
+    let html = '';
+    if (key === 'welcome') html = renderWelcome();
+    else if (key === 'empty') html = renderEmptyThemes({ name: '', color: (COLORS[0] || {}).name });
+    else if (key === 'logo') return `<div class="illust-builtin">${BRAND_LOGO_SVG}</div>`;
+    else return '';
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    const svg = doc.querySelector('svg.empty-illust');
+    if (!svg) return '';
+    // give the grain filter a unique id so it doesn't clash with the page
+    let out = svg.outerHTML.replace(/id="(grain[WE])"/, 'id="$1lib"').replace(/url\(#(grain[WE])\)/, 'url(#$1lib)');
+    return `<div class="illust-builtin">${out}</div>`;
+  } catch (e) { return ''; }
+}
 function renderLibraryContent() {
   const container = document.getElementById('libContent');
   if (!container) return;
@@ -4710,19 +4775,19 @@ function renderLibraryContent() {
       const customSrc = customLib.illustrations[slot.key];
       const bundledSrc = bundledLib.illustrations[slot.key];
       const src = customSrc || bundledSrc;
-      const sourceLabel = customSrc ? '我上傳的' : bundledSrc ? '部署資料夾' : '預設 SVG';
+      const sourceLabel = customSrc ? '我上傳的' : bundledSrc ? '部署資料夾' : '內建插畫';
       return `
         <div class="illust-row">
           <div class="illust-preview">
             ${src
               ? `<img src="${escapeAttr(src)}" alt="${escapeHtml(slot.name)}">`
-              : `<div class="illust-preview-empty">使用內建SVG<br>(可上傳替換)</div>`}
+              : (builtinIllustration(slot.key) || `<div class="illust-preview-empty">使用內建插畫<br>(可上傳替換)</div>`)}
           </div>
           <div class="illust-info">
             <div class="illust-name">${escapeHtml(slot.name)} <span style="font-size:10px; font-weight:600; color:var(--ink-faint);">· ${sourceLabel}</span></div>
             <div class="illust-desc">${escapeHtml(slot.desc)}</div>
             <div class="illust-actions">
-              <button class="small-icon-btn" data-illust-upload="${slot.key}">📷 上傳</button>
+              <button class="small-icon-btn" data-illust-upload="${slot.key}"><span class="btn-ill">${LIB_ICONS.camera}</span>上傳</button>
               ${customSrc ? `<button class="small-icon-btn" style="color:var(--danger)" data-illust-remove="${slot.key}">移除</button>` : ''}
             </div>
           </div>
@@ -4766,7 +4831,7 @@ function renderLibraryContent() {
   cells += `
     <div class="lib-upload" id="libUploadBtn">
       <div>
-        <div style="font-size:24px; margin-bottom:4px;">＋</div>
+        <div class="lib-upload-ill">${LIB_ICONS.upload}</div>
         <div>上傳圖檔</div>
       </div>
     </div>
@@ -5677,31 +5742,31 @@ function openBackupModal() {
 
   openModal(`
     <div class="modal-handle"></div>
-    <div class="modal-title">💾 備份 & 還原</div>
+    <div class="modal-title modal-title-ill"><span class="title-ill">${headerIcon('backupBtn')}</span>備份 & 還原</div>
     <div class="modal-sub">資料存在這台裝置的瀏覽器裡，換瀏覽器或清除快取就需要重新匯入</div>
 
     <div style="background:var(--surface-2); border-radius:var(--r); padding:14px 16px; margin-bottom:18px;">
       <div style="font-size:13px; color:var(--ink-soft); margin-bottom:8px; font-weight:700;">目前的資料</div>
       <div style="display:flex; gap:16px; flex-wrap:wrap;">
-        <span style="font-size:13px;">👶 ${kids} 位小朋友</span>
-        <span style="font-size:13px;">📋 ${themes} 個主題</span>
-        <span style="font-size:13px;">⭐ ${stamps} 個集點</span>
+        <span class="bk-stat"><span class="btn-ill">${LIB_ICONS.avatars}</span>${kids} 位小朋友</span>
+        <span class="bk-stat"><span class="btn-ill">${LIB_ICONS.trophies}</span>${themes} 個主題</span>
+        <span class="bk-stat"><span class="btn-ill">${LIB_ICONS.stickers}</span>${stamps} 個集點</span>
         <span style="font-size:13px; color:var(--ink-faint);">${kb} KB</span>
       </div>
     </div>
 
     <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:18px;">
       <button class="btn btn-primary" id="doExport" style="justify-content:center; display:flex; align-items:center; gap:8px;">
-        📤 匯出備份檔（.json）
+        <span class="btn-ill bk-ill">${headerIcon('backupBtn')}</span>匯出備份檔（.json）
       </button>
-      <label class="btn" style="background:var(--mint-soft); color:#2C8262; justify-content:center; display:flex; align-items:center; gap:8px; cursor:pointer;">
-        📥 匯入備份檔
+      <label class="btn" style="background:var(--surface-2); color:var(--ink); justify-content:center; display:flex; align-items:center; gap:8px; cursor:pointer;">
+        <span class="btn-ill bk-ill">${LIB_ICONS.upload}</span>匯入備份檔
         <input type="file" id="importFile" accept=".json" style="display:none">
       </label>
     </div>
 
-    <div style="background:#FFF8F0; border-radius:var(--r); padding:12px 14px; font-size:12px; color:var(--ink-soft); line-height:1.6;">
-      💡 <strong>小提示：</strong>建議定期匯出備份，或換裝置/瀏覽器前先匯出，再在新瀏覽器裡匯入。照片和自訂圖庫也會一起備份。
+    <div style="background:var(--surface-2); border-radius:var(--r); padding:12px 14px; font-size:12px; color:var(--ink-soft); line-height:1.6;">
+      <strong>小提示：</strong>建議定期匯出備份，或換裝置/瀏覽器前先匯出，再在新瀏覽器裡匯入。照片和自訂圖庫也會一起備份。
     </div>
 
     <div class="modal-actions">
