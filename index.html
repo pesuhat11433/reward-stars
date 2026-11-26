@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>集點寶貝 · 小朋友獎勵卡</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Huninn&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #FBF7F2;
@@ -2379,6 +2382,300 @@
   .arc-strip-item img { width: 100%; height: 100%; object-fit: contain; display: block; }
   .arc-strip-item.on { opacity: 1; filter: none; transform: scale(1.25); }
   .arc-label { font-size: 15px; font-weight: 800; color: var(--ink); margin-top: 10px; letter-spacing: .5px; }
+
+  /* ---- Avatar maker · 自己做頭像 ---- */
+  .avm { background: var(--surface-2); border-radius: var(--r-lg); padding: 14px 12px 12px; margin-top: 12px; }
+  .avm-stage { position: relative; display: grid; place-items: center; padding: 4px 0 10px; }
+  .avm-preview {
+    width: 150px; height: 150px; border-radius: 50%; background: #fff;
+    box-shadow: 0 10px 24px rgba(30,36,44,.08); overflow: hidden;
+  }
+  .avm-preview svg { width: 100%; height: 100%; display: block; }
+  .avm-preview.boing { animation: avm-boing .55s var(--spring); }
+  @keyframes avm-boing {
+    0% { transform: scale(1); }
+    25% { transform: scale(1.1, .88); }
+    55% { transform: scale(.95, 1.06); }
+    100% { transform: scale(1); }
+  }
+  .avm-dice {
+    position: absolute; right: 8px; top: 4px; width: 46px; height: 46px; border-radius: 50%;
+    border: none; background: #fff; box-shadow: var(--shadow); font-size: 22px; cursor: pointer;
+    transition: transform .45s var(--spring);
+  }
+  .avm-dice:active { transform: scale(.82) rotate(-30deg); }
+  .avm-tabs { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding: 2px 2px 10px; }
+  .avm-tabs::-webkit-scrollbar { display: none; }
+  .avm-tab {
+    flex: 0 0 auto; border: none; background: #fff; color: var(--ink-soft); font-family: inherit;
+    font-size: 15px; font-weight: 800; padding: 10px 16px; border-radius: 100px; cursor: pointer;
+    transition: transform .4s var(--spring), background .2s, color .2s;
+  }
+  .avm-tab:active { transform: scale(.9); }
+  .avm-tab.on { background: var(--ink); color: #fff; }
+  .avm-opts.swap { animation: avm-in .4s var(--spring-soft); }
+  @keyframes avm-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  .avm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 8px; }
+  .avm-opt {
+    border: 3px solid transparent; background: #fff; border-radius: 18px; padding: 6px 4px 8px; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; gap: 2px; font-family: inherit;
+    transition: transform .4s var(--spring), border-color .2s;
+  }
+  .avm-opt:active { transform: scale(.9); }
+  .avm-opt.on { border-color: var(--ink); animation: avm-pick .45s var(--spring); }
+  @keyframes avm-pick { 0% { transform: scale(.88); } 100% { transform: scale(1); } }
+  .avm-thumb { width: 64px; height: 64px; display: block; }
+  .avm-thumb svg { width: 100%; height: 100%; display: block; }
+  .avm-name { font-size: 13px; font-weight: 700; color: var(--ink); }
+  .avm-sub { font-size: 13px; font-weight: 700; color: var(--ink-soft); margin: 12px 2px 8px; }
+  .avm-swatches { display: flex; flex-wrap: wrap; gap: 10px; padding: 2px; }
+  .avm-swatch {
+    width: 48px; height: 48px; border-radius: 50%; cursor: pointer;
+    border: 2px solid rgba(0,0,0,.08); box-shadow: 0 0 0 3px #fff;
+    transition: transform .4s var(--spring), box-shadow .2s;
+  }
+  .avm-swatch:active { transform: scale(.85); }
+  .avm-swatch.on { box-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--ink); transform: scale(1.06); }
+  .avm-head { display: flex; align-items: center; justify-content: space-between; margin-top: 16px; }
+  .inline-avatar { display: inline-block; width: 1.4em; height: 1.4em; vertical-align: -0.35em; }
+  .inline-avatar img { width: 100% !important; height: 100% !important; }
+
+  /* Sticker name: 國字 + 注音 + English */
+  .sticker-name { display: flex; flex-direction: column; align-items: center; gap: 2px; margin-top: 6px; }
+  .sticker-name-zh { font-size: 20px; font-weight: 900; color: var(--ink); line-height: 1.1; letter-spacing: 1px; }
+  .sticker-name-zh ruby { ruby-position: over; margin: 0 1px; }
+  .sticker-name-zh rt { font-size: 11.5px; font-weight: 600; color: var(--ink-soft); letter-spacing: 0; }
+  .sticker-name-en { font-size: 12px; font-weight: 700; color: var(--accent); letter-spacing: .3px; }
+  .arc-card { justify-content: center; padding: 10px 8px 14px; }
+  .arc-card .arc-face, .arc-card .arc-face img { width: 124px !important; height: 124px !important; }
+  .sticker-hero .sticker-name { margin-top: 0; }
+
+  /* Illustrated header icons (flat gouache style) */
+  .brand-icon { width: 48px !important; height: 48px !important; background: none !important; box-shadow: none !important; border-radius: 0 !important; }
+  .ill-logo { width: 48px; height: 48px; display: block; transition: transform .5s var(--spring); }
+  .brand:hover .ill-logo, .brand:active .ill-logo { transform: rotate(-12deg) scale(1.08); }
+  .lib-button { width: 46px !important; height: 46px !important; padding: 2px !important; border-radius: 14px !important; display: grid !important; place-items: center; }
+  .ill-icon { width: 40px; height: 40px; display: block; transition: transform .45s var(--spring); }
+  .lib-button:hover .ill-icon { transform: rotate(-6deg) scale(1.08); }
+  @media (max-width: 420px) {
+    .lib-button { width: 42px !important; height: 42px !important; }
+    .ill-icon { width: 36px; height: 36px; }
+    .brand-icon, .ill-logo { width: 42px !important; height: 42px !important; }
+  }
+
+  .empty-state { background: #F4EFE6; }
+  .empty-illust.gift-scene { width: 240px; height: 220px; animation: gift-hop 2.6s var(--spring) infinite; transform-origin: 50% 100%; }
+  @keyframes gift-hop { 0%, 78%, 100% { transform: none; } 84% { transform: scale(1.04, .95); } 90% { transform: translateY(-6px) scale(.98, 1.03); } }
+
+  @media (max-width: 480px) {
+    .header { flex-wrap: wrap; row-gap: 12px; }
+    .header > div:last-child { display: contents !important; }
+    .header .brand { margin-right: auto; }
+    .header .tabs { flex-basis: 100%; order: 5; }
+    .header .tab-btn { flex: 1; padding: 10px 0; font-size: 15px; }
+  }
+
+  /* ===== Warm palette (gift-box reference) ===== */
+  :root {
+    --bg: #F1ECE3;
+    --surface: #FFFCF7;
+    --surface-2: #F7F2EA;
+    --ink: #2B2622;
+    --ink-soft: #776C63;
+    --ink-faint: #B2A79C;
+    --line: #E6DED2;
+    --line-soft: #EFE8DE;
+    --accent: #EC5B9B;
+    --accent-soft: #FCE1EE;
+    --c-pink: #F26FAE; --c-red: #E5453A; --c-yellow: #FBC444; --c-orange: #F59A5E; --c-blue: #4A7FD0; --c-white: #FFFDF8;
+    --shadow: 0 1px 2px rgba(60, 40, 20, 0.04), 0 6px 18px rgba(60, 40, 20, 0.06);
+  }
+  body {
+    background-color: var(--bg);
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.35  0 0 0 0 0.28  0 0 0 0 0.2  0 0 0 .07 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  }
+  .tabs { background: #E8E0D4; }
+  .stamp-mega-tip b { color: #FFC0DD; }
+  .empty-state { background: var(--surface); }
+  .btn-success { background: var(--c-pink); box-shadow: 0 6px 16px rgba(242,111,174,.3); }
+  .arc-picker { background: var(--bg); }
+  .stamp-mega-wrap { background: linear-gradient(to bottom, rgba(255,252,247,0), var(--surface) 34%); }
+
+  /* ===== Brand: morphing shape + tumbling letter tiles ===== */
+  .brand { cursor: pointer; gap: 8px !important; }
+  .morph-logo { width: 44px; height: 44px; display: block; overflow: visible; }
+  .brand-tiles { display: flex; align-items: center; gap: 3px; }
+  .brand-tile {
+    display: grid; place-items: center; width: 30px; height: 30px; border-radius: 9px;
+    background: var(--c-white); color: var(--ink); font-size: 17px; font-weight: 900;
+    box-shadow: 0 2px 0 rgba(60,40,20,.08), 0 4px 10px rgba(60,40,20,.08);
+    transform: rotate(var(--r, 0deg));
+  }
+  .brand-tile:nth-child(1) { --r: -9deg; }
+  .brand-tile:nth-child(2) { --r: 7deg; margin-top: 6px; }
+  .brand-tile:nth-child(3) { --r: -5deg; margin-top: -4px; }
+  .brand-tile:nth-child(4) { --r: 10deg; margin-top: 4px; }
+  .brand-tile.drop { animation: tile-drop .9s cubic-bezier(.3,1.5,.5,1) both; animation-delay: calc(var(--i) * 90ms); }
+  @keyframes tile-drop {
+    0%   { transform: translateY(-46px) rotate(calc(var(--r) * -4)); opacity: 0; }
+    45%  { transform: translateY(4px) rotate(calc(var(--r) * 1.6)); opacity: 1; }
+    70%  { transform: translateY(-3px) rotate(calc(var(--r) * .7)); }
+    100% { transform: translateY(0) rotate(var(--r)); }
+  }
+  .brand-tile:hover { animation: tile-wiggle .5s var(--spring); }
+  @keyframes tile-wiggle { 50% { transform: rotate(calc(var(--r) * -1)) scale(1.12); } }
+  @media (max-width: 420px) {
+    .brand-tile { width: 27px; height: 27px; font-size: 15px; }
+    .morph-logo { width: 38px; height: 38px; }
+  }
+
+  /* ===== Confetti burst on tap ===== */
+  .burst-piece { position: fixed; left: 0; top: 0; width: 16px; height: 16px; pointer-events: none; z-index: 400; }
+  .burst-piece svg { width: 100%; height: 100%; display: block; overflow: visible; }
+
+  /* ===== 小寶盒 · 紅底 + 黑色宇宙 ===== */
+  .cosmos {
+    background-color: #DE3420;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.6' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.5  0 0 0 0 0.05  0 0 0 0 0  0 0 0 .16 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    border-radius: 30px;
+    box-shadow: 0 10px 26px rgba(160, 30, 10, .22);
+    padding: 22px 16px 24px;
+    animation: card-in .6s var(--spring-soft) both;
+  }
+  .cosmos::before, .cosmos::after { display: none; }
+  .vault-title {
+    background: none; -webkit-text-fill-color: #FFF6E4; color: #FFF6E4;
+    font-size: 24px; display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .vault-sub { color: rgba(255, 238, 214, .75); font-weight: 700; margin-bottom: 4px; }
+  .space-hero { width: 100%; max-width: 460px; display: block; margin: 10px auto 6px; overflow: visible; }
+  .v-tw { animation: v-tw 2.6s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+  @keyframes v-tw { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .35; transform: scale(.7); } }
+  .v-float-a { animation: v-float-a 5.5s ease-in-out infinite; }
+  .v-float-b { animation: v-float-b 4.6s ease-in-out infinite; }
+  @keyframes v-float-a { 0%, 100% { transform: translate(0, 0) rotate(0); } 50% { transform: translate(4px, -9px) rotate(-2deg); } }
+  @keyframes v-float-b { 0%, 100% { transform: translate(0, 0) rotate(0); } 50% { transform: translate(-5px, 8px) rotate(3deg); } }
+  .v-wandstar { animation: v-spin 6s linear infinite; transform-box: fill-box; transform-origin: center; }
+  @keyframes v-spin { to { transform: rotate(360deg); } }
+
+  .vault-stats { gap: 10px; margin-bottom: 16px; }
+  .vault-stat {
+    background: #FFF6E4; border: none; backdrop-filter: none; padding: 12px 6px;
+    border-radius: 22px 18px 24px 16px / 18px 24px 16px 22px;
+    transition: transform .4s var(--spring);
+  }
+  .vault-stat:nth-child(2) { transform: rotate(1.5deg); }
+  .vault-stat:nth-child(3) { transform: rotate(-1.5deg); }
+  .vault-stat-value { color: #DE3420; text-shadow: none; font-size: 26px; font-weight: 900; }
+  .vault-stat-label { color: var(--ink); font-weight: 700; font-size: 11px; }
+
+  .space-blob {
+    position: relative; background-color: #151313; color: #fff;
+    border-radius: 70px 100px 80px 110px / 60px 70px 90px 70px;
+    padding: 18px 18px 30px; margin: 4px 0 6px;
+    background-image:
+      radial-gradient(1.6px 1.6px at 12% 18%, #fff 98%, transparent),
+      radial-gradient(1.2px 1.2px at 30% 70%, #fff 98%, transparent),
+      radial-gradient(2px 2px at 52% 12%, #fff 98%, transparent),
+      radial-gradient(1.2px 1.2px at 78% 30%, #fff 98%, transparent),
+      radial-gradient(1.6px 1.6px at 88% 78%, #fff 98%, transparent),
+      radial-gradient(1.2px 1.2px at 8% 86%, #fff 98%, transparent),
+      radial-gradient(1.6px 1.6px at 64% 92%, #fff 98%, transparent);
+  }
+  .vault-section-title { color: #FFF6E4; font-weight: 800; }
+  .vault-section-title::before, .vault-section-title::after { background: linear-gradient(to right, transparent, rgba(255,246,228,.45), transparent); }
+  .space-blob .vault-section-title { margin-top: 6px; color: #F4E5A6; }
+  .trophy-medallion { background: #F4E5A6; animation: none; box-shadow: 0 6px 14px rgba(0,0,0,.35); border-radius: 50%; padding: 4px; }
+  .trophy-inner { border-radius: 50%; background: #FFFDF8; }
+  .trophy-slot { border-radius: 50%; }
+  .trophy-slot.has-trophy { animation: v-float-b 4.8s ease-in-out infinite; }
+  .trophy-slot.has-trophy:nth-child(2n) { animation-name: v-float-a; animation-duration: 5.6s; }
+  .trophy-slot.empty { border-radius: 50%; border: 2px dashed rgba(244,229,166,.35); background: transparent; color: rgba(244,229,166,.45); }
+  .trophy-label { color: #F4E5A6; }
+  .space-blob .trophy-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 16px 12px; padding: 0 4px 10px; }
+  .space-blob .trophy-slot.empty { font-size: 20px; }
+  .vault-empty-icon { filter: none; }
+  .vault-empty-title { color: #F4E5A6; }
+  .cosmos .history-date { color: #FFF6E4 !important; font-weight: 800; }
+  .cosmos .filter-chip { background: transparent !important; color: #FFF6E4 !important; border: 2px solid rgba(255,246,228,.6) !important; }
+  .cosmos .filter-chip.active { background: #FFF6E4 !important; color: #DE3420 !important; border-color: #FFF6E4 !important; }
+  .polaroid-export-all-btn { background: #151313 !important; color: #FFF6E4 !important; border: none !important; }
+  .cosmos > .cosmos-content > .vault-empty .vault-empty-text { color: rgba(255,246,228,.8); }
+
+  /* 小寶盒：拿掉紅底，回到暖米色 */
+  .cosmos { background-color: var(--surface); background-image: none; box-shadow: var(--shadow); color: var(--ink); }
+  .vault-title { -webkit-text-fill-color: var(--ink); color: var(--ink); }
+  .vault-sub { color: var(--ink-faint); }
+  .vault-stat { background: var(--surface-2); }
+  .vault-stat-value { color: var(--ink); }
+  .vault-stat:nth-child(1) .vault-stat-value { color: #E5453A; }
+  .vault-stat:nth-child(2) .vault-stat-value { color: #E8964A; }
+  .vault-stat:nth-child(3) .vault-stat-value { color: #4A7FD0; }
+  .cosmos > .cosmos-content > .vault-section-title { color: var(--ink); }
+  .cosmos > .cosmos-content > .vault-section-title::before,
+  .cosmos > .cosmos-content > .vault-section-title::after { background: linear-gradient(to right, transparent, var(--line), transparent); }
+  .cosmos .history-date { color: var(--ink) !important; }
+  .cosmos .filter-chip { color: var(--ink-soft) !important; border-color: var(--line) !important; background: var(--surface) !important; }
+  .cosmos .filter-chip.active { background: var(--ink) !important; color: #fff !important; border-color: var(--ink) !important; }
+  .cosmos > .cosmos-content > .vault-empty .vault-empty-text { color: var(--ink-soft); }
+  .history-polaroid { box-shadow: 0 3px 12px rgba(60,40,20,.12), 0 1px 3px rgba(60,40,20,.08); }
+
+  /* ===== 標題字體：粉圓 Huninn ===== */
+  :root { --font-title: "Huninn", -apple-system, "PingFang TC", "Microsoft JhengHei", sans-serif; }
+  .brand-tile, .modal-title, .empty-title, .vault-title, .vault-section-title,
+  .arc-title, .arc-kicker, .theme-title, .sticker-name-zh, .stamp-mega, .arc-confirm,
+  .big-picker-title, .trophy-detail-name, .avm-head .field-label, .vault-empty-title,
+  .vault-stat-value, .progress-text strong {
+    font-family: var(--font-title);
+    font-weight: 400 !important;
+    letter-spacing: .5px;
+  }
+  .modal-title { font-size: 24px; }
+  .empty-title { font-size: 21px; }
+  .vault-title { font-size: 27px; }
+  .arc-title { font-size: 42px; }
+  .theme-title { font-size: 19px; }
+  .stamp-mega { font-size: 32px; }
+  .brand-tile { font-size: 18px; }
+
+  /* ===== 我的圖庫 / 備份：插畫風 icon ===== */
+  .modal-title-ill { display: flex; align-items: center; gap: 10px; }
+  .title-ill { width: 44px; height: 44px; display: inline-grid; place-items: center; animation: ill-pop .6s var(--spring) both; }
+  .title-ill svg { width: 44px; height: 44px; }
+  @keyframes ill-pop { 0% { transform: scale(.4) rotate(-20deg); } 100% { transform: none; } }
+  .manifest-status.loaded { background: var(--surface-2); color: var(--ink-soft); }
+  .manifest-status.loaded::before { content: ''; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #2E5C49; margin-right: 8px; vertical-align: 1px; }
+  .lib-tabs { gap: 8px; }
+  .lib-tab {
+    display: flex; align-items: center; gap: 6px; padding: 7px 14px 7px 8px !important;
+    background: var(--surface-2) !important; color: var(--ink-soft) !important; border: none !important;
+    transition: transform .4s var(--spring), background .2s;
+  }
+  .lib-tab:active { transform: scale(.92); }
+  .lib-tab.active { background: var(--ink) !important; color: #fff !important; }
+  .lib-tab-ill { width: 28px; height: 28px; display: inline-grid; place-items: center; transition: transform .45s var(--spring); }
+  .lib-tab-ill svg { width: 28px; height: 28px; }
+  .lib-tab.active .lib-tab-ill { transform: rotate(-8deg) scale(1.12); }
+  .lib-item { background: var(--surface-2) !important; border: none !important; border-radius: 16px !important; }
+  .lib-item-source.bundled { background: #2E5C49; }
+  .lib-item-source.custom { background: var(--c-pink); }
+  .lib-upload { border: 2px dashed #D9CFC1 !important; background: var(--surface) !important; border-radius: 16px !important; color: var(--ink-soft); transition: transform .4s var(--spring); }
+  .lib-upload:active { transform: scale(.92); }
+  .lib-upload-ill { width: 40px; height: 40px; margin: 0 auto 4px; }
+  .lib-upload-ill svg { width: 40px; height: 40px; }
+  .illust-row { background: var(--surface-2) !important; border: none !important; }
+  .illust-preview { background: var(--surface) !important; border: none !important; }
+  .small-icon-btn { display: inline-flex; align-items: center; gap: 4px; background: var(--surface) !important; }
+  .btn-ill { width: 20px; height: 20px; display: inline-grid; }
+  .btn-ill svg { width: 20px; height: 20px; }
+
+  .illust-builtin { width: 100%; height: 100%; display: grid; place-items: center; }
+  .illust-builtin svg { width: 100% !important; height: 100% !important; animation: none !important; }
+  .illust-builtin .morph-logo { width: 70% !important; height: 70% !important; }
+
+  .bk-stat { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; }
+  .bk-ill, .bk-ill svg { width: 24px !important; height: 24px !important; }
+  #doExport, #doExport + label { min-height: 52px; font-size: 15px; }
 </style>
 </head>
 <body>
@@ -2387,20 +2684,14 @@
   <!-- Header -->
   <div class="header">
     <div class="brand">
-      <div class="brand-icon" id="brandIcon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-          <path d="M12 2L14.39 8.26L21 9.27L16.5 13.97L17.78 21L12 17.77L6.22 21L7.5 13.97L3 9.27L9.61 8.26L12 2Z"
-                fill="white" stroke="white" stroke-width="0.5" stroke-linejoin="round"/>
-        </svg>
-      </div>
+      <div class="brand-icon" id="brandIcon"><svg class="morph-logo" viewBox="-32 -32 64 64" aria-hidden="true"><defs><linearGradient id="brandGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FBC444"/><stop offset="1" stop-color="#F26FAE"/></linearGradient></defs><path class="morph-path" fill="url(#brandGrad)" d="M0,-26 A26,26 0 1,1 0,26 A26,26 0 1,1 0,-26Z"/></svg></div>
       <div>
-        <div class="brand-title">集點寶貝</div>
-        <div class="brand-sub">REWARD STARS</div>
+        <div class="brand-title brand-tiles" aria-label="集點寶貝"><span class="brand-tile" style="--i:0">集</span><span class="brand-tile" style="--i:1">點</span><span class="brand-tile" style="--i:2">寶</span><span class="brand-tile" style="--i:3">貝</span></div>
       </div>
     </div>
     <div style="display:flex; align-items:center; gap:8px;">
-      <button class="lib-button" id="libBtn" title="我的圖庫">🖼️</button>
-      <button class="lib-button" id="backupBtn" title="備份 / 還原資料">💾</button>
+      <button class="lib-button" id="libBtn" title="我的圖庫" aria-label="我的圖庫"><svg class="ill-icon" viewBox="4 12 56 52" aria-hidden="true"><path d="M24,22 L52,20 L54,58 L26,59Z" fill="#26262B"/><path d="M14,19 L47,18 L48,55 L15,56Z" fill="#DCE8D4"/><path d="M18,22 L44,21.5 L44.5,44 L18.5,44.5Z" fill="#fff"/><path d="M18.5,44.5 L18.5,36 L25,29 L31,35 L36,31 L44.5,38 L44.5,44Z" fill="#2E5C49"/><path d="M18.5,44.5 L18.5,40 L27,37 L36,41 L44.5,39 L44.5,44Z" fill="#4E7A55"/><circle cx="38" cy="27" r="3.6" fill="#F6C53F"/><path d="M22,50 q3,-2 5,0 t5,0 t5,0" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round"/><path d="M9,51 L22,38 L26,54 L21,51 L16,57 L13,55 L18,49Z" fill="#26262B" transform="translate(2,3)"/><path d="M9,51 L22,38 L26,54 L21,51 L16,57 L13,55 L18,49Z" fill="#F6C53F"/></svg></button>
+      <button class="lib-button" id="backupBtn" title="備份 / 還原資料" aria-label="備份 / 還原資料"><svg class="ill-icon" viewBox="4 12 56 52" aria-hidden="true"><path d="M20,25 L50,24 L55,29 L55,60 L21,61Z" fill="#26262B"/><path d="M15,21 L45,20 L50,25 L50,56 L16,57Z" fill="#5B7FC4"/><path d="M22,21 L41,20.6 L41,32 L22.4,32.4Z" fill="#DCE8D4"/><path d="M34,23 L38,23 L38,30 L34,30Z" fill="#26262B"/><path d="M20,38 L46,37.5 L46.5,56 L20.5,56.5Z" fill="#F7F2E6"/><path d="M24,43 L42,42.6 M24,48 L39,47.7" stroke="#EC8FB2" stroke-width="2.4" stroke-linecap="round"/><path d="M17,28 l5,-5" stroke="#B9CCEE" stroke-width="2" stroke-linecap="round"/></svg></button>
       <div class="tabs" role="tablist">
         <button class="tab-btn active" data-tab="cards">獎勵卡</button>
         <button class="tab-btn" data-tab="history">小寶盒</button>
@@ -3043,6 +3334,7 @@ function render() {
   }
 }
 
+const BRAND_LOGO_SVG = (document.getElementById('brandIcon') || {}).innerHTML || '';
 function renderBrandIcon() {
   const el = document.getElementById('brandIcon');
   if (!el) return;
@@ -3050,12 +3342,7 @@ function renderBrandIcon() {
   if (logo) {
     el.innerHTML = `<img src="${escapeAttr(logo)}" alt="" style="width:90%; height:90%; object-fit:contain; border-radius:8px;">`;
   } else {
-    el.innerHTML = `
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-        <path d="M12 2L14.39 8.26L21 9.27L16.5 13.97L17.78 21L12 17.77L6.22 21L7.5 13.97L3 9.27L9.61 8.26L12 2Z"
-              fill="white" stroke="white" stroke-width="0.5" stroke-linejoin="round"/>
-      </svg>
-    `;
+    el.innerHTML = BRAND_LOGO_SVG;
   }
 }
 
@@ -3151,8 +3438,24 @@ function renderWelcome() {
   const custom = getIllustration('welcome');
   const illust = custom
     ? `<img class="empty-illust" src="${escapeAttr(custom)}" alt="">`
-    : `<svg class="empty-illust" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="100" cy="100" r="80" fill="#FFE4E9"/>
+    : `<svg class="empty-illust gift-scene" viewBox="0 0 240 220" xmlns="http://www.w3.org/2000/svg"><defs><filter id="grainW" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="1.1" numOctaves="2" seed="4" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 -1.4 1" result="w"/><feComposite in="w" in2="SourceGraphic" operator="in" result="speck"/><feComponentTransfer in="speck" result="soft"><feFuncA type="linear" slope=".16"/></feComponentTransfer><feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="soft"/></feMerge></filter></defs><g filter="url(#grainW)"><path d="M62,104 C60,92 68,86 80,86 C92,86 100,92 98,104Z" fill="#fff"/><path d="M70,104 L70,90 L74,90 L74,104 M88,104 L88,90 L92,90 L92,104" fill="#4A7FD0"/><rect x="70" y="96" width="22" height="10" fill="#4A7FD0"/><path d="M66,92 C58,80 52,66 48,52 L56,49 C61,62 66,74 72,86Z" fill="#F59A5E"/><path d="M95,94 C106,92 118,90 132,86 L134,93 C120,98 108,100 97,101Z" fill="#F59A5E"/><path d="M132,85 l6,-5 M133,88 l8,-3 M134,92 l8,0 M133,95 l7,3" stroke="#F59A5E" stroke-width="3.4" stroke-linecap="round"/><circle cx="80" cy="72" r="16" fill="#F59A5E"/><path d="M64,72 C62,56 74,52 82,54 C92,54 98,60 96,70 C90,64 80,62 72,66 C70,70 68,72 64,72Z" fill="#3B2A28"/><circle cx="64" cy="82" r="5" fill="#3B2A28"/><circle cx="62" cy="90" r="4.4" fill="#3B2A28"/><circle cx="96" cy="82" r="5" fill="#3B2A28"/><circle cx="98" cy="90" r="4.4" fill="#3B2A28"/><circle cx="76" cy="73" r="1.6" fill="#3B2A28"/><circle cx="86" cy="73" r="1.6" fill="#3B2A28"/><ellipse cx="72" cy="78" rx="3.4" ry="2" fill="#EE6F55" opacity=".7"/><ellipse cx="90" cy="78" rx="3.4" ry="2" fill="#EE6F55" opacity=".7"/><g transform="translate(70,44) rotate(-6)"><rect x="-30" y="-5" width="66" height="11" fill="#F26FAE"/><path d="M2,-4 C-12,-26 -30,-14 -16,-6 C-10,-3 -4,-4 2,-4 C6,-26 26,-20 18,-8 C14,-4 8,-4 2,-4 M2,-4 l-10,-12 M2,-4 l9,-14" stroke="#E5453A" stroke-width="4.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g><circle cx="52" cy="50" r="5" fill="#F59A5E"/><rect x="42" y="104" width="76" height="104" fill="#F26FAE"/><rect x="42" y="104" width="76" height="104" fill="#E9579C" opacity=".35" transform="translate(38,0) scale(.5,1)"/><path d="M78,104 V208" stroke="#E5453A" stroke-width="6"/><path d="M42,168 L118,150" stroke="#E5453A" stroke-width="6"/>
+  <g transform="translate(178,158) rotate(10) scale(1)">
+    <path d="M-22,-62 C-10,-70 30,-72 52,-60" stroke="#fff" stroke-width="0" fill="none"/>
+    <g transform="translate(0,-74) rotate(-6)">
+      <rect x="-34" y="-5" width="70" height="11" fill="#FBC444"/>
+      <path d="M0,0 C-14,-20 -26,-8 -14,-2 C-8,1 -3,0 0,0 C3,-20 18,-16 12,-4 C8,0 3,0 0,0 M0,0 l-8,12 M0,0 l7,12" stroke="#fff" stroke-width="4.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <path d="M-8,-8 C-10,-30 -8,-48 2,-52 C12,-56 18,-50 26,-46 L30,-10Z" fill="#fff"/>
+    <path d="M2,-52 C-6,-52 -16,-48 -22,-42 C-20,-38 -10,-38 0,-40Z" fill="#fff"/>
+    <circle cx="-22" cy="-42" r="3.2" fill="#F5A3B8"/>
+    <path d="M20,-50 C26,-56 36,-54 36,-46 C36,-40 28,-40 24,-44Z" fill="#3B2A28"/>
+    <ellipse cx="6" cy="-44" rx="1.8" ry="2.2" fill="#3B2A28"/><ellipse cx="13" cy="-43" rx="1.8" ry="2.2" fill="#3B2A28"/>
+    <rect x="-40" y="-14" width="80" height="78" fill="#FBC444"/>
+    <path d="M-40,6 H40 M-40,30 H40 M-14,-14 V64 M14,-14 V64" stroke="#FFF7E2" stroke-width="5.5" opacity=".9"/>
+    <path d="M-18,-16 C-18,-24 -6,-24 -6,-16 L-6,-6 C-6,-2 -18,-2 -18,-6Z" fill="#fff"/>
+    <path d="M10,-14 C10,-22 22,-22 22,-14 L22,-4 C22,0 10,0 10,-4Z" fill="#fff"/>
+    <path d="M-14,-6 v3 M-10,-6 v3 M14,-4 v3 M18,-4 v3" stroke="#F5A3B8" stroke-width="1.6" stroke-linecap="round"/>
+  </g></g></svg><svg style="display:none">
         <circle cx="75" cy="90" r="8" fill="#2B2A33"/>
         <circle cx="125" cy="90" r="8" fill="#2B2A33"/>
         <path d="M75 120 Q100 140 125 120" stroke="#2B2A33" stroke-width="4" fill="none" stroke-linecap="round"/>
@@ -3175,16 +3478,24 @@ function renderEmptyThemes(kid) {
   const custom = getIllustration('empty');
   const illust = custom
     ? `<img class="empty-illust" src="${escapeAttr(custom)}" alt="">`
-    : `<svg class="empty-illust" viewBox="0 0 200 200">
-        <rect x="40" y="50" width="120" height="100" rx="14" fill="${color.soft}" stroke="${color.main}" stroke-width="3" stroke-dasharray="6 4"/>
-        <circle cx="70" cy="80" r="8" fill="${color.main}" opacity="0.4"/>
-        <circle cx="100" cy="80" r="8" fill="${color.main}" opacity="0.4"/>
-        <circle cx="130" cy="80" r="8" fill="${color.main}" opacity="0.4"/>
-        <circle cx="70" cy="110" r="8" fill="${color.main}" opacity="0.4"/>
-        <circle cx="100" cy="110" r="8" fill="${color.main}" opacity="0.4"/>
-        <circle cx="130" cy="110" r="8" fill="${color.main}" opacity="0.4"/>
-        <path d="M100 30 L104 40 L114 42 L106 50 L108 60 L100 55 L92 60 L94 50 L86 42 L96 40 Z" fill="${color.main}"/>
-      </svg>`;
+    : `<svg class="empty-illust gift-scene" viewBox="0 0 240 220" xmlns="http://www.w3.org/2000/svg"><defs><filter id="grainE" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="1.1" numOctaves="2" seed="4" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 -1.4 1" result="w"/><feComposite in="w" in2="SourceGraphic" operator="in" result="speck"/><feComponentTransfer in="speck" result="soft"><feFuncA type="linear" slope=".16"/></feComponentTransfer><feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="soft"/></feMerge></filter></defs><g filter="url(#grainE)"><path d="M60,40 C62,52 62,52 74,54 C62,56 62,56 60,68 C58,56 58,56 46,54 C58,52 58,52 60,40Z" fill="#FBC444"/><path d="M176,52 C177,60 177,60 185,61 C177,62 177,62 176,70 C175,62 175,62 167,61 C175,60 175,60 176,52Z" fill="${color.main}"/><path d="M36,110 l10,-3 M196,104 l6,8 M150,30 q6,6 12,0" stroke="#E5453A" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <g transform="translate(120,150) rotate(-4) scale(1.25)">
+    <path d="M-22,-62 C-10,-70 30,-72 52,-60" stroke="#fff" stroke-width="0" fill="none"/>
+    <g transform="translate(0,-74) rotate(-6)">
+      <rect x="-34" y="-5" width="70" height="11" fill="#FBC444"/>
+      <path d="M0,0 C-14,-20 -26,-8 -14,-2 C-8,1 -3,0 0,0 C3,-20 18,-16 12,-4 C8,0 3,0 0,0 M0,0 l-8,12 M0,0 l7,12" stroke="#fff" stroke-width="4.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <path d="M-8,-8 C-10,-30 -8,-48 2,-52 C12,-56 18,-50 26,-46 L30,-10Z" fill="#fff"/>
+    <path d="M2,-52 C-6,-52 -16,-48 -22,-42 C-20,-38 -10,-38 0,-40Z" fill="#fff"/>
+    <circle cx="-22" cy="-42" r="3.2" fill="#F5A3B8"/>
+    <path d="M20,-50 C26,-56 36,-54 36,-46 C36,-40 28,-40 24,-44Z" fill="#3B2A28"/>
+    <ellipse cx="6" cy="-44" rx="1.8" ry="2.2" fill="#3B2A28"/><ellipse cx="13" cy="-43" rx="1.8" ry="2.2" fill="#3B2A28"/>
+    <rect x="-40" y="-14" width="80" height="78" fill="#FBC444"/>
+    <path d="M-40,6 H40 M-40,30 H40 M-14,-14 V64 M14,-14 V64" stroke="#FFF7E2" stroke-width="5.5" opacity=".9"/>
+    <path d="M-18,-16 C-18,-24 -6,-24 -6,-16 L-6,-6 C-6,-2 -18,-2 -18,-6Z" fill="#fff"/>
+    <path d="M10,-14 C10,-22 22,-22 22,-14 L22,-4 C22,0 10,0 10,-4Z" fill="#fff"/>
+    <path d="M-14,-6 v3 M-10,-6 v3 M14,-4 v3 M18,-4 v3" stroke="#F5A3B8" stroke-width="1.6" stroke-linecap="round"/>
+  </g></g></svg>`;
   return `
     <div class="empty-state">
       ${illust}
@@ -3328,6 +3639,95 @@ function closeAllMenus() {
 
 // ---- Treasure Box (小寶盒) ----
 let historyFilter = 'all';
+
+// ---- 小寶盒 hero · 太空小孩 + 斑點狗（紅底黑色宇宙） ----
+function vaultStar(cx, cy, r, rot, cls, delay) {
+  let d = '';
+  for (let i = 0; i < 10; i++) {
+    const a = (i * 36 + (rot || 0) - 90) * Math.PI / 180, rr = i % 2 ? r * 0.45 : r;
+    d += (i ? 'L' : 'M') + (cx + Math.cos(a) * rr).toFixed(1) + ',' + (cy + Math.sin(a) * rr).toFixed(1);
+  }
+  return `<path class="${cls || 'v-tw'}" style="animation-delay:${delay || 0}s" d="${d}Z" fill="#F4E5A6" stroke="#F4E5A6" stroke-width="2" stroke-linejoin="round"/>`;
+}
+function spaceHeroSVG(kid) {
+  const av = kid ? resolveSticker(kid.avatar) : { type: 'image', src: avatarDataURI(AV_DEFAULT) };
+  const face = av.type === 'image'
+    ? `<image href="${escapeAttr(av.src)}" x="-37" y="-40" width="74" height="74" clip-path="url(#helmetClip)" preserveAspectRatio="xMidYMid meet"/>`
+    : `<text x="0" y="9" text-anchor="middle" font-size="28">${escapeHtml(av.value)}</text>`;
+  const dots = [[70,96],[96,64],[150,52],[214,50],[262,72],[300,108],[318,160],[296,206],[244,236],[176,244],[110,232],[62,196],[52,140],[132,108],[226,120],[252,160],[160,190],[84,160],[200,214],[284,138]]
+    .map(([x, y], i) => `<circle class="v-tw" style="animation-delay:${(i % 7) * 0.35}s" cx="${x}" cy="${y}" r="${i % 3 ? 1.6 : 2.4}" fill="#fff"/>`).join('');
+  return `<svg class="space-hero" viewBox="0 0 360 290" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <defs><clipPath id="helmetClip"><circle r="22"/></clipPath><clipPath id="shibaClip"><circle r="20"/></clipPath></defs>
+    <path d="M62,68 C84,34 128,46 160,32 C198,16 236,40 270,40 C312,42 340,74 336,114 C333,146 352,170 334,204 C314,240 276,236 246,254 C214,272 176,256 144,262 C104,270 62,252 42,218 C26,190 14,160 24,126 C30,100 46,88 62,68Z" fill="#151313"/>
+    ${dots}
+    ${vaultStar(222, 226, 15, 8, 'v-tw', 0.2)}
+    ${vaultStar(170, 256, 13, -10, 'v-tw', 0.9)}
+    ${vaultStar(318, 174, 11, 12, 'v-tw', 1.4)}
+    <g class="v-float-a">
+      <g transform="translate(118,150) rotate(-18)">
+        <rect x="-30" y="-22" width="70" height="60" rx="16" fill="#CFC9C0"/>
+        <rect x="-26" y="-14" width="10" height="40" rx="5" fill="#B7B0A6"/>
+        <path d="M-2,36 C-14,56 -26,72 -34,88" stroke="#FFFDF8" stroke-width="22" fill="none" stroke-linecap="round"/>
+        <path d="M18,40 C14,60 10,78 8,96" stroke="#FFFDF8" stroke-width="22" fill="none" stroke-linecap="round"/>
+        <path d="M-10,52 C-16,60 -20,64 -24,70" stroke="#E4DED4" stroke-width="22" fill="none" stroke-linecap="butt" opacity=".9"/>
+        <path d="M12,62 C11,68 10,72 10,76" stroke="#E4DED4" stroke-width="22" fill="none" stroke-linecap="butt" opacity=".9"/>
+        <path d="M-32,86 L-40,102" stroke="#A9A49E" stroke-width="24" stroke-linecap="round"/>
+        <path d="M8,94 L6,110" stroke="#A9A49E" stroke-width="24" stroke-linecap="round"/>
+        <path d="M-22,32 C-28,10 -20,-12 2,-16 C26,-20 44,-6 42,18 C41,32 34,42 20,46 C2,50 -16,46 -22,32Z" fill="#FFFDF8"/>
+        <path d="M-20,30 C-4,38 22,38 40,28 L40,36 C22,46 -4,46 -20,38Z" fill="#A9A49E"/>
+        <rect x="2" y="2" width="22" height="16" rx="4" fill="#E4DED4"/>
+        <circle cx="8" cy="8" r="2.6" fill="#E5453A"/><circle cx="16" cy="8" r="2.6" fill="#FBC444"/><circle cx="12" cy="14" r="2.2" fill="#4A7FD0"/>
+        <path d="M-16,-2 C-30,6 -40,16 -42,24" stroke="#FFFDF8" stroke-width="16" fill="none" stroke-linecap="round"/>
+        <path d="M-36,16 L-40,22" stroke="#E4DED4" stroke-width="16" stroke-linecap="butt"/>
+        <circle cx="-44" cy="28" r="8" fill="#A9A49E"/>
+        <path d="M30,-8 C46,-24 58,-40 66,-56" stroke="#FFFDF8" stroke-width="16" fill="none" stroke-linecap="round"/>
+        <path d="M54,-38 L58,-44" stroke="#E4DED4" stroke-width="16" stroke-linecap="butt"/>
+        <g class="v-wand">
+          <path d="M66,-58 L96,-102" stroke="#F4E5A6" stroke-width="4" stroke-linecap="round"/>
+          ${vaultStar(98, -106, 16, 14, 'v-wandstar', 0)}
+        </g>
+        <circle cx="66" cy="-58" r="8.5" fill="#A9A49E"/>
+        <g transform="translate(4,-36) rotate(18)">
+          <ellipse cx="0" cy="25" rx="20" ry="7" fill="#A9A49E"/>
+          <circle r="28" fill="#BDBAB6"/>
+          <circle r="22" fill="#FCE3D3"/>
+          ${face}
+          <path d="M-18,-12 A22,22 0 0 1 -7,-20" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round" opacity=".85"/>
+        </g>
+      </g>
+    </g>
+    <g class="v-float-b">
+      <g transform="translate(262,168) rotate(-8)">
+        <path d="M28,0 C44,-4 48,-22 36,-26 C26,-29 22,-18 30,-14" stroke="#E8964A" stroke-width="9" fill="none" stroke-linecap="round"/>
+        <path d="M33,-20 C30,-20 29,-17 31,-16" stroke="#FFF1DD" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M-18,-10 C-34,-8 -48,-2 -56,4 C-60,8 -54,12 -48,10 C-40,6 -30,6 -20,6Z" fill="#E8964A"/>
+        <circle cx="-54" cy="7" r="5" fill="#FFF1DD"/>
+        <path d="M-16,-14 C-6,-26 20,-24 30,-6 C38,8 36,28 26,40 L14,52 C10,56 4,52 6,46 L10,34 C2,34 -8,30 -14,22 L-24,40 C-28,46 -34,42 -32,36 L-22,10 C-24,0 -22,-8 -16,-14Z" fill="#E8964A"/>
+        <path d="M-12,4 C-4,20 12,26 22,22 C18,30 8,32 0,28 C-8,24 -12,14 -12,4Z" fill="#FFF1DD"/>
+        <circle cx="9" cy="50" r="4.5" fill="#FFF1DD"/><circle cx="-29" cy="40" r="4.5" fill="#FFF1DD"/>
+        <g transform="translate(-8,-40)">
+          <ellipse cx="0" cy="23" rx="16" ry="6" fill="#A9A49E"/>
+          <path d="M-20,-12 L-17,-38 L-4,-22Z M20,-12 L17,-38 L4,-22Z" fill="#E8964A" stroke="#E8964A" stroke-width="4" stroke-linejoin="round"/>
+          <path d="M-16,-20 L-15,-32 L-8,-24Z M16,-20 L15,-32 L8,-24Z" fill="#FFF1DD"/>
+          <circle r="25" fill="#BDBAB6"/>
+          <g clip-path="url(#shibaClip)">
+            <circle r="20" fill="#E8964A"/>
+            <path d="M-21,4 C-18,18 -8,22 0,22 C8,22 18,18 21,4 C14,10 8,8 0,8 C-8,8 -14,10 -21,4Z" fill="#FFF1DD"/>
+            <ellipse cx="0" cy="10" rx="9.5" ry="7.5" fill="#FFF1DD"/>
+            <ellipse cx="-8" cy="-9" rx="2.6" ry="1.8" fill="#FFF1DD"/><ellipse cx="8" cy="-9" rx="2.6" ry="1.8" fill="#FFF1DD"/>
+            <circle cx="-8" cy="-2" r="2.6" fill="#151313"/><circle cx="8" cy="-2" r="2.6" fill="#151313"/>
+            <circle cx="-7.2" cy="-2.8" r=".8" fill="#fff"/><circle cx="8.8" cy="-2.8" r=".8" fill="#fff"/>
+            <ellipse cx="0" cy="6" rx="3.6" ry="2.5" fill="#151313"/>
+            <path d="M-5.5,11 Q-2.8,14.5 0,11 Q2.8,14.5 5.5,11" stroke="#151313" stroke-width="1.7" fill="none" stroke-linecap="round"/>
+            <ellipse cx="-13" cy="7" rx="4" ry="2.4" fill="#F5A3B8" opacity=".75"/><ellipse cx="13" cy="7" rx="4" ry="2.4" fill="#F5A3B8" opacity=".75"/>
+          </g>
+          <path d="M-16,-10 A20,20 0 0 1 -6,-18" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" opacity=".85"/>
+        </g>
+      </g>
+    </g>
+  </svg>`;
+}
+
 function renderHistory() {
   const content = document.getElementById('content');
 
@@ -3397,13 +3797,14 @@ function renderHistory() {
   });
   const days = Object.keys(groups).sort().reverse();
 
-  const kidLabel = kid ? `${kid.avatar} ${escapeHtml(kid.name)} 的` : '';
+  const kidLabel = kid ? `<span class="inline-avatar">${renderStickerHTML(kid.avatar, {size:'100%', round:true})}</span> ${escapeHtml(kid.name)} 的` : '';
 
   content.innerHTML = `
     <div class="cosmos">
       <div class="cosmos-content">
-        <div class="vault-title">🌌 ${kidLabel}小寶盒</div>
+        <div class="vault-title">${kidLabel}小寶盒</div>
         <div class="vault-sub">TREASURE GALAXY</div>
+        ${spaceHeroSVG(kid)}
 
         <div class="vault-stats">
           <div class="vault-stat">
@@ -3420,16 +3821,18 @@ function renderHistory() {
           </div>
         </div>
 
+        <div class="space-blob">
         ${trophyThemes.length > 0 ? `
           <div class="vault-section-title">收藏的寶物</div>
           <div class="trophy-grid">${slots.join('')}</div>
         ` : `
           <div class="vault-empty">
-            <div class="vault-empty-icon">🪐</div>
+            <div class="vault-empty-icon"><svg viewBox="0 0 40 40" width="52" height="52">${vaultStar(20, 21, 17, 0, 'v-tw', 0)}</svg></div>
             <div class="vault-empty-title">寶盒還是空的喔</div>
             <div class="vault-empty-text">集滿一張卡兌換獎勵，<br>就會出現在這個小宇宙裡</div>
           </div>
         `}
+        </div>
 
         <div class="vault-section-title">活動歷程</div>
 
@@ -3497,7 +3900,7 @@ function openTrophyDetail(tid) {
       <div class="trophy-detail-name">${escapeHtml(trophy.name)}</div>
       <div class="trophy-detail-theme">完成了「${escapeHtml(t.title)}」 · 集滿 ${t.goal} 點</div>
       <div class="trophy-detail-meta">
-        ${kid ? `<span>${kid.avatar} <strong>${escapeHtml(kid.name)}</strong></span>` : ''}
+        ${kid ? `<span><span class="inline-avatar">${renderStickerHTML(kid.avatar, {size:'100%', round:true})}</span> <strong>${escapeHtml(kid.name)}</strong></span>` : ''}
         <span>📅 <strong>${dateStr}</strong> 入手</span>
       </div>
     </div>
@@ -3934,6 +4337,7 @@ function openStampDialog(tid) {
       <div class="field">
         <button type="button" class="sticker-hero" id="openStickerPickerBtn">
           <span class="sticker-hero-card" id="heroCard">${renderStickerHTML(draft.sticker, {size:84})}</span>
+          <span id="heroName">${stickerNameHTML(allStickers.find(x => x.value === draft.sticker))}</span>
           <span class="sticker-hero-hint">點一下換貼紙 · <b>${allStickers.length} 款</b></span>
         </button>
       </div>
@@ -3971,6 +4375,7 @@ function openStampDialog(tid) {
     draft.sticker = s;
     heroCard.innerHTML = renderStickerHTML(s, {size:84});
     megaIcon.innerHTML = renderStickerHTML(s, {size:48});
+    document.getElementById('heroName').innerHTML = stickerNameHTML(allStickers.find(x => x.value === s));
     heroCard.classList.remove('bump'); void heroCard.offsetWidth; heroCard.classList.add('bump');
     setTimeout(() => heroCard.classList.remove('bump'), 650);
   }
@@ -4028,7 +4433,7 @@ function openStampDialog(tid) {
     if (saving) return;
     saving = true;
     saveBtn.classList.add('pressed');
-    if (navigator.vibrate) { try { navigator.vibrate(15); } catch (e) {} }
+    if (navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) { try { navigator.vibrate(15); } catch (e) {} }
     const reason = document.getElementById('stampReason').value.trim();
     // Let the squash-and-bounce play before the sheet closes
     setTimeout(() => {
@@ -4036,6 +4441,22 @@ function openStampDialog(tid) {
       closeModal();
     }, 320);
   };
+}
+
+
+// ---- Sticker names · 國字 + 注音 + English (key = 檔名) ----
+const STICKER_NAMES = {"B1": ["紫髮女孩","ㄗˇ ㄈㄚˇ ㄋㄩˇ ㄏㄞˊ","Purple Hair Girl"],"B2": ["粉髮女孩","ㄈㄣˇ ㄈㄚˇ ㄋㄩˇ ㄏㄞˊ","Pink Hair Girl"],"B3": ["黑髮女孩","ㄏㄟ ㄈㄚˇ ㄋㄩˇ ㄏㄞˊ","Black Hair Girl"],"B4": ["凱蒂貓","ㄎㄞˇ ㄉㄧˋ ㄇㄠ","Hello Kitty"],"B5": ["美樂蒂","ㄇㄟˇ ㄌㄜˋ ㄉㄧˋ","My Melody"],"B6": ["酷洛米","ㄎㄨˋ ㄌㄨㄛˋ ㄇㄧˇ","Kuromi"],"B7": ["大耳狗","ㄉㄚˋ ㄦˇ ㄍㄡˇ","Cinnamoroll"],"B8": ["布丁狗","ㄅㄨˋ ㄉㄧㄥ ㄍㄡˇ","Pompompurin"],"B9": ["閃電麥坤","ㄕㄢˇ ㄉㄧㄢˋ ㄇㄞˋ ㄎㄨㄣ","Lightning McQueen"],"B10": ["拖線","ㄊㄨㄛ ㄒㄧㄢˋ","Mater"],"B11": ["黃色跑車","ㄏㄨㄤˊ ㄙㄜˋ ㄆㄠˇ ㄔㄜ","Yellow Racer"],"B12": ["黑色跑車","ㄏㄟ ㄙㄜˋ ㄆㄠˇ ㄔㄜ","Black Racer"],"B13": ["藍色汽車","ㄌㄢˊ ㄙㄜˋ ㄑㄧˋ ㄔㄜ","Blue Car"],"B14": ["消防車","ㄒㄧㄠ ㄈㄤˊ ㄔㄜ","Fire Truck"],"B15": ["警車","ㄐㄧㄥˇ ㄔㄜ","Police Car"],"B16": ["推土機","ㄊㄨㄟ ㄊㄨˇ ㄐㄧ","Bulldozer"],"B17": ["白色跑車","ㄅㄞˊ ㄙㄜˋ ㄆㄠˇ ㄔㄜ","White Sports Car"],"B18": ["吉普車","ㄐㄧˊ ㄆㄨˇ ㄔㄜ","Jeep"],"B19": ["吊車","ㄉㄧㄠˋ ㄔㄜ","Crane Truck"],"B20": ["救護車","ㄐㄧㄡˋ ㄏㄨˋ ㄔㄜ","Ambulance"],"B21": ["公車","ㄍㄨㄥ ㄔㄜ","Bus"],"B22": ["廂型車","ㄒㄧㄤ ㄒㄧㄥˊ ㄔㄜ","Van"],"B23": ["水泥車","ㄕㄨㄟˇ ㄋㄧˊ ㄔㄜ","Cement Mixer"],"B24": ["砂石車","ㄕㄚ ㄕˊ ㄔㄜ","Dump Truck"],"B25": ["小汽車","ㄒㄧㄠˇ ㄑㄧˋ ㄔㄜ","Little Car"],"B26": ["冰淇淋車","ㄅㄧㄥ ㄑㄧˊ ㄌㄧㄣˊ ㄔㄜ","Ice Cream Truck"],"B27": ["遊覽車","ㄧㄡˊ ㄌㄢˇ ㄔㄜ","Coach Bus"],"B28": ["巡邏車","ㄒㄩㄣˊ ㄌㄨㄛˊ ㄔㄜ","Patrol Car"],"B29": ["計程車","ㄐㄧˋ ㄔㄥˊ ㄔㄜ","Taxi"],"B30": ["眨眼女孩","ㄓㄚˇ ㄧㄢˇ ㄋㄩˇ ㄏㄞˊ","Winking Girl"],"B31": ["酷酷女孩","ㄎㄨˋ ㄎㄨˋ ㄋㄩˇ ㄏㄞˊ","Cool Girl"],"B32": ["丸子頭女孩","ㄨㄢˊ ㄗ˙ ㄊㄡˊ ㄋㄩˇ ㄏㄞˊ","Bun Hair Girl"],"B33": ["帕恰狗","ㄆㄚˋ ㄑㄧㄚˋ ㄍㄡˇ","Pochacco"],"B34": ["雙子星","ㄕㄨㄤ ㄗˇ ㄒㄧㄥ","Little Twin Stars"],"B35": ["大卡車","ㄉㄚˋ ㄎㄚˇ ㄔㄜ","Big Truck"],"B36": ["紫色汽車","ㄗˇ ㄙㄜˋ ㄑㄧˋ ㄔㄜ","Purple Car"],"B37": ["綠色汽車","ㄌㄩˋ ㄙㄜˋ ㄑㄧˋ ㄔㄜ","Green Car"],"B38": ["堆高機","ㄉㄨㄟ ㄍㄠ ㄐㄧ","Forklift"],"B39": ["賽車","ㄙㄞˋ ㄔㄜ","Race Car"],"B40": ["垃圾車","ㄌㄜˋ ㄙㄜˋ ㄔㄜ","Garbage Truck"],"B41": ["挖土機","ㄨㄚ ㄊㄨˇ ㄐㄧ","Excavator"],"B42": ["壓路機","ㄧㄚ ㄌㄨˋ ㄐㄧ","Road Roller"],"B43": ["柴犬","ㄔㄞˊ ㄑㄩㄢˇ","Shiba Inu"],"B44": ["紫色小馬","ㄗˇ ㄙㄜˋ ㄒㄧㄠˇ ㄇㄚˇ","Purple Pony"],"B45": ["粉紅小馬","ㄈㄣˇ ㄏㄨㄥˊ ㄒㄧㄠˇ ㄇㄚˇ","Pink Pony"],"B46": ["白色小馬","ㄅㄞˊ ㄙㄜˋ ㄒㄧㄠˇ ㄇㄚˇ","White Pony"],"B47": ["黃色小馬","ㄏㄨㄤˊ ㄙㄜˋ ㄒㄧㄠˇ ㄇㄚˇ","Yellow Pony"],"B48": ["彩虹","ㄘㄞˇ ㄏㄨㄥˊ","Rainbow"],"B49": ["草莓蛋糕","ㄘㄠˇ ㄇㄟˊ ㄉㄢˋ ㄍㄠ","Strawberry Cake"],"B50": ["冰淇淋","ㄅㄧㄥ ㄑㄧˊ ㄌㄧㄣˊ","Ice Cream"]};
+function stickerNameOf(item) {
+  const src = (item && item.src) || '';
+  const m = src.match(/([^\/]+)\.(png|jpe?g|webp|gif|svg)$/i);
+  return m ? STICKER_NAMES[m[1]] : null;
+}
+function stickerNameHTML(item) {
+  const n = stickerNameOf(item);
+  if (!n) return '';
+  const zy = n[1].split(' ');
+  const ruby = [...n[0]].map((ch, i) => `<ruby>${escapeHtml(ch)}<rt>${escapeHtml(zy[i] || '')}</rt></ruby>`).join('');
+  return `<span class="sticker-name"><span class="sticker-name-zh">${ruby}</span><span class="sticker-name-en">${escapeHtml(n[2])}</span></span>`;
 }
 
 // ---- Arc card picker (弧形轉動卡片) ----
@@ -4062,7 +4483,7 @@ function openArcPicker(items, currentValue, onPick) {
       ${items.map((it, i) => `
         <button type="button" class="arc-card" data-i="${i}">
           <span class="arc-face">${it.type === 'image' ? `<img src="${escapeAttr(it.src)}" alt="" draggable="false">` : `<span>${escapeHtml(it.value)}</span>`}</span>
-          <span class="arc-label">No.${String(i + 1).padStart(2, '0')}</span>
+          ${stickerNameHTML(it)}
         </button>`).join('')}
     </div>
     <div class="arc-hint">左右滑動，點中間的卡片選它</div>
@@ -4121,7 +4542,7 @@ function openArcPicker(items, currentValue, onPick) {
     countEl.textContent = `${cur + 1} / ${n}`;
     const si = stripItems[cur];
     strip.scrollLeft = si.offsetLeft - strip.clientWidth / 2 + si.offsetWidth / 2;
-    if (navigator.vibrate) { try { navigator.vibrate(6); } catch (e) {} }
+    if (navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) { try { navigator.vibrate(6); } catch (e) {} }
   }
 
   // Under-damped spring → the arc overshoots a little and settles (Q彈)
@@ -4282,6 +4703,15 @@ const ILLUST_SLOTS = [
   { key:'logo', name:'招牌 LOGO', desc:'標題旁的小圖示' },
 ];
 
+const LIB_ICONS = {
+  stickers: `<svg viewBox="0 0 40 40"><path d="M22.0,8.0 L25.9,16.6 L35.3,17.7 L28.4,24.1 L30.2,33.3 L22.0,28.7 L13.8,33.3 L15.6,24.1 L8.7,17.7 L18.1,16.6Z" fill="#26262B" stroke="#26262B" stroke-width="2.4" stroke-linejoin="round"/><path d="M19.0,5.0 L22.9,13.6 L32.3,14.7 L25.4,21.1 L27.2,30.3 L19.0,25.7 L10.8,30.3 L12.6,21.1 L5.7,14.7 L15.1,13.6Z" fill="#FBC444" stroke="#FBC444" stroke-width="2.4" stroke-linejoin="round"/><circle cx="31" cy="9" r="3" fill="#F26FAE"/></svg>`,
+  avatars: `<svg viewBox="0 0 40 40"><circle cx="22" cy="23" r="14" fill="#26262B"/><circle cx="19" cy="20" r="14" fill="#F6C9A6"/><path d="M5,19 C5,8 13,5 19,5 C27,5 33,9 33,18 C27,14 20,12 12,15 C10,17 8,18 5,19Z" fill="#3B2A28"/><circle cx="14" cy="21" r="1.8" fill="#2B2622"/><circle cx="24" cy="21" r="1.8" fill="#2B2622"/><ellipse cx="11" cy="26" rx="2.6" ry="1.6" fill="#F26FAE" opacity=".7"/><ellipse cx="27" cy="26" rx="2.6" ry="1.6" fill="#F26FAE" opacity=".7"/><path d="M16,27 Q19,30 22,27" stroke="#2B2622" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>`,
+  trophies: `<svg viewBox="0 0 40 40"><rect x="9" y="15" width="27" height="22" fill="#26262B"/><rect x="6" y="12" width="27" height="22" fill="#F26FAE"/><rect x="4" y="10" width="31" height="6" fill="#FF8FC2"/><path d="M19.5,10 V34" stroke="#E5453A" stroke-width="3.6"/><path d="M19.5,10 C14,2 7,6 12,9 C14,10 17,10 19.5,10 C22,2 31,4 27,9 C25,10 22,10 19.5,10" stroke="#FBC444" stroke-width="2.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  illustrations: `<svg viewBox="0 0 40 40"><path d="M21,7 C33,7 38,15 36,22 C34,27 29,25 27,28 C25,32 30,36 23,37 C12,38 6,31 6,22 C6,13 12,7 21,7Z" fill="#26262B"/><path d="M18,4 C30,4 35,12 33,19 C31,24 26,22 24,25 C22,29 27,33 20,34 C9,35 3,28 3,19 C3,10 9,4 18,4Z" fill="#F7F2E6"/><circle cx="11" cy="15" r="3" fill="#E5453A"/><circle cx="19" cy="10" r="3" fill="#FBC444"/><circle cx="27" cy="14" r="3" fill="#4A7FD0"/><circle cx="11" cy="24" r="3" fill="#2E5C49"/></svg>`,
+  camera: `<svg viewBox="0 0 40 40"><rect x="7" y="13" width="30" height="21" rx="4" fill="#26262B"/><rect x="4" y="10" width="30" height="21" rx="4" fill="#4A7FD0"/><rect x="11" y="6" width="10" height="6" rx="2" fill="#4A7FD0"/><circle cx="19" cy="21" r="7" fill="#F7F2E6"/><circle cx="19" cy="21" r="3.6" fill="#2B2622"/><circle cx="29" cy="15" r="1.8" fill="#FBC444"/></svg>`,
+  upload: `<svg viewBox="0 0 40 40"><path d="M11,10 L36,9 L37,36 L12,37Z" fill="#26262B"/><path d="M6,6 L31,5 L32,32 L7,33Z" fill="#DCE8D4"/><path d="M9,9 L28,8.6 L28.5,24 L9.4,24.4Z" fill="#fff"/><path d="M9.4,24.4 L9.4,19 L15,14 L20,19 L23,16.5 L28.5,21 L28.5,24Z" fill="#2E5C49"/><circle cx="24" cy="12.5" r="2.4" fill="#FBC444"/><circle cx="30" cy="30" r="8" fill="#F26FAE"/><path d="M30,26 V34 M26,30 H34" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>`,
+};
+function headerIcon(id) { const svg = document.querySelector('#' + id + ' svg'); return svg ? svg.outerHTML : ''; }
 function openLibrary() {
   // detect manifest status
   const hasBundle = (bundledLib.stickers.length + bundledLib.avatars.length + bundledLib.trophies.length) > 0
@@ -4289,18 +4719,18 @@ function openLibrary() {
 
   openModal(`
     <div class="modal-handle"></div>
-    <div class="modal-title">🖼️ 我的圖庫</div>
+    <div class="modal-title modal-title-ill"><span class="title-ill">${headerIcon('libBtn')}</span>我的圖庫</div>
     <div class="modal-sub">把你生成的圖檔加進來，立刻變成貼紙、頭像或寶物</div>
 
     <div class="manifest-status ${hasBundle ? 'loaded' : 'no-bundle'}">
       ${hasBundle
-        ? `✓ 已自動載入 assets/manifest.json（${bundledLib.stickers.length + bundledLib.avatars.length + bundledLib.trophies.length} 張預設圖）`
+        ? `已自動載入 assets/manifest.json（${bundledLib.stickers.length + bundledLib.avatars.length + bundledLib.trophies.length} 張預設圖）`
         : '尚未偵測到 assets/manifest.json — 部署資料夾的圖檔載入功能仍可使用，或直接在這裡上傳。'}
     </div>
 
     <div class="lib-tabs" id="libTabs">
       ${Object.keys(CAT_LABELS).map(c => `
-        <button class="lib-tab ${libView.cat===c?'active':''}" data-cat="${c}">${CAT_LABELS[c]}</button>
+        <button class="lib-tab ${libView.cat===c?'active':''}" data-cat="${c}"><span class="lib-tab-ill">${LIB_ICONS[c]}</span><span>${CAT_LABELS[c]}</span></button>
       `).join('')}
     </div>
 
@@ -4315,10 +4745,27 @@ function openLibrary() {
     b.onclick = () => { libView.cat = b.dataset.cat; openLibrary(); };
   });
   document.getElementById('libClose').onclick = () => { closeModal(); render(); };
+  const activeTab = document.querySelector('#libTabs .lib-tab.active');
+  if (activeTab) activeTab.scrollIntoView({ block: 'nearest', inline: 'center' });
 
   renderLibraryContent();
 }
 
+function builtinIllustration(key) {
+  try {
+    let html = '';
+    if (key === 'welcome') html = renderWelcome();
+    else if (key === 'empty') html = renderEmptyThemes({ name: '', color: (COLORS[0] || {}).name });
+    else if (key === 'logo') return `<div class="illust-builtin">${BRAND_LOGO_SVG}</div>`;
+    else return '';
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    const svg = doc.querySelector('svg.empty-illust');
+    if (!svg) return '';
+    // give the grain filter a unique id so it doesn't clash with the page
+    let out = svg.outerHTML.replace(/id="(grain[WE])"/, 'id="$1lib"').replace(/url\(#(grain[WE])\)/, 'url(#$1lib)');
+    return `<div class="illust-builtin">${out}</div>`;
+  } catch (e) { return ''; }
+}
 function renderLibraryContent() {
   const container = document.getElementById('libContent');
   if (!container) return;
@@ -4328,19 +4775,19 @@ function renderLibraryContent() {
       const customSrc = customLib.illustrations[slot.key];
       const bundledSrc = bundledLib.illustrations[slot.key];
       const src = customSrc || bundledSrc;
-      const sourceLabel = customSrc ? '我上傳的' : bundledSrc ? '部署資料夾' : '預設 SVG';
+      const sourceLabel = customSrc ? '我上傳的' : bundledSrc ? '部署資料夾' : '內建插畫';
       return `
         <div class="illust-row">
           <div class="illust-preview">
             ${src
               ? `<img src="${escapeAttr(src)}" alt="${escapeHtml(slot.name)}">`
-              : `<div class="illust-preview-empty">使用內建SVG<br>(可上傳替換)</div>`}
+              : (builtinIllustration(slot.key) || `<div class="illust-preview-empty">使用內建插畫<br>(可上傳替換)</div>`)}
           </div>
           <div class="illust-info">
             <div class="illust-name">${escapeHtml(slot.name)} <span style="font-size:10px; font-weight:600; color:var(--ink-faint);">· ${sourceLabel}</span></div>
             <div class="illust-desc">${escapeHtml(slot.desc)}</div>
             <div class="illust-actions">
-              <button class="small-icon-btn" data-illust-upload="${slot.key}">📷 上傳</button>
+              <button class="small-icon-btn" data-illust-upload="${slot.key}"><span class="btn-ill">${LIB_ICONS.camera}</span>上傳</button>
               ${customSrc ? `<button class="small-icon-btn" style="color:var(--danger)" data-illust-remove="${slot.key}">移除</button>` : ''}
             </div>
           </div>
@@ -4384,7 +4831,7 @@ function renderLibraryContent() {
   cells += `
     <div class="lib-upload" id="libUploadBtn">
       <div>
-        <div style="font-size:24px; margin-bottom:4px;">＋</div>
+        <div class="lib-upload-ill">${LIB_ICONS.upload}</div>
         <div>上傳圖檔</div>
       </div>
     </div>
@@ -4627,10 +5074,297 @@ function confirmResetTheme(tid) {
   });
 }
 
+// ============================================================
+// Avatar Maker · 自己做頭像（手繪 Q 版風格 SVG）
+// ============================================================
+const AV_INK = '#3A3434';
+const AV_OPTIONS = {
+  gender: [
+    { v: 'girl', label: '女生' },
+    { v: 'boy', label: '男生' },
+  ],
+  face: [
+    { v: 'round', label: '圓臉' },
+    { v: 'oval', label: '鵝蛋臉' },
+    { v: 'bun', label: '包子臉' },
+    { v: 'square', label: '方圓臉' },
+  ],
+  skin: [
+    { v: '#FFEBDF' }, { v: '#FDDCC8' }, { v: '#F6C9A6' },
+    { v: '#E3AD84' }, { v: '#C78B63' }, { v: '#8F5F43' },
+  ],
+  eyes: [
+    { v: 'round', label: '圓圓眼' },
+    { v: 'side', label: '偷看眼' },
+    { v: 'sparkle', label: '閃亮眼' },
+    { v: 'sleepy', label: '想睡眼' },
+    { v: 'smile', label: '笑瞇瞇' },
+    { v: 'glasses', label: '戴眼鏡' },
+  ],
+  iris: [
+    { v: '#6E6E73' }, { v: '#2E2B2B' }, { v: '#7A5238' },
+    { v: '#4F86C6' }, { v: '#4E9B78' }, { v: '#8C6CC4' },
+  ],
+  hair: [
+    { v: 'short', label: '短髮' },
+    { v: 'spiky', label: '刺刺頭' },
+    { v: 'bowl', label: '香菇頭' },
+    { v: 'bob', label: '鮑伯頭' },
+    { v: 'long', label: '長直髮' },
+    { v: 'twintails', label: '雙辮子' },
+    { v: 'bun', label: '丸子頭' },
+    { v: 'hijab', label: '頭巾' },
+    { v: 'bear', label: '熊熊帽' },
+    { v: 'bunny', label: '兔兔帽' },
+  ],
+  hairColor: [
+    { v: '#2B2A2E' }, { v: '#5A3B2C' }, { v: '#8E6149' }, { v: '#E6C27C' },
+    { v: '#F6AECB' }, { v: '#B9A4E4' }, { v: '#CDD0D4' }, { v: '#F6F2EA' },
+  ],
+  nose: [
+    { v: 'none', label: '沒有' },
+    { v: 'dot', label: '小點點' },
+    { v: 'hook', label: '小勾勾' },
+    { v: 'button', label: '圓鼻子' },
+  ],
+  mouth: [
+    { v: 'smile', label: '微笑' },
+    { v: 'grin', label: '大笑' },
+    { v: 'o', label: '喔～' },
+    { v: 'cat', label: '貓咪嘴' },
+    { v: 'tongue', label: '吐舌頭' },
+    { v: 'flat', label: '抿嘴' },
+  ],
+  brows: [
+    { v: 'none', label: '沒有' },
+    { v: 'soft', label: '彎彎' },
+    { v: 'thick', label: '粗粗' },
+    { v: 'angry', label: '生氣' },
+    { v: 'worried', label: '擔心' },
+  ],
+  blush: [
+    { v: 'none', label: '沒有' },
+    { v: 'pink', label: '粉紅' },
+    { v: 'lines', label: '害羞' },
+    { v: 'peach', label: '蜜桃' },
+    { v: 'freckles', label: '雀斑' },
+  ],
+};
+const AV_TABS = [
+  { key: 'gender', label: '性別' },
+  { key: 'face', label: '臉型' },
+  { key: 'skin', label: '膚色', color: true },
+  { key: 'eyes', label: '眼睛' },
+  { key: 'iris', label: '眼珠', color: true },
+  { key: 'hair', label: '髮型' },
+  { key: 'nose', label: '鼻子' },
+  { key: 'mouth', label: '嘴巴' },
+  { key: 'brows', label: '眉毛' },
+  { key: 'blush', label: '腮紅' },
+];
+const AV_DEFAULT = {
+  gender: 'girl', face: 'round', skin: '#FDDCC8', eyes: 'round', iris: '#6E6E73',
+  hair: 'long', hairColor: '#2B2A2E', nose: 'none', mouth: 'smile', brows: 'none', blush: 'pink',
+};
+
+function avFacePath(f) {
+  switch (f) {
+    case 'oval':   return 'M100,52 C138,52 156,84 155,114 C154,148 130,170 100,170 C70,170 46,148 45,114 C44,84 62,52 100,52Z';
+    case 'bun':    return 'M100,58 C140,58 158,82 160,112 C163,148 136,168 100,168 C64,168 37,148 40,112 C42,82 60,58 100,58Z';
+    case 'square': return 'M64,56 L136,56 C152,56 160,66 160,84 L160,132 C160,154 140,168 100,168 C60,168 40,154 40,132 L40,84 C40,66 48,56 64,56Z';
+    default:       return 'M100,54 C136,54 160,78 160,112 C160,146 134,166 100,166 C66,166 40,146 40,112 C40,78 64,54 100,54Z';
+  }
+}
+
+function avEye(cx, cy, p, mirror) {
+  const s = `stroke="${AV_INK}" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"`;
+  const lash = p.gender === 'girl'
+    ? (mirror
+        ? `<path d="M${cx+13},${cy-9} l6,-5 M${cx+15},${cy-4} l7,-2" ${s} fill="none"/>`
+        : `<path d="M${cx-13},${cy-9} l-6,-5 M${cx-15},${cy-4} l-7,-2" ${s} fill="none"/>`)
+    : '';
+  if (p.eyes === 'smile') {
+    return `<path d="M${cx-11},${cy+3} Q${cx},${cy-10} ${cx+11},${cy+3}" ${s} fill="none" stroke-width="3"/>` + lash;
+  }
+  let dx = 0, dy = 0;
+  if (p.eyes === 'side') dx = 4;
+  if (p.eyes === 'sleepy') dy = 3;
+  const ir = p.eyes === 'sparkle' ? 14 : 13;
+  // sketchy scribble across the iris (like the hand-drawn reference)
+  const ix = cx + dx, iy = cy + dy;
+  const scribble = `<path d="M${ix-9},${iy-6} L${ix+7},${iy-10} M${ix-11},${iy} L${ix+10},${iy-4} M${ix-10},${iy+6} L${ix+10},${iy+2} M${ix-6},${iy+10} L${ix+8},${iy+8}" stroke="#000" stroke-opacity=".28" stroke-width="1.6" stroke-linecap="round" fill="none"/>`;
+  const spark = p.eyes === 'sparkle'
+    ? `<path d="M${ix-5},${iy-11} l1.6,4 4,1.6 -4,1.6 -1.6,4 -1.6,-4 -4,-1.6 4,-1.6Z" fill="#fff"/><circle cx="${ix+5}" cy="${iy+5}" r="2.4" fill="#fff"/>`
+    : `<circle cx="${ix-4}" cy="${iy-5}" r="4.2" fill="#fff"/><circle cx="${ix+5}" cy="${iy+5}" r="2" fill="#fff"/>`;
+  const lid = p.eyes === 'sleepy'
+    ? `<path d="M${cx-17},${cy-4} Q${cx},${cy-10} ${cx+17},${cy-4} L${cx+17},${cy-20} L${cx-17},${cy-20}Z" fill="${p.skin}"/><path d="M${cx-17},${cy-4} Q${cx},${cy-10} ${cx+17},${cy-4}" ${s} fill="none"/>`
+    : '';
+  return `<circle cx="${cx}" cy="${cy}" r="16.5" fill="#fff" ${s}/>` +
+    `<circle cx="${ix}" cy="${iy}" r="${ir}" fill="${p.iris}"/>` + scribble + spark + lid + lash;
+}
+
+function avHairBack(p) {
+  const c = p.hairColor, s = `stroke="${AV_INK}" stroke-width="2.3" stroke-linejoin="round"`;
+  switch (p.hair) {
+    case 'long': return `<path d="M36,110 C30,54 66,38 100,38 C134,38 170,54 164,110 L168,190 L32,190Z" fill="${c}" ${s}/>`;
+    case 'bob':  return `<path d="M34,112 C30,54 66,38 100,38 C134,38 170,54 166,112 L166,160 C150,166 50,166 34,160Z" fill="${c}" ${s}/>`;
+    case 'twintails': return `<path d="M38,110 C32,54 66,38 100,38 C134,38 168,54 162,110 L158,150 L42,150Z" fill="${c}" ${s}/>` +
+      [[34,150],[30,170],[28,190]].map(([x,y]) => `<ellipse cx="${x}" cy="${y}" rx="11" ry="12" fill="${c}" ${s}/>`).join('') +
+      [[166,150],[170,170],[172,190]].map(([x,y]) => `<ellipse cx="${x}" cy="${y}" rx="11" ry="12" fill="${c}" ${s}/>`).join('') +
+      `<circle cx="32" cy="140" r="5" fill="#FF8FA3" ${s}/><circle cx="168" cy="140" r="5" fill="#FF8FA3" ${s}/>`;
+    case 'bun':  return `<circle cx="100" cy="34" r="20" fill="${c}" ${s}/>`;
+    default: return '';
+  }
+}
+
+function avHairFront(p) {
+  const c = p.hairColor, s = `stroke="${AV_INK}" stroke-width="2.3" stroke-linejoin="round" stroke-linecap="round"`;
+  const hood = (extra) => `<path fill-rule="evenodd" d="M22,124 C18,48 182,48 178,124 C178,176 148,198 100,198 C52,198 22,176 22,124Z M100,64 C132,64 152,86 152,116 C152,146 130,164 100,164 C70,164 48,146 48,116 C48,86 68,64 100,64Z" fill="${c}" ${s}/>` + extra;
+  switch (p.hair) {
+    case 'short':  return `<path d="M38,112 C32,52 76,36 102,38 C140,38 168,60 162,112 C156,96 148,86 138,78 C122,90 92,92 70,80 C58,90 46,100 38,112Z" fill="${c}" ${s}/>`;
+    case 'spiky':  return `<path d="M38,112 C32,70 40,58 48,54 L46,36 L64,46 L70,26 L86,42 L100,22 L112,42 L130,26 L134,46 L154,38 L152,56 C166,66 168,90 162,112 C154,96 146,86 136,80 C118,90 84,90 66,82 C54,92 46,100 38,112Z" fill="${c}" ${s}/>`;
+    case 'bowl':   return `<path d="M36,122 C30,54 70,38 100,38 C130,38 170,54 164,122 L156,122 L156,94 C130,100 70,100 44,94 L44,122Z" fill="${c}" ${s}/>`;
+    case 'bob':    return `<path d="M36,116 C32,56 70,40 100,40 C132,40 168,56 164,116 C156,100 150,90 146,82 C120,96 88,82 74,70 C64,86 50,98 36,116Z" fill="${c}" ${s}/>`;
+    case 'long':
+    case 'twintails': return `<path d="M38,110 C34,54 68,40 100,40 C132,40 166,54 162,110 C156,100 154,96 152,88 L48,88 C46,96 44,100 38,110Z" fill="${c}" ${s}/><path d="M70,88 L74,78 M100,88 L100,76 M130,88 L126,78" ${s} fill="none" stroke-width="1.6"/>`;
+    case 'bun':    return `<path d="M38,112 C34,56 68,44 100,44 C132,44 166,56 162,112 C154,96 146,86 138,80 C120,92 82,90 62,80 C52,90 44,100 38,112Z" fill="${c}" ${s}/>`;
+    case 'hijab':  return hood(`<path d="M60,186 Q100,174 140,186" ${s} fill="none" stroke-opacity=".35"/>`);
+    case 'bear':   return `<circle cx="46" cy="58" r="20" fill="${c}" ${s}/><circle cx="154" cy="58" r="20" fill="${c}" ${s}/><circle cx="46" cy="58" r="9" fill="#F7B6C2"/><circle cx="154" cy="58" r="9" fill="#F7B6C2"/>` + hood('');
+    case 'bunny':  return `<path d="M62,70 C48,20 58,4 70,8 C84,12 84,40 80,66Z" fill="${c}" ${s}/><path d="M138,70 C152,20 142,4 130,8 C116,12 116,40 120,66Z" fill="${c}" ${s}/><path d="M66,60 C60,30 64,18 70,18 C76,20 76,40 74,60Z M134,60 C140,30 136,18 130,18 C124,20 124,40 126,60Z" fill="#F7B6C2"/>` + hood('');
+    default: return '';
+  }
+}
+
+function avFeatures(p) {
+  const s = `stroke="${AV_INK}" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" fill="none"`;
+  let out = '';
+  // blush
+  if (p.blush === 'pink') out += `<ellipse cx="64" cy="136" rx="11" ry="7" fill="#FF9EB2" opacity=".55"/><ellipse cx="136" cy="136" rx="11" ry="7" fill="#FF9EB2" opacity=".55"/>`;
+  if (p.blush === 'peach') out += `<ellipse cx="64" cy="136" rx="15" ry="10" fill="#FFB48C" opacity=".45"/><ellipse cx="136" cy="136" rx="15" ry="10" fill="#FFB48C" opacity=".45"/>`;
+  if (p.blush === 'lines') out += `<ellipse cx="64" cy="136" rx="12" ry="7" fill="#FF9EB2" opacity=".4"/><ellipse cx="136" cy="136" rx="12" ry="7" fill="#FF9EB2" opacity=".4"/><path d="M57,139 l4,-6 M63,139 l4,-6 M69,139 l4,-6 M129,139 l4,-6 M135,139 l4,-6 M141,139 l4,-6" stroke="#E46F86" stroke-width="1.6" stroke-linecap="round"/>`;
+  if (p.blush === 'freckles') out += [[58,134],[64,138],[70,133],[130,133],[136,138],[142,134]].map(([x,y]) => `<circle cx="${x}" cy="${y}" r="1.6" fill="#B07858"/>`).join('');
+  // eyes
+  out += avEye(76, 116, p, false) + avEye(124, 116, p, true);
+  if (p.eyes === 'glasses') {
+    out += `<circle cx="76" cy="116" r="21" ${s}/><circle cx="124" cy="116" r="21" ${s}/><path d="M97,114 Q100,111 103,114 M55,112 L44,108 M145,112 L156,108" ${s}/>`;
+  }
+  // brows
+  if (p.brows === 'soft')    out += `<path d="M64,94 Q76,88 88,94 M112,94 Q124,88 136,94" ${s}/>`;
+  if (p.brows === 'thick')   out += `<path d="M68,93 L84,93 M116,93 L132,93" ${s} stroke-width="5"/>`;
+  if (p.brows === 'angry')   out += `<path d="M64,90 L88,97 M136,90 L112,97" ${s} stroke-width="3"/>`;
+  if (p.brows === 'worried') out += `<path d="M64,97 L88,90 M136,97 L112,90" ${s} stroke-width="2.6"/>`;
+  // nose
+  if (p.nose === 'dot')    out += `<ellipse cx="100" cy="132" rx="2.2" ry="1.6" fill="${AV_INK}"/>`;
+  if (p.nose === 'hook')   out += `<path d="M101,126 Q106,133 99,135" ${s}/>`;
+  if (p.nose === 'button') out += `<path d="M95,133 Q100,138 105,133" ${s}/>`;
+  // mouth
+  if (p.mouth === 'smile')  out += `<path d="M92,146 Q100,153 108,146" ${s}/>`;
+  if (p.mouth === 'grin')   out += `<path d="M88,143 Q100,162 112,143Z" fill="#E66B6B" stroke="${AV_INK}" stroke-width="2.3" stroke-linejoin="round"/><path d="M92,145 L108,145" stroke="#fff" stroke-width="2.4"/>`;
+  if (p.mouth === 'o')      out += `<ellipse cx="100" cy="148" rx="4.5" ry="5.5" fill="#E66B6B" stroke="${AV_INK}" stroke-width="2.2"/>`;
+  if (p.mouth === 'cat')    out += `<path d="M90,145 Q95,151 100,145 Q105,151 110,145" ${s}/>`;
+  if (p.mouth === 'tongue') out += `<path d="M90,145 Q100,153 110,145" ${s}/><path d="M97,149 Q97,158 102,157 Q106,156 105,148" fill="#F28A9A" stroke="${AV_INK}" stroke-width="2"/>`;
+  if (p.mouth === 'flat')   out += `<path d="M94,148 L106,148" ${s}/>`;
+  return out;
+}
+
+function avatarSVG(parts, opts) {
+  const p = Object.assign({}, AV_DEFAULT, parts || {});
+  const vb = (opts && opts.viewBox) || '0 0 200 200';
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${vb}">` +
+    avHairBack(p) +
+    `<path d="${avFacePath(p.face)}" fill="${p.skin}" stroke="${AV_INK}" stroke-width="2.4" stroke-linejoin="round"/>` +
+    avFeatures(p) + avHairFront(p) + `</svg>`;
+  // later attributes override earlier ones (duplicate attrs make the SVG invalid as an <img>)
+  return svg.replace(/<([a-z]+)((?:\s+[a-z-]+="[^"]*")+)\s*(\/?)>/gi, (m, tag, attrs, sl) => {
+    const map = new Map();
+    attrs.replace(/([a-z-]+)="([^"]*)"/gi, (_, k, v) => { map.delete(k); map.set(k, v); return ''; });
+    return `<${tag}${[...map].map(([k, v]) => ` ${k}="${v}"`).join('')}${sl ? '/' : ''}>`;
+  });
+}
+function avatarDataURI(parts) {
+  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(avatarSVG(parts));
+}
+function randomAvatarParts() {
+  const pick = k => AV_OPTIONS[k][Math.floor(Math.random() * AV_OPTIONS[k].length)].v;
+  const out = {};
+  Object.keys(AV_OPTIONS).forEach(k => out[k] = pick(k));
+  return out;
+}
+
+// Mount the maker UI inside `host`; calls onChange(parts) on every edit.
+function mountAvatarMaker(host, initialParts, onChange) {
+  const parts = Object.assign({}, AV_DEFAULT, initialParts || {});
+  let tab = 'gender';
+  const CROP = { eyes: '40 82 120 64', iris: '40 82 120 64', nose: '60 100 80 60', mouth: '60 110 80 60', brows: '40 70 120 60', blush: '36 96 128 64' };
+
+  host.innerHTML = `
+    <div class="avm">
+      <div class="avm-stage">
+        <div class="avm-preview" id="avmPreview">${avatarSVG(parts)}</div>
+        <button type="button" class="avm-dice" id="avmDice" aria-label="隨機">🎲</button>
+      </div>
+      <div class="avm-tabs" id="avmTabs">
+        ${AV_TABS.map(t => `<button type="button" class="avm-tab ${t.key === tab ? 'on' : ''}" data-k="${t.key}">${t.label}</button>`).join('')}
+      </div>
+      <div class="avm-opts" id="avmOpts"></div>
+    </div>`;
+  const preview = host.querySelector('#avmPreview');
+  const optsEl = host.querySelector('#avmOpts');
+
+  function boing() {
+    preview.innerHTML = avatarSVG(parts);
+    preview.classList.remove('boing'); void preview.offsetWidth; preview.classList.add('boing');
+  }
+  function renderOpts() {
+    const def = AV_TABS.find(t => t.key === tab);
+    let html = '';
+    if (def.color) {
+      html = `<div class="avm-swatches">${AV_OPTIONS[tab].map(o => `<button type="button" class="avm-swatch ${parts[tab] === o.v ? 'on' : ''}" data-v="${o.v}" style="background:${o.v}"></button>`).join('')}</div>`;
+    } else {
+      html = `<div class="avm-grid">${AV_OPTIONS[tab].map(o => {
+        const trial = Object.assign({}, parts, { [tab]: o.v });
+        if (tab === 'gender' && parts.gender !== o.v) trial.hair = o.v === 'boy' ? 'short' : 'long';
+        return `<button type="button" class="avm-opt ${parts[tab] === o.v ? 'on' : ''}" data-v="${o.v}">
+          <span class="avm-thumb">${avatarSVG(trial, { viewBox: CROP[tab] })}</span>
+          <span class="avm-name">${o.label}</span></button>`;
+      }).join('')}</div>`;
+      if (tab === 'hair') {
+        html += `<div class="avm-sub">${['hijab','bear','bunny'].includes(parts.hair) ? '帽子／頭巾顏色' : '髮色'}</div>
+          <div class="avm-swatches">${AV_OPTIONS.hairColor.map(o => `<button type="button" class="avm-swatch ${parts.hairColor === o.v ? 'on' : ''}" data-hc="${o.v}" style="background:${o.v}"></button>`).join('')}</div>`;
+      }
+    }
+    optsEl.innerHTML = html;
+    optsEl.querySelectorAll('[data-v]').forEach(b => b.onclick = () => {
+      const v = b.dataset.v;
+      if (tab === 'gender' && parts.gender !== v) {
+        parts.hair = v === 'boy' ? 'short' : 'long';
+      }
+      parts[tab] = v;
+      update();
+    });
+    optsEl.querySelectorAll('[data-hc]').forEach(b => b.onclick = () => { parts.hairColor = b.dataset.hc; update(); });
+  }
+  function update() {
+    boing(); renderOpts();
+    onChange(Object.assign({}, parts));
+  }
+  host.querySelectorAll('.avm-tab').forEach(b => b.onclick = () => {
+    tab = b.dataset.k;
+    host.querySelectorAll('.avm-tab').forEach(x => x.classList.toggle('on', x === b));
+    renderOpts();
+    optsEl.classList.remove('swap'); void optsEl.offsetWidth; optsEl.classList.add('swap');
+  });
+  host.querySelector('#avmDice').onclick = () => {
+    Object.assign(parts, randomAvatarParts());
+    update();
+  };
+  renderOpts();
+}
+
 // ---- Kid Editor ----
 function openKidEditor(kidId) {
   const editing = kidId ? state.kids.find(k => k.id === kidId) : null;
-  const draft = editing ? {...editing} : { name:'', avatar:'🐻', color:'pink' };
+  const draft = editing ? {...editing} : { name:'', avatar: avatarDataURI(AV_DEFAULT), avatarParts: {...AV_DEFAULT}, color:'pink' };
 
   openModal(`
     <div class="modal-handle"></div>
@@ -4654,6 +5388,8 @@ function openKidEditor(kidId) {
       <div class="avatar-grid" id="avatarGrid">
         ${getAllForCategory('avatars', AVATARS).map(item => `<button class="avatar-opt ${item.value===draft.avatar?'active':''}" data-v="${escapeAttr(item.value)}">${item.type==='image' ? `<img src="${escapeAttr(item.src)}" alt="">` : item.value}</button>`).join('')}
       </div>
+      <div class="avm-head"><label class="field-label" style="margin:0">✨ 自己做頭像</label></div>
+      <div id="avatarMaker"></div>
     </div>
 
     <div class="field">
@@ -4674,6 +5410,13 @@ function openKidEditor(kidId) {
   const refreshAvatarPreview = () => {
     document.getElementById('avatarPreview').innerHTML = renderStickerHTML(draft.avatar, {size:'90%', round:true});
   };
+
+  mountAvatarMaker(document.getElementById('avatarMaker'), draft.avatarParts, parts => {
+    draft.avatarParts = parts;
+    draft.avatar = avatarDataURI(parts);
+    document.querySelectorAll('#avatarGrid .avatar-opt').forEach(x => x.classList.remove('active'));
+    refreshAvatarPreview();
+  });
 
   // Pick handlers
   document.querySelectorAll('#avatarGrid .avatar-opt').forEach(b => {
@@ -4716,11 +5459,11 @@ function openKidEditor(kidId) {
     const name = document.getElementById('kidName').value.trim();
     if (!name) { toast('請輸入名字'); return; }
     if (editing) {
-      Object.assign(editing, { name, avatar: draft.avatar, color: draft.color });
+      Object.assign(editing, { name, avatar: draft.avatar, avatarParts: draft.avatarParts, color: draft.color });
       logEvent('edit_kid', { kidId: editing.id, kidName: name });
       toast('已更新');
     } else {
-      const k = { id: uid('k'), name, avatar: draft.avatar, color: draft.color, createdAt: Date.now() };
+      const k = { id: uid('k'), name, avatar: draft.avatar, avatarParts: draft.avatarParts, color: draft.color, createdAt: Date.now() };
       state.kids.push(k);
       view.kidId = k.id;
       logEvent('create_kid', { kidId: k.id, kidName: name });
@@ -4999,31 +5742,31 @@ function openBackupModal() {
 
   openModal(`
     <div class="modal-handle"></div>
-    <div class="modal-title">💾 備份 & 還原</div>
+    <div class="modal-title modal-title-ill"><span class="title-ill">${headerIcon('backupBtn')}</span>備份 & 還原</div>
     <div class="modal-sub">資料存在這台裝置的瀏覽器裡，換瀏覽器或清除快取就需要重新匯入</div>
 
     <div style="background:var(--surface-2); border-radius:var(--r); padding:14px 16px; margin-bottom:18px;">
       <div style="font-size:13px; color:var(--ink-soft); margin-bottom:8px; font-weight:700;">目前的資料</div>
       <div style="display:flex; gap:16px; flex-wrap:wrap;">
-        <span style="font-size:13px;">👶 ${kids} 位小朋友</span>
-        <span style="font-size:13px;">📋 ${themes} 個主題</span>
-        <span style="font-size:13px;">⭐ ${stamps} 個集點</span>
+        <span class="bk-stat"><span class="btn-ill">${LIB_ICONS.avatars}</span>${kids} 位小朋友</span>
+        <span class="bk-stat"><span class="btn-ill">${LIB_ICONS.trophies}</span>${themes} 個主題</span>
+        <span class="bk-stat"><span class="btn-ill">${LIB_ICONS.stickers}</span>${stamps} 個集點</span>
         <span style="font-size:13px; color:var(--ink-faint);">${kb} KB</span>
       </div>
     </div>
 
     <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:18px;">
       <button class="btn btn-primary" id="doExport" style="justify-content:center; display:flex; align-items:center; gap:8px;">
-        📤 匯出備份檔（.json）
+        <span class="btn-ill bk-ill">${headerIcon('backupBtn')}</span>匯出備份檔（.json）
       </button>
-      <label class="btn" style="background:var(--mint-soft); color:#2C8262; justify-content:center; display:flex; align-items:center; gap:8px; cursor:pointer;">
-        📥 匯入備份檔
+      <label class="btn" style="background:var(--surface-2); color:var(--ink); justify-content:center; display:flex; align-items:center; gap:8px; cursor:pointer;">
+        <span class="btn-ill bk-ill">${LIB_ICONS.upload}</span>匯入備份檔
         <input type="file" id="importFile" accept=".json" style="display:none">
       </label>
     </div>
 
-    <div style="background:#FFF8F0; border-radius:var(--r); padding:12px 14px; font-size:12px; color:var(--ink-soft); line-height:1.6;">
-      💡 <strong>小提示：</strong>建議定期匯出備份，或換裝置/瀏覽器前先匯出，再在新瀏覽器裡匯入。照片和自訂圖庫也會一起備份。
+    <div style="background:var(--surface-2); border-radius:var(--r); padding:12px 14px; font-size:12px; color:var(--ink-soft); line-height:1.6;">
+      <strong>小提示：</strong>建議定期匯出備份，或換裝置/瀏覽器前先匯出，再在新瀏覽器裡匯入。照片和自訂圖庫也會一起備份。
     </div>
 
     <div class="modal-actions">
@@ -5132,6 +5875,123 @@ setInterval(() => {
   // Just re-render passively; status is computed in render
   if (view.tab === 'cards') render();
 }, 60000);
+
+// ============================================================
+// Brand motion · 形狀漸變 LOGO + 字塊掉落 + 點擊彩帶
+// ============================================================
+(function brandMotion() {
+  const N = 96;
+  const TAU = Math.PI * 2;
+  const superellipse = p => th => 1 / Math.pow(Math.pow(Math.abs(Math.cos(th)), p) + Math.pow(Math.abs(Math.sin(th)), p), 1 / p);
+  const poly = (m, round) => th => {
+    const seg = TAU / m;
+    const a = ((th % seg) + seg) % seg - seg / 2;
+    return Math.cos(Math.PI / m) / Math.cos(a) * (1 - round) + round * 0.78;
+  };
+  const SHAPES = [
+    th => 0.92 / Math.sqrt(Math.pow(Math.cos(th) * 0.92, 2) + Math.pow(Math.sin(th) * 1.15, 2)), // egg
+    superellipse(3.2),                                       // pillow square
+    superellipse(0.62),                                      // 4-point star
+    poly(3, 0.35),                                           // soft triangle
+    th => 0.82 + 0.18 * Math.cos(6 * th),                    // flower
+    th => 0.62 + 0.38 * Math.pow((Math.cos(5 * th) + 1) / 2, 1.6), // 5-point star
+  ];
+  const COLORS = [['#FBC444','#F26FAE'], ['#4A7FD0','#F59A5E'], ['#F26FAE','#E5453A'], ['#F59A5E','#FBC444'], ['#E5453A','#F26FAE'], ['#FBC444','#4A7FD0']];
+  const ROT = [-0.4, 0.785, 0.785, -1.57, 0, -1.57];
+  const sample = (f, rot) => {
+    const r = []; let max = 0;
+    for (let i = 0; i < N; i++) { const v = f(i / N * TAU - rot); r.push(v); if (v > max) max = v; }
+    return r.map(v => v / max);
+  };
+  const RADII = SHAPES.map((f, i) => sample(f, ROT[i]));
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+  const mix = (a, b, t) => { const A = hex(a), B = hex(b); return `rgb(${A.map((v, i) => Math.round(lerp(v, B[i], Math.max(0, Math.min(1, t))))).join(',')})`; };
+  // ease with a little overshoot → Q彈 morph
+  const backOut = t => { const c = 1.9; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); };
+  function pathFrom(r, R, spin) {
+    const pts = r.map((v, i) => { const th = i / N * TAU + spin; return [Math.cos(th) * v * R, Math.sin(th) * v * R]; });
+    let d = `M${pts[0][0].toFixed(2)},${pts[0][1].toFixed(2)}`;
+    for (let i = 0; i < N; i++) {
+      const p0 = pts[(i - 1 + N) % N], p1 = pts[i], p2 = pts[(i + 1) % N], p3 = pts[(i + 2) % N];
+      const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+      const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+      d += `C${c1[0].toFixed(2)},${c1[1].toFixed(2)} ${c2[0].toFixed(2)},${c2[1].toFixed(2)} ${p2[0].toFixed(2)},${p2[1].toFixed(2)}`;
+    }
+    return d + 'Z';
+  }
+  const HOLD = 900, MORPH = 750;
+  let start = performance.now();
+  const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function frame(now) {
+    const path = document.querySelector('#brandIcon .morph-path');
+    if (path && !document.hidden) {
+      const el = Math.max(0, now - start), cycle = HOLD + MORPH;
+      const k = Math.floor(el / cycle), local = el - k * cycle;
+      const from = k % SHAPES.length, to = (k + 1) % SHAPES.length;
+      const raw = local < HOLD ? 0 : (local - HOLD) / MORPH;
+      const t = raw === 0 ? 0 : backOut(Math.min(1, raw));
+      const r = RADII[from].map((v, i) => lerp(v, RADII[to][i], t));
+      const breathe = 1 + 0.03 * Math.sin(now / 260);
+      path.setAttribute('d', pathFrom(r, 27 * breathe, now / 4000));
+      const stops = document.querySelectorAll('#brandGrad stop');
+      if (stops.length === 2) {
+        stops[0].setAttribute('stop-color', mix(COLORS[from][0], COLORS[to][0], raw));
+        stops[1].setAttribute('stop-color', mix(COLORS[from][1], COLORS[to][1], raw));
+      }
+      const g = document.getElementById('brandGrad');
+      if (g) g.setAttribute('gradientTransform', `rotate(${(now / 30) % 360} .5 .5)`);
+    }
+    if (!reduce) requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  function dropTiles() {
+    document.querySelectorAll('.brand-tile').forEach(t => {
+      t.classList.remove('drop'); void t.offsetWidth; t.classList.add('drop');
+    });
+  }
+  dropTiles();
+  const brand = document.querySelector('.brand');
+  if (brand) brand.addEventListener('click', () => { dropTiles(); start = performance.now() - HOLD; confettiBurst(brand.querySelector('.brand-icon') || brand); });
+})();
+
+// Confetti pieces drawn in the illustration style (sparkles, dashes, arcs, rings, plus)
+function confettiBurst(el, count) {
+  if (!el) return;
+  const r = el.getBoundingClientRect();
+  const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+  const cols = ['#FBC444', '#F26FAE', '#E5453A', '#4A7FD0', '#F59A5E', '#2E5C49'];
+  const SHAPES = [
+    c => `<svg viewBox="-10 -10 20 20"><path d="M0,-10 C1.6,-1.6 1.6,-1.6 10,0 C1.6,1.6 1.6,1.6 0,10 C-1.6,1.6 -1.6,1.6 -10,0 C-1.6,-1.6 -1.6,-1.6 0,-10Z" fill="${c}"/></svg>`,
+    c => `<svg viewBox="-10 -10 20 20"><path d="M-7,0 H7" stroke="${c}" stroke-width="4" stroke-linecap="round"/></svg>`,
+    c => `<svg viewBox="-10 -10 20 20"><path d="M-7,-2 Q0,9 7,-2" stroke="${c}" stroke-width="3.6" fill="none" stroke-linecap="round"/></svg>`,
+    c => `<svg viewBox="-10 -10 20 20"><circle r="5.5" stroke="${c}" stroke-width="3.4" fill="none"/></svg>`,
+    c => `<svg viewBox="-10 -10 20 20"><path d="M0,-7 V7 M-7,0 H7" stroke="${c}" stroke-width="3.6" stroke-linecap="round"/></svg>`,
+  ];
+  const n = count || 12;
+  for (let i = 0; i < n; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'burst-piece';
+    piece.innerHTML = SHAPES[i % SHAPES.length](cols[(i * 7 + Math.floor(Math.random() * 3)) % cols.length]);
+    document.body.appendChild(piece);
+    const ang = (i / n) * Math.PI * 2 + Math.random() * 0.5;
+    const dist = 38 + Math.random() * 34;
+    const dx = Math.cos(ang) * dist, dy = Math.sin(ang) * dist;
+    const rot = (Math.random() - 0.5) * 300;
+    const size = 0.8 + Math.random() * 0.7;
+    const at = (x, y) => `translate(${cx + x - 8}px, ${cy + y - 8}px)`;
+    piece.animate([
+      { transform: `${at(0, 0)} scale(.2) rotate(0deg)`, opacity: 1 },
+      { transform: `${at(dx, dy)} scale(${size}) rotate(${rot}deg)`, opacity: 1, offset: 0.55 },
+      { transform: `${at(dx * 1.1, dy * 1.1 + 18)} scale(${size * 0.8}) rotate(${rot * 1.3}deg)`, opacity: 0 },
+    ], { duration: 760 + Math.random() * 200, easing: 'cubic-bezier(.2,.9,.3,1.1)' }).onfinish = () => piece.remove();
+  }
+}
+['libBtn', 'backupBtn'].forEach(id => {
+  const b = document.getElementById(id);
+  if (b) b.addEventListener('click', () => confettiBurst(b));
+});
 
 </script>
 </body>
