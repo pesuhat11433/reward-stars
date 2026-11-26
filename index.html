@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>集點寶貝 · 小朋友獎勵卡</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Huninn&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #FBF7F2;
@@ -2616,6 +2619,24 @@
   .cosmos .filter-chip.active { background: var(--ink) !important; color: #fff !important; border-color: var(--ink) !important; }
   .cosmos > .cosmos-content > .vault-empty .vault-empty-text { color: var(--ink-soft); }
   .history-polaroid { box-shadow: 0 3px 12px rgba(60,40,20,.12), 0 1px 3px rgba(60,40,20,.08); }
+
+  /* ===== 標題字體：粉圓 Huninn ===== */
+  :root { --font-title: "Huninn", -apple-system, "PingFang TC", "Microsoft JhengHei", sans-serif; }
+  .brand-tile, .modal-title, .empty-title, .vault-title, .vault-section-title,
+  .arc-title, .arc-kicker, .theme-title, .sticker-name-zh, .stamp-mega, .arc-confirm,
+  .big-picker-title, .trophy-detail-name, .avm-head .field-label, .vault-empty-title,
+  .vault-stat-value, .progress-text strong {
+    font-family: var(--font-title);
+    font-weight: 400 !important;
+    letter-spacing: .5px;
+  }
+  .modal-title { font-size: 24px; }
+  .empty-title { font-size: 21px; }
+  .vault-title { font-size: 27px; }
+  .arc-title { font-size: 42px; }
+  .theme-title { font-size: 19px; }
+  .stamp-mega { font-size: 32px; }
+  .brand-tile { font-size: 18px; }
 </style>
 </head>
 <body>
