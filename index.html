@@ -2689,6 +2689,16 @@
   /* full-body chibi preview */
   .avm-preview { width: 176px !important; height: 250px !important; border-radius: 28px !important; }
   .avm-preview svg { width: 100%; height: 100%; }
+
+  .avm-groups { display: flex; gap: 6px; margin: 2px 0 8px; }
+  .avm-group {
+    flex: 1; border: none; border-radius: 16px; padding: 10px 0; font-family: var(--font-title); font-size: 16px;
+    background: #fff; color: var(--ink-soft); cursor: pointer; transition: transform .4s var(--spring), background .2s, color .2s;
+  }
+  .avm-group:active { transform: scale(.9); }
+  .avm-group.on { background: var(--ink); color: #fff; }
+  .avm-tabs .avm-tab { font-size: 14px; padding: 8px 14px; }
+  .avm-tabs .avm-tab.on { background: var(--accent); color: #fff; }
 </style>
 </head>
 <body>
@@ -5439,29 +5449,6 @@ const AV_ACC_OPTS = [
 ];
 
 // ---------- 2.5D face: glossy eyes, soft lips, radial skin ----------
-function avEye(cx, cy, p, mirror) {
-  const lashC = '#2A1F1B';
-  const flick = p.gender === 'girl'
-    ? (mirror ? `<path d="M${cx + 15},${cy - 7} L${cx + 21},${cy - 12}" stroke="${lashC}" stroke-width="3" stroke-linecap="round"/>`
-              : `<path d="M${cx - 15},${cy - 7} L${cx - 21},${cy - 12}" stroke="${lashC}" stroke-width="3" stroke-linecap="round"/>`)
-    : '';
-  if (p.eyes === 'smile') {
-    return `<path d="M${cx - 12},${cy + 3} Q${cx},${cy - 10} ${cx + 12},${cy + 3}" stroke="${lashC}" stroke-width="3.4" fill="none" stroke-linecap="round"/>` + flick;
-  }
-  const dx = p.eyes === 'side' ? 4 : 0, dy = p.eyes === 'sleepy' ? 3 : 0;
-  const ix = cx + dx, iy = cy + dy, ir = p.eyes === 'sparkle' ? 13.5 : 12.5;
-  const id = (p._pfx || 'a') + 'ir';
-  let s = `<ellipse cx="${cx}" cy="${cy}" rx="16" ry="16.5" fill="url(#${(p._pfx || 'a')}scl)"/>`;
-  s += `<circle cx="${ix}" cy="${iy + 1}" r="${ir}" fill="url(#${id})"/>`;
-  s += `<circle cx="${ix}" cy="${iy + 1.5}" r="${(ir * .45).toFixed(1)}" fill="${avDark(p.iris, .65)}"/>`;
-  s += `<ellipse cx="${ix + 4.5}" cy="${iy - 4}" rx="4.6" ry="3.8" fill="#fff"/><circle cx="${ix - 4.5}" cy="${iy + 6}" r="2" fill="#fff" opacity=".85"/>`;
-  if (p.eyes === 'sparkle') s += sparkle(ix - 5, iy - 5, 4) + sparkle(ix + 6, iy + 6, 2.5);
-  if (p.eyes === 'sleepy') s += `<path d="M${cx - 17},${cy - 3} Q${cx},${cy - 9} ${cx + 17},${cy - 3} L${cx + 17},${cy - 20} L${cx - 17},${cy - 20}Z" fill="${p.skin}"/>`;
-  const lidY = p.eyes === 'sleepy' ? cy - 3 : cy - 9;
-  s += `<path d="M${cx - 17},${lidY + 4} C${cx - 10},${lidY - 4} ${cx + 10},${lidY - 4} ${cx + 17},${lidY + 3}" stroke="${lashC}" stroke-width="3.4" fill="none" stroke-linecap="round"/>`;
-  return s + flick;
-}
-
 function avFeatures(p) {
   const pf = p._pfx || 'a';
   let out = '';
@@ -5470,9 +5457,11 @@ function avFeatures(p) {
   if (p.blush === 'peach') out += `<ellipse cx="64" cy="136" rx="19" ry="13" fill="url(#${pf}blushO)"/><ellipse cx="136" cy="136" rx="19" ry="13" fill="url(#${pf}blushO)"/>`;
   if (p.blush === 'lines') out += `<path d="M58,139 l4,-6 M64,139 l4,-6 M70,139 l4,-6 M130,139 l4,-6 M136,139 l4,-6 M142,139 l4,-6" stroke="#E47A8E" stroke-width="1.6" stroke-linecap="round" opacity=".8"/>`;
   if (p.blush === 'freckles') out += `<ellipse cx="64" cy="136" rx="14" ry="9" fill="url(#${pf}blushP)" opacity=".6"/><ellipse cx="136" cy="136" rx="14" ry="9" fill="url(#${pf}blushP)" opacity=".6"/>` + [[58, 134], [64, 138], [70, 133], [130, 133], [136, 138], [142, 134]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1.5" fill="#B07858" opacity=".7"/>`).join('');
+  if (p.blush === 'hearts') out += avHeart(64, 136, 5, '#F48A9A') + avHeart(136, 136, 5, '#F48A9A');
+  if (p.blush === 'stars') out += sparkle(64, 136, 6, '#F6C244') + sparkle(136, 136, 6, '#F6C244');
   // eyes
   out += avEye(76, 116, p, false) + avEye(124, 116, p, true);
-  if (p.eyes === 'glasses') out += `<circle cx="76" cy="116" r="21" stroke="#5A4036" stroke-width="2.4" fill="#fff" fill-opacity=".08"/><circle cx="124" cy="116" r="21" stroke="#5A4036" stroke-width="2.4" fill="#fff" fill-opacity=".08"/><path d="M97,114 Q100,111 103,114" stroke="#5A4036" stroke-width="2.4" fill="none"/>`;
+  out += avGlasses(p);
   // brows (soft, tinted by hair colour)
   const bc = avDark(p.hairColor === '#F6F2EA' ? '#B9A89A' : p.hairColor, .2);
   const bs = `stroke="${bc}" stroke-linecap="round" fill="none" opacity=".8"`;
@@ -5480,6 +5469,8 @@ function avFeatures(p) {
   if (p.brows === 'thick')   out += `<path d="M68,93 L84,93 M116,93 L132,93" ${bs} stroke-width="5"/>`;
   if (p.brows === 'angry')   out += `<path d="M64,90 L88,97 M136,90 L112,97" ${bs} stroke-width="3.2"/>`;
   if (p.brows === 'worried') out += `<path d="M64,97 L88,90 M136,97 L112,90" ${bs} stroke-width="2.8"/>`;
+  if (p.brows === 'round')   out += `<ellipse cx="72" cy="92" rx="5" ry="3.4" fill="${bc}" opacity=".85"/><ellipse cx="128" cy="92" rx="5" ry="3.4" fill="${bc}" opacity=".85"/>`;
+  if (p.brows === 'raised')  out += `<path d="M64,94 Q76,89 88,94 M112,90 Q124,82 136,88" ${bs} stroke-width="2.8"/>`;
   // nose (soft shading instead of a line)
   const nose = avDark(p.skin, .12);
   if (p.nose === 'dot')    out += `<ellipse cx="100" cy="132" rx="3.4" ry="2.4" fill="${nose}"/><ellipse cx="99" cy="131" rx="1.3" ry=".9" fill="#fff" opacity=".6"/>`;
@@ -5494,6 +5485,11 @@ function avFeatures(p) {
   if (p.mouth === 'tongue') out += `<path d="M90,145 Q100,153 110,145" ${s}/><path d="M97,149 Q97,158 102,157 Q106,156 105,148" fill="#F28A9A"/>`;
   if (p.mouth === 'flat')   out += `<path d="M94,148 L106,148" ${s}/>`;
   if (p.mouth === 'pout')   out += `<path d="M91,147 C95,141 99,142 100,144 C101,142 105,141 109,147 C105,150 95,150 91,147Z" fill="#D58C90"/><path d="M91,147 C95,155 105,155 109,147 C105,150 95,150 91,147Z" fill="#C27980"/><path d="M96,151 C99,152.5 101,152.5 104,151" stroke="#fff" stroke-width="1.4" opacity=".6" fill="none" stroke-linecap="round"/>`;
+  if (p.mouth === 'teeth')  out += `<path d="M87,143 Q100,160 113,143Z" fill="url(#${pf}mouth)"/><path d="M88,143 L112,143 L110,148 C104,149 96,149 90,148Z" fill="#fff"/>`;
+  if (p.mouth === 'fang')   out += `<path d="M91,145 Q100,153 109,145" ${s}/><path d="M95,147 L97,152 L99,148Z" fill="#fff" stroke="${lipLine}" stroke-width="1"/>`;
+  if (p.mouth === 'wow')    out += `<ellipse cx="100" cy="149" rx="7" ry="9" fill="url(#${pf}mouth)"/><ellipse cx="100" cy="154" rx="4" ry="3" fill="#F28A9A"/>`;
+  if (p.mouth === 'wavy')   out += `<path d="M90,148 Q93,144 96,148 Q99,152 102,148 Q105,144 108,148" ${s}/>`;
+  if (p.mouth === 'kiss')   out += `<path d="M99,141 Q105,144 100,148 Q105,151 99,155" ${s}/>` + avHeart(116, 142, 3.4, '#F48A9A');
   return out;
 }
 
@@ -5558,8 +5554,118 @@ function avFillClothes(p) {
 let AV_SEQ = 0;
 
 
+// ---------- 眼睛拆件：眼型 / 視線 / 睫毛 / 眼神光 / 眼鏡 ----------
+AV_OPTIONS.eyes = [
+  { v: 'round', label: '圓圓眼' }, { v: 'big', label: '大大眼' }, { v: 'almond', label: '杏仁眼' },
+  { v: 'upturn', label: '上揚眼' }, { v: 'droop', label: '下垂眼' }, { v: 'small', label: '豆豆眼' },
+  { v: 'sleepy', label: '想睡眼' }, { v: 'smile', label: '笑瞇瞇' },
+];
+AV_OPTIONS.gaze = [
+  { v: 'center', label: '看前面' }, { v: 'left', label: '看左邊' }, { v: 'right', label: '看右邊' }, { v: 'up', label: '看上面' }, { v: 'down', label: '看下面' },
+];
+AV_OPTIONS.lashes = [
+  { v: 'none', label: '沒有' }, { v: 'short', label: '短睫毛' }, { v: 'flick', label: '眼尾上翹' },
+  { v: 'long', label: '長睫毛' }, { v: 'bottom', label: '下睫毛' }, { v: 'full', label: '上下都有' },
+];
+AV_OPTIONS.shine = [
+  { v: 'classic', label: '圓點光' }, { v: 'sparkle', label: '星星光' }, { v: 'heart', label: '愛心光' }, { v: 'big', label: '大反光' }, { v: 'none', label: '沒有' },
+];
+AV_OPTIONS.glasses = [
+  { v: 'none', label: '沒有' }, { v: 'round', label: '圓眼鏡' }, { v: 'square', label: '方眼鏡' }, { v: 'sun', label: '太陽眼鏡' }, { v: 'star', label: '星星眼鏡' },
+];
+AV_OPTIONS.mouth.push(
+  { v: 'teeth', label: '露齒笑' }, { v: 'fang', label: '小虎牙' }, { v: 'wow', label: '哇！' }, { v: 'wavy', label: '波浪嘴' }, { v: 'kiss', label: '親親' },
+);
+AV_OPTIONS.brows.push({ v: 'round', label: '圓圓眉' }, { v: 'raised', label: '挑眉' });
+AV_OPTIONS.blush.push({ v: 'hearts', label: '愛心' }, { v: 'stars', label: '星星' });
+Object.assign(AV_DEFAULT, { gaze: 'center', lashes: 'flick', shine: 'classic', glasses: 'none' });
+AV_TABS.find(t => t.key === 'eyes').label = '眼型';
+AV_TABS.push({ key: 'gaze', label: '視線' }, { key: 'lashes', label: '睫毛' }, { key: 'shine', label: '眼神光' }, { key: 'glasses', label: '眼鏡' });
+const AV_GROUPS = [
+  { label: '身體', tabs: ['gender', 'face', 'skin'] },
+  { label: '頭髮', tabs: ['hair'] },
+  { label: '眼睛', tabs: ['eyes', 'gaze', 'lashes', 'shine', 'iris', 'glasses'] },
+  { label: '五官', tabs: ['brows', 'nose', 'mouth', 'blush'] },
+  { label: '服裝', tabs: ['top', 'bottom', 'shoes', 'back', 'acc'] },
+];
+
+// Older saved avatars used combined eye presets; map them onto the new parts.
+function avNormalizeFace(p) {
+  if (p.eyes === 'side') { p.eyes = 'round'; if (!p.gaze || p.gaze === 'center') p.gaze = 'right'; }
+  if (p.eyes === 'sparkle') { p.eyes = 'round'; p.shine = 'sparkle'; }
+  if (p.eyes === 'glasses') { p.eyes = 'round'; if (!p.glasses || p.glasses === 'none') p.glasses = 'round'; }
+  if (!p.lashes) p.lashes = p.gender === 'boy' ? 'short' : 'flick';
+  return p;
+}
+
+function avHeart(x, y, r, c) {
+  return `<path d="M${x},${y + r} C${x - r * 1.4},${y} ${x - r},${y - r * 1.1} ${x},${y - r * .35} C${x + r},${y - r * 1.1} ${x + r * 1.4},${y} ${x},${y + r}Z" fill="${c}"/>`;
+}
+
+function avEye(cx, cy, p, mirror) {
+  const lashC = '#2A1F1B', pf = p._pfx || 'a';
+  const outer = mirror ? 1 : -1;                       // which side is the outer corner
+  const [gx, gy] = ({ center: [0, 0], left: [-4, 0], right: [4, 0], up: [0, -3], down: [0, 3] })[p.gaze] || [0, 0];
+  const hasFlick = ['flick', 'long', 'full'].includes(p.lashes);
+  const flick = (x, y) => hasFlick ? `<path d="M${x},${y} l${outer * 6},-5" stroke="${lashC}" stroke-width="3" stroke-linecap="round"/>` : '';
+
+  if (p.eyes === 'smile') {
+    return `<path d="M${cx - 12},${cy + 3} Q${cx},${cy - 10} ${cx + 12},${cy + 3}" stroke="${lashC}" stroke-width="3.4" fill="none" stroke-linecap="round"/>` + flick(cx + outer * 12, cy + 2);
+  }
+  if (p.eyes === 'small') {
+    const x = cx + gx * .6, y = cy + 2 + gy * .6;
+    return `<ellipse cx="${x}" cy="${y}" rx="5.5" ry="7" fill="${avDark(p.iris, .55)}"/>` +
+      (p.shine === 'none' ? '' : `<circle cx="${x + 1.8}" cy="${y - 2.6}" r="1.8" fill="#fff"/>`) + flick(cx + outer * 7, cy - 4);
+  }
+  const S = ({ round: [16, 16.5, 12.5, 0], big: [18.5, 19.5, 15.5, 0], almond: [18, 12.5, 11, 0], upturn: [18, 12.5, 11, 12], droop: [18, 13, 11, -10], sleepy: [16, 16.5, 12.5, 0] })[p.eyes] || [16, 16.5, 12.5, 0];
+  const [rx, ry, ir, tiltDeg] = S;
+  const tilt = tiltDeg * (mirror ? -1 : 1);
+  const ix = cx + gx, iy = cy + gy;
+  const cid = `${pf}ec${mirror ? 1 : 0}`;
+  let s = `<clipPath id="${cid}"><ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}"/></clipPath>`;
+  s += `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="url(#${pf}scl)"/>`;
+  s += `<g clip-path="url(#${cid})">`;
+  s += `<circle cx="${ix}" cy="${iy + 1}" r="${ir}" fill="url(#${pf}ir)"/>`;
+  s += `<circle cx="${ix}" cy="${iy + 1.5}" r="${(ir * .45).toFixed(1)}" fill="${avDark(p.iris, .65)}"/>`;
+  const hx = ix + ir * .36, hy = iy - ir * .3;
+  if (p.shine === 'classic') s += `<ellipse cx="${hx}" cy="${hy}" rx="${(ir * .37).toFixed(1)}" ry="${(ir * .3).toFixed(1)}" fill="#fff"/><circle cx="${ix - ir * .36}" cy="${iy + ir * .48}" r="${(ir * .16).toFixed(1)}" fill="#fff" opacity=".85"/>`;
+  if (p.shine === 'sparkle') s += sparkle(ix - ir * .38, iy - ir * .38, ir * .34) + sparkle(ix + ir * .45, iy + ir * .45, ir * .22) + `<circle cx="${hx}" cy="${hy}" r="${(ir * .16).toFixed(1)}" fill="#fff"/>`;
+  if (p.shine === 'heart') s += avHeart(hx - 1, hy + 1, ir * .32, '#fff') + `<circle cx="${ix - ir * .4}" cy="${iy + ir * .48}" r="${(ir * .14).toFixed(1)}" fill="#fff" opacity=".85"/>`;
+  if (p.shine === 'big') s += `<ellipse cx="${ix + ir * .15}" cy="${iy - ir * .2}" rx="${(ir * .62).toFixed(1)}" ry="${(ir * .42).toFixed(1)}" fill="#fff" opacity=".85" transform="rotate(-25 ${ix} ${iy})"/>`;
+  if (p.eyes === 'sleepy') s += `<rect x="${cx - rx - 2}" y="${cy - ry - 2}" width="${rx * 2 + 4}" height="${ry + 1}" fill="${p.skin}"/>`;
+  s += `</g>`;
+  // upper lash line follows the top of the eye
+  const top = p.eyes === 'sleepy' ? cy - 1 : cy - ry * .78;
+  const lw = p.lashes === 'none' ? 1.8 : (p.lashes === 'short' ? 2.8 : 3.4);
+  const lc = p.lashes === 'none' ? avDark(p.skin, .45) : lashC;
+  s += `<path d="M${cx - rx - .5},${top + ry * .45} C${cx - rx * .6},${top - ry * .25} ${cx + rx * .6},${top - ry * .25} ${cx + rx + .5},${top + ry * .4}" stroke="${lc}" stroke-width="${lw}" fill="none" stroke-linecap="round"/>`;
+  const ox = cx + outer * rx;
+  if (hasFlick) s += `<path d="M${ox},${top + ry * .4} l${outer * 6},-6" stroke="${lashC}" stroke-width="3" stroke-linecap="round"/>`;
+  if (p.lashes === 'long' || p.lashes === 'full') {
+    s += [.15, .45, .75].map(k => { const x = cx + outer * rx * k, y = top - ry * .12 + ry * .1 * k; return `<path d="M${x},${y} l${outer * 3},-6" stroke="${lashC}" stroke-width="2" stroke-linecap="round"/>`; }).join('');
+  }
+  if (p.lashes === 'bottom' || p.lashes === 'full') {
+    s += [.35, .65, .9].map(k => { const x = cx + outer * rx * k, y = cy + ry * .82 - ry * .2 * k; return `<path d="M${x},${y} l${outer * 2.4},4" stroke="${lashC}" stroke-width="1.7" stroke-linecap="round"/>`; }).join('');
+  }
+  return tilt ? `<g transform="rotate(${tilt} ${cx} ${cy})">${s}</g>` : s;
+}
+
+function avGlasses(p) {
+  const fr = p.glasses === 'sun' ? '#2B2622' : p.glasses === 'star' ? '#F26FAE' : '#5A4036';
+  const lens = p.glasses === 'sun' ? `fill="#2B2622" fill-opacity=".82"` : `fill="#fff" fill-opacity=".1"`;
+  const bridge = `<path d="M97,114 Q100,110 103,114" stroke="${fr}" stroke-width="2.6" fill="none"/><path d="M55,112 L44,108 M145,112 L156,108" stroke="${fr}" stroke-width="2.6" stroke-linecap="round"/>`;
+  if (p.glasses === 'round' || p.glasses === 'sun') return `<circle cx="76" cy="116" r="21" stroke="${fr}" stroke-width="2.6" ${lens}/><circle cx="124" cy="116" r="21" stroke="${fr}" stroke-width="2.6" ${lens}/>` + bridge +
+    (p.glasses === 'sun' ? `<path d="M64,106 L72,100 M112,106 L120,100" stroke="#fff" stroke-width="2.4" stroke-linecap="round" opacity=".7"/>` : '');
+  if (p.glasses === 'square') return `<rect x="55" y="99" width="42" height="33" rx="8" stroke="${fr}" stroke-width="2.6" ${lens}/><rect x="103" y="99" width="42" height="33" rx="8" stroke="${fr}" stroke-width="2.6" ${lens}/>` + bridge;
+  if (p.glasses === 'star') {
+    const star = (x, y) => { let d = ''; for (let i = 0; i < 10; i++) { const a = (i * 36 - 90) * Math.PI / 180, r = i % 2 ? 11 : 24; d += (i ? 'L' : 'M') + (x + Math.cos(a) * r).toFixed(1) + ',' + (y + Math.sin(a) * r).toFixed(1); } return `<path d="${d}Z" stroke="${fr}" stroke-width="2.6" stroke-linejoin="round" ${lens}/>`; };
+    return star(76, 117) + star(124, 117) + bridge;
+  }
+  return '';
+}
+
 function avatarSVG(parts, opts) {
-  const p = avFillClothes(Object.assign({}, AV_DEFAULT, parts || {}));
+  const p = avNormalizeFace(avFillClothes(Object.assign({}, AV_DEFAULT, parts || {})));
   p._pfx = 'av' + (++AV_SEQ) + '_';
   // hats sit flat on the head: tall hairstyles would poke through them
   const hat = ['fire', 'police', 'pirate', 'chef', 'conductor', 'dino'].includes(p.acc);
@@ -5595,6 +5701,8 @@ function randomAvatarParts() {
   out.topColor = col(); out.bottomColor = col(); out.shoeColor = col(); out.backColor = col();
   if (Math.random() < 0.6) out.back = 'none';
   if (Math.random() < 0.5) out.acc = 'none';
+  if (Math.random() < 0.8) out.glasses = 'none';
+  if (Math.random() < 0.6) out.gaze = 'center';
   return out;
 }
 
@@ -5603,7 +5711,7 @@ function mountAvatarMaker(host, initialParts, onChange) {
   const parts = Object.assign({}, AV_DEFAULT, initialParts || {});
   avFillClothes(parts);
   let tab = 'gender';
-  const CROP = { gender: AV_FULL_VIEWBOX, top: '44 150 112 74', bottom: '34 196 132 90', shoes: '60 230 80 50', back: '14 140 172 144', acc: '10 -6 180 150', hair: '0 0 200 240', eyes: '40 82 120 64', iris: '40 82 120 64', nose: '60 100 80 60', mouth: '60 110 80 60', brows: '40 70 120 60', blush: '36 96 128 64' };
+  const CROP = { gaze: '40 82 120 64', lashes: '40 82 120 64', shine: '50 92 52 44', glasses: '34 80 132 72', gender: AV_FULL_VIEWBOX, top: '44 150 112 74', bottom: '34 196 132 90', shoes: '60 230 80 50', back: '14 140 172 144', acc: '10 -6 180 150', hair: '0 0 200 240', eyes: '40 82 120 64', iris: '40 82 120 64', nose: '60 100 80 60', mouth: '60 110 80 60', brows: '40 70 120 60', blush: '36 96 128 64' };
 
   host.innerHTML = `
     <div class="avm">
@@ -5611,9 +5719,10 @@ function mountAvatarMaker(host, initialParts, onChange) {
         <div class="avm-preview" id="avmPreview">${avatarSVG(parts, { viewBox: AV_FULL_VIEWBOX })}</div>
         <button type="button" class="avm-dice" id="avmDice" aria-label="隨機">🎲</button>
       </div>
-      <div class="avm-tabs" id="avmTabs">
-        ${AV_TABS.map(t => `<button type="button" class="avm-tab ${t.key === tab ? 'on' : ''}" data-k="${t.key}">${t.label}</button>`).join('')}
+      <div class="avm-groups" id="avmGroups">
+        ${AV_GROUPS.map((g, i) => `<button type="button" class="avm-group ${i === 0 ? 'on' : ''}" data-g="${i}">${g.label}</button>`).join('')}
       </div>
+      <div class="avm-tabs" id="avmTabs"></div>
       <div class="avm-opts" id="avmOpts"></div>
     </div>`;
   const preview = host.querySelector('#avmPreview');
@@ -5633,7 +5742,7 @@ function mountAvatarMaker(host, initialParts, onChange) {
       const pieceDefs = { top: TOPS, bottom: BOTTOMS, shoes: SHOES, back: BACKS };
       html = `<div class="avm-grid">${list.map(o => {
         const trial = Object.assign({}, parts, { [tab]: o.v });
-        if (tab === 'gender' && parts.gender !== o.v) Object.assign(trial, AV_CLOTH_DEFAULTS[o.v], { hair: o.v === 'boy' ? 'short' : 'long' });
+        if (tab === 'gender' && parts.gender !== o.v) Object.assign(trial, AV_CLOTH_DEFAULTS[o.v], { hair: o.v === 'boy' ? 'short' : 'long', lashes: o.v === 'boy' ? 'short' : 'flick' });
         // a new piece shows in its own default colour until the kid picks another
         if (def.colorKey && parts[tab] !== o.v && pieceDefs[tab][o.v].def) trial[def.colorKey] = pieceDefs[tab][o.v].def;
         return `<button type="button" class="avm-opt ${parts[tab] === o.v ? 'on' : ''}" data-v="${o.v}">
@@ -5654,6 +5763,7 @@ function mountAvatarMaker(host, initialParts, onChange) {
       const v = b.dataset.v;
       if (tab === 'gender' && parts.gender !== v) {
         parts.hair = v === 'boy' ? 'short' : 'long';
+        parts.lashes = v === 'boy' ? 'short' : 'flick';
         Object.assign(parts, AV_CLOTH_DEFAULTS[v]);
       }
       if (def.colorKey && parts[tab] !== v) {
@@ -5670,17 +5780,29 @@ function mountAvatarMaker(host, initialParts, onChange) {
     boing(); renderOpts();
     onChange(Object.assign({}, parts));
   }
-  host.querySelectorAll('.avm-tab').forEach(b => b.onclick = () => {
-    tab = b.dataset.k;
-    host.querySelectorAll('.avm-tab').forEach(x => x.classList.toggle('on', x === b));
+  const tabsEl = host.querySelector('#avmTabs');
+  function selectTab(k) {
+    tab = k;
+    tabsEl.querySelectorAll('.avm-tab').forEach(x => x.classList.toggle('on', x.dataset.k === k));
     renderOpts();
     optsEl.classList.remove('swap'); void optsEl.offsetWidth; optsEl.classList.add('swap');
+  }
+  function renderTabs(gi) {
+    const g = AV_GROUPS[gi];
+    tabsEl.innerHTML = g.tabs.map(k => `<button type="button" class="avm-tab" data-k="${k}">${AV_TABS.find(t => t.key === k).label}</button>`).join('');
+    tabsEl.style.display = g.tabs.length > 1 ? '' : 'none';
+    tabsEl.querySelectorAll('.avm-tab').forEach(b => b.onclick = () => selectTab(b.dataset.k));
+    selectTab(g.tabs[0]);
+  }
+  host.querySelectorAll('.avm-group').forEach(b => b.onclick = () => {
+    host.querySelectorAll('.avm-group').forEach(x => x.classList.toggle('on', x === b));
+    renderTabs(+b.dataset.g);
   });
   host.querySelector('#avmDice').onclick = () => {
     Object.assign(parts, randomAvatarParts());
     update();
   };
-  renderOpts();
+  renderTabs(0);
 }
 
 // ---- Kid Editor ----
